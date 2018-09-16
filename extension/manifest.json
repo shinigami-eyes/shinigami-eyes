@@ -1,0 +1,50 @@
+{
+    "manifest_version": 2,
+    "name": "Shinigami Eyes",
+    "author": "Shinigami Eyes",
+    "version": "1.0",
+    "description": "Highlights transphobic/anti-LGBT and trans-friendly subreddits/users/facebook pages/groups with different colors.",
+    "icons": {
+        "48": "icons/icon-48.png"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "*://*.facebook.com/*",
+                "*://*.youtube.com/*",
+                "*://*.reddit.com/*",
+                "*://*.twitter.com/*"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "css": [
+                "content.css"
+            ]
+        }
+    ],
+    "web_accessible_resources": [
+        "data/transphobic.dat",
+        "data/t-friendly.dat"
+    ],
+    "background": {
+        "scripts": [
+            "background.js",
+            "bloomfilter.js"
+        ]
+    },
+    "options_ui": {
+        "page": "help.html",
+        "open_in_tab": true
+    },
+    "permissions": [
+        "contextMenus",
+        "storage"
+    ],
+    "applications": {
+        "gecko": {
+            "id": "shinigamieyes@shinigamieyes",
+            "strict_min_version": "60.0"
+        }
+    }
+}
