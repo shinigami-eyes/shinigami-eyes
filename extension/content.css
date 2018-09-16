@@ -1,0 +1,6 @@
+.assigned-label-transphobic { color: #991515 !important; }
+.assigned-label-t-friendly { color: #77B91E !important; }
+.assigned-label-bad { color: #A87200 !important; }
+.assigned-label-good { color: #014E0B !important; }
+
+.has-assigned-label * { color: inherit !important; }
