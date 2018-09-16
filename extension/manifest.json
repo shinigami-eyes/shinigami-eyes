@@ -3,6 +3,7 @@
     "name": "Shinigami Eyes",
     "author": "Shinigami Eyes",
     "version": "1.0",
+    "homepage_url": "https://github.com/shinigami-eyes/shinigami-eyes",
     "description": "Highlights transphobic/anti-LGBT and trans-friendly subreddits/users/facebook pages/groups with different colors.",
     "icons": {
         "48": "icons/icon-48.png"
