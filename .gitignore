@@ -2,3 +2,7 @@
 *.crx
 *.pem
 
+.vs/ProjectSettings.json
+.vs/VSWorkspaceState.json
+slnx.sqlite
+*.suo
