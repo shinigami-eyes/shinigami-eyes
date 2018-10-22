@@ -19,7 +19,7 @@ if (hostname == 'reddit.com') {
 }
 if (hostname == 'facebook.com') {
     var m = document.querySelector("[id^='profile_pic_header_']")
-    if (m) myself = 'facebook.com/' + m.id.match(/header_(\d+)/)[1];
+    if (m) myself = 'facebook.com/' + captureRegex(m.id, /header_(\d+)/);
 }
 if (hostname == 'twitter.com') {
     myself = document.querySelector('.DashUserDropdown-userInfo a');
@@ -153,22 +153,29 @@ function takeFirstPathComponents(/** @type {string}*/path, /** @type {number}*/n
     return '/' + m.join('/');
 }
 
+function captureRegex(str, regex){
+    if(!str) return null;
+    var match = str.match(regex);
+    if(match && match[1]) return match[1];
+    return null;
+}
+
 function getCurrentFacebookPageId() {
 
     // page
     var elem = document.querySelector("a[rel=theater][aria-label='Profile picture']");
     if (elem) {
-        var p = elem.href.match(/facebook\.com\/(\d+)/)
-        if (p) return p[1];
+        var p = captureRegex(elem.href, /facebook\.com\/(\d+)/)
+        if (p) return p;
     }
 
     // page (does not work if page is loaded directly)
     elem = document.querySelector("[ajaxify^='/page_likers_and_visitors_dialog']")
-    if (elem) return elem.getAttribute('ajaxify').match(/\/(\d+)\//)[1];
+    if (elem) return captureRegex(elem.getAttribute('ajaxify'), /\/(\d+)\//);
 
     // group
     elem = document.querySelector("[id^='headerAction_']");
-    if (elem) return elem.id.match(/_(\d+)/)[1];
+    if (elem) return captureRegex(elem.id, /_(\d+)/);
 
     // profile
     elem = document.querySelector('#pagelet_timeline_main_column');
@@ -177,6 +184,15 @@ function getCurrentFacebookPageId() {
 }
 
 function getIdentifier(urlstr) {
+    try{
+        return getIdentifierInternal(urlstr);
+    }catch(e){
+        console.warning("Unable to get identifier for " + urlstr);
+        return null;
+    }
+}
+
+function getIdentifierInternal(urlstr) {
     if (!urlstr) return null;
 
     if (hostname == 'facebook.com') {
@@ -190,7 +206,7 @@ function getIdentifier(urlstr) {
         if (urlstr.dataset) {
             var hovercard = urlstr.dataset.hovercard;
             if (hovercard) {
-                var id = hovercard.match(/id=(\d+)/)[1];
+                var id = captureRegex(hovercard, /id=(\d+)/);
                 if (id)
                     return 'facebook.com/' + id;
             }
@@ -244,9 +260,9 @@ function getIdentifier(urlstr) {
 
     var host = url.hostname;
     if (isHostedOn(host, 'web.archive.org')) {
-        var match = url.href.match(/\/web\/\w+\/(.*)/);
+        var match = captureRegex(url.href, /\/web\/\w+\/(.*)/);
         if (!match) return null;
-        url = new URL('http://' + match[1]);
+        url = new URL('http://' + match);
         host = url.hostname;
     }
     if (host.startsWith('www.')) host = host.substring(4);
@@ -266,7 +282,8 @@ function getIdentifier(urlstr) {
         return 'youtube.com' + takeFirstPathComponents(url.pathname, 2);
     }
     if (host.indexOf('.blogspot.') != -1) {
-        return host.match(/([a-zA-Z0-9\-]*)\.blogspot/)[1].toLowerCase() + '.blogspot.com';
+        var m = captureRegex(host, /([a-zA-Z0-9\-]*)\.blogspot/);
+        if(m) return m.toLowerCase() + '.blogspot.com';
     }
 
     var id = host;
