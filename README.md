@@ -36,13 +36,17 @@ The purpose of this extension is to make transgender people feel more confident 
 We try to be conservative when marking a page one way or the other. Do not flag unless you're reasonably confident about your decision.
 ### Not enough to mark as anti-trans
 Being a conservative, a [SWERF](https://rationalwiki.org/wiki/Trans-exclusionary_radical_feminism#Sex_worker-exclusionary_radical_feminism), a bad or mediocre ally, [ace](https://rationalwiki.org/wiki/Asexuality)-phobic, supporting "free speech" and "both sides".
+
 ![Examples](https://raw.githubusercontent.com/shinigami-eyes/shinigami-eyes/master/images/example-not-anti-trans.png)
 ### Mark as anti-trans
 "Protecting womyn's spaces", alt-right transphobia, strong [transmedicalism](https://rationalwiki.org/wiki/Transgender_glossary#Truscum) and [enby](https://rationalwiki.org/wiki/Non-binary_gender)-phobia.
+
 ![Examples](https://raw.githubusercontent.com/shinigami-eyes/shinigami-eyes/master/images/example-anti-trans.png)
 ### Not enough to mark as trans-friendly
 Being transgender, having some decent minimum standard like "hurting people = bad", or supporting the overall LGBT community.
+
 ![Examples](https://raw.githubusercontent.com/shinigami-eyes/shinigami-eyes/master/images/example-not-trans-friendly.png)
 ### Mark as trans-friendly
 Openly supporting the transgender community or calling out transphobia.
+
 ![Examples](https://raw.githubusercontent.com/shinigami-eyes/shinigami-eyes/master/images/example-trans-friendly.png)
