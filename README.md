@@ -18,7 +18,7 @@ The initial version has been created through a mix of manual labeling and machin
 No, the check is done offline, on your computer.
 
 ## Which criteria is used to determine the label?
-This extension is focused on anti-trans (including anti-nonbinary) sentiment, of all flavors: radfem/terf, religious, alt-right etc. (although most of the data is about the first group).
+This extension is focused on anti-trans (including anti-nonbinary) sentiment, of all flavors: radfem/terf, religious, alt-right etc. (although most of the data is about the first group). See below for more details.
 
 ## I think a page is labeled incorrectly
 Right click its link, `Shinigami Eyes` -> `Mark as (whatever is appropriate)`. Your contribution will help us improve this extension.
@@ -33,6 +33,12 @@ As a transgender person, I got used to be distrustful towards people. While gues
 The purpose of this extension is to make transgender people feel more confident towards people, groups, and pages they can trust, and to highlight possible interactions with the transphobic ones (when this is not already evident, such as when discussing about common LGBT or feminist goals).
 
 ## Instructions on how to label
-We try to be conservative when marking a page one way or the other. Do not flag unless you're very confident this is the correct label.
+We try to be conservative when marking a page one way or the other. Do not flag unless you're reasonably confident about your decision.
 ### Do not mark as anti-trans
-![Screenshot](https://raw.githubusercontent.com/shinigami-eyes/shinigami-eyes/master/images/example-not-anti-trans.png)
+![Examples](https://raw.githubusercontent.com/shinigami-eyes/shinigami-eyes/master/images/example-not-anti-trans.png)
+### Do mark as anti-trans
+![Examples](https://raw.githubusercontent.com/shinigami-eyes/shinigami-eyes/master/images/example-anti-trans.png)
+### Do not mark as trans-friendly
+![Examples](https://raw.githubusercontent.com/shinigami-eyes/shinigami-eyes/master/images/example-not-trans-friendly.png)
+### Do mark as trans-friendly
+![Examples](https://raw.githubusercontent.com/shinigami-eyes/shinigami-eyes/master/images/example-trans-friendly.png)
