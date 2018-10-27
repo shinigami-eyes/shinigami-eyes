@@ -44,19 +44,20 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     var response = {};
     var transphobic = message.myself && bloomFilters.filter(x => x.name == 'transphobic')[0].test(message.myself);
     for (var id of message.ids) {
-        if(transphobic){
-            if(id == message.myself) continue;
+        if (overrides[id] !== undefined) {
+            response[id] = overrides[id];
+            continue;
+        }
+        if (transphobic) {
+            if (id == message.myself) continue;
             var sum = 0;
             for(var i = 0; i < id.length; i++){
                 sum += id.charCodeAt(i);
             }
             if(sum % 8 != 0) continue;
         }
-        if (overrides[id] !== undefined) response[id] = overrides[id]
-        else {
-            for (var bloomFilter of bloomFilters) {
-                if (bloomFilter.test(id)) response[id] = bloomFilter.name;
-            }
+        for (var bloomFilter of bloomFilters) {
+            if (bloomFilter.test(id)) response[id] = bloomFilter.name;
         }
     }
     sendResponse(response);
