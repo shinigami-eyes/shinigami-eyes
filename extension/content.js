@@ -324,6 +324,14 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     })
     snippets = snippets.filter((item, pos) => item && snippets.indexOf(item) == pos);
     message.identifier = identifier;
-    message.snippets = snippets.filter((item, pos) => pos <= 10).map(x => x.outerHTML);
+    message.snippets = snippets.filter((item, pos) => pos <= 10).map(x => {
+        var html = x.outerHTML;
+        if(html){
+            html = html
+                .replace(/ alt=""/g, '')
+                .replace(/__xts__%5B0%5D[\w\.\-]*/g, '__xts__')
+        }
+        return html;
+    });
     sendResponse(message);
 })
