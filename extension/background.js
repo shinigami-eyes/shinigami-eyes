@@ -11,6 +11,8 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     if(!v.installationId){
         installationId = (Math.random()+ '.' +Math.random() + '.' +Math.random()).replace(/\./g, '');
         browser.storage.local.set({installationId: installationId});
+    }else{
+        installationId = v.installationId;
     }
 })
 
