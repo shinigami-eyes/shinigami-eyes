@@ -91,10 +91,42 @@ createContextMenu('Help', 'help');
 
 var uncommittedResponse = null;
 
+function submitPendingRatings(){
+    var submitted = overrides[PENDING_SUBMISSIONS].map(x => x);
+    var requestBody ={
+         installationId: installationId,
+         entries: submitted
+    }
+    console.log('Sending request');
+    fetch('https://shinigami-eyes.azurewebsites.net/api/submit', {
+        body: JSON.stringify(requestBody),
+        method: 'POST',
+         credentials: 'omit',
+    }).then(response => {
+        response.text().then(result => {
+            console.log('Response: ' + result);
+            if(result == 'SUCCESS'){
+                overrides[PENDING_SUBMISSIONS] = overrides[PENDING_SUBMISSIONS].filter(x => submitted.indexOf(x) == -1);
+                browser.storage.local.set({overrides: overrides});
+            }
+        })
+        
+    });
+}
+
+
+var PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
+
 function saveLabel(response){
     if(accepted){
+        if(!overrides[PENDING_SUBMISSIONS]){
+            overrides[PENDING_SUBMISSIONS] = Object.getOwnPropertyNames(overrides)
+                .map(x => { return { identifier: x, label: overrides[x] }});
+        }
         overrides[response.identifier] = response.mark;
-        browser.storage.local.set({overrides: overrides})
+        browser.storage.local.set({overrides: overrides});
+        overrides[PENDING_SUBMISSIONS].push(response);
+        submitPendingRatings();
         //console.log(response);
         browser.tabs.sendMessage(response.tabId, { updateAllLabels: true });
         //browser.tabs.executeScript(response.tabId, {code: 'updateAllLabels()'});

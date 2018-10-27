@@ -40,7 +40,8 @@
     },
     "permissions": [
         "contextMenus",
-        "storage"
+        "storage",
+        "*://shinigami-eyes.azurewebsites.net/*"
     ],
     "applications": {
         "gecko": {
