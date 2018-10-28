@@ -53,4 +53,3 @@ Being transgender, having some decent minimum standard like "hurting people = ba
 Openly supporting the transgender community or calling out transphobia.
 
 ![Examples](https://raw.githubusercontent.com/shinigami-eyes/shinigami-eyes/master/images/example-trans-friendly.png)
-
