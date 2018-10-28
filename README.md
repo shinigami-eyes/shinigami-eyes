@@ -27,6 +27,9 @@ Right click its link, `Shinigami Eyes` -> `Mark as (whatever is appropriate)`. Y
 While the data is stored locally on your computer, it's represented as a [bloom filter](https://en.wikipedia.org/wiki/Bloom_filter). It's a data structure that "remembers" whether it contains something or not, but that is unable to explicitely list what it contains.
 It's susceptible to false positives, but there should be very few of them.
 
+## What's the origin of this extension's name?
+In the [Death Note](https://en.wikipedia.org/wiki/Death_Note) manga/anime, "having the shinigami eyes" means being able to see people's names and remaining lifespan just by looking at them. In a similar way, this extension allows you to see a person's trans acceptance orientation just by looking at them.
+
 ## Why did you create this extension?
 As a transgender person, I got used to be distrustful towards people. While guessing the attitudes of an openly [conservative](https://rationalwiki.org/wiki/Pope_Francis#On_gender.2C_sex_and_sexuality) group or person towards transgender people is easy, this is much more difficult when you deal with communities that tend to be moderately progressive or with intersectional interests, such as the [feminist](https://rationalwiki.org/wiki/Trans-exclusionary_radical_feminism) community, the [lesbian](https://www.pinknews.co.uk/2018/07/07/anti-trans-group-allowed-to-lead-pride-in-london-march-after-hijack/) community, women's associations and the [atheist](https://the-orbit.net/zinniajones/2014/05/atheist-transphobia-superstition-over-science/) community.
 
