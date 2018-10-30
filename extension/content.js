@@ -25,6 +25,10 @@ if (hostname == 'twitter.com') {
     myself = document.querySelector('.DashUserDropdown-userInfo a');
 }
 
+if (isHostedOn(hostname, 'youtube.com')) {
+    setInterval(updateYouTubeChannelHeader, 300);
+}
+
 if (myself && (myself.href || myself.startsWith('http:') || myself.startsWith('https:')))
     myself = getIdentifier(myself);
 //console.log('Myself: ' + myself)
@@ -59,6 +63,38 @@ function init() {
 
 
 
+}
+
+
+var lastAppliedYouTubeUrl = null;
+var lastAppliedYouTubeTitle = null;
+
+function updateYouTubeChannelHeader(){
+    var url = window.location.href;
+    var title = document.getElementById('channel-title');
+    var currentTitle = title ? title.textContent : null;
+
+    if(url == lastAppliedYouTubeUrl && currentTitle == lastAppliedYouTubeTitle) return;
+    lastAppliedYouTubeUrl = url;
+    lastAppliedYouTubeTitle = currentTitle;
+    
+    if(currentTitle) {
+        var replacement = document.getElementById('channel-title-replacement');
+        if(!replacement) {
+            replacement = document.createElement('A');
+            replacement.id = 'channel-title-replacement'
+            replacement.className = title.className;
+            title.parentNode.insertBefore(replacement, title.nextSibling);
+            title.style.display = 'none';
+            replacement.style.fontSize = '2.4rem';
+            replacement.style.fontWeight = '400';
+            replacement.style.lineHeight = '3rem';
+            replacement.style.textDecoration = 'none';
+        }
+        replacement.textContent = lastAppliedYouTubeTitle;
+        replacement.href = lastAppliedYouTubeUrl;
+    }
+    updateAllLabels();
 }
 
 function updateAllLabels(refresh) {
