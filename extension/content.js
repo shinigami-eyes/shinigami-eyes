@@ -23,6 +23,30 @@ if (hostname == 'facebook.com') {
 }
 if (hostname == 'twitter.com') {
     myself = document.querySelector('.DashUserDropdown-userInfo a');
+
+    [...document.styleSheets].filter(x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('user-style')).forEach(x => x.disabled = true);
+
+    var style = document.createElement('style');
+    style.textContent = `
+
+    .pretty-link b, .pretty-link s {
+        color: inherit !important;
+    }
+    
+    .fullname,
+    .stream-item a:hover .fullname,
+    .stream-item a:active .fullname
+    {color:inherit;}
+    
+    `;
+    document.head.appendChild(style);
+
+}else if(hostname == 'reddit.com'){
+    var style = document.createElement('style');
+    style.textContent = `
+.author { color: #369 !important;}
+    `;
+    document.head.appendChild(style);
 }
 
 if (isHostedOn(hostname, 'youtube.com')) {
@@ -35,7 +59,7 @@ if (myself && (myself.href || myself.startsWith('http:') || myself.startsWith('h
 
 function init() {
     updateAllLabels();
-
+    
     var observer = new MutationObserver(mutationsList => {
 
         for (var mutation of mutationsList) {
@@ -72,6 +96,7 @@ var lastAppliedYouTubeTitle = null;
 function updateYouTubeChannelHeader(){
     var url = window.location.href;
     var title = document.getElementById('channel-title');
+    if(title && title.tagName == 'H3') title = null; // search results, already a link
     var currentTitle = title ? title.textContent : null;
 
     if(url == lastAppliedYouTubeUrl && currentTitle == lastAppliedYouTubeTitle) return;
@@ -148,9 +173,16 @@ function applyLabel(a, identifier) {
     }
 }
 
-function initLink(a) {
+function initLink(a){
     var identifier = getIdentifier(a);
     if (!identifier) return;
+
+    if(hostname == 'reddit.com'){
+        if(a.classList.contains('title')) return; // post title (classic)
+        var parent = a.parentNode;
+        if(parent && parent.parentNode && parent.parentNode.classList.contains('flat-list')) return; // post buttons (classic)
+        if(a.id && a.id.startsWith('CommentTopMeta')) return; // post date (redesign)
+    }
 
     var label = knownLabels[identifier];
     if (label === undefined) {
