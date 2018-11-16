@@ -79,7 +79,9 @@ function createContextMenu(text, id) {
             "*://*.facebook.com/*",
             "*://*.youtube.com/*",
             "*://*.reddit.com/*",
-            "*://*.twitter.com/*"
+            "*://*.twitter.com/*",
+            "*://medium.com/*",
+            "*://disqus.com/*"
         ]
     });
 }

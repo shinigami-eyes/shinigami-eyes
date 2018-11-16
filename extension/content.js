@@ -6,70 +6,100 @@ if (hostname.startsWith('www.')) {
 }
 if (hostname.endsWith('.reddit.com')) hostname = 'reddit.com';
 
+
 var myself = null;
-if (hostname == 'reddit.com') {
-    myself = document.querySelector('#header-bottom-right .user a');
-    if (!myself) {
-        var m = document.querySelector('#USER_DROPDOWN_ID');
-        if (m) {
-            m = [...m.querySelectorAll('*')].filter(x => x.childNodes.length == 1 && x.firstChild.nodeType == 3).map(x => x.textContent)[0]
-            if (m) myself = 'reddit.com/user/' + m;
+
+function fixupSiteStyles(){
+    if (hostname == 'reddit.com') {
+        myself = document.querySelector('#header-bottom-right .user a');
+        if (!myself) {
+            var m = document.querySelector('#USER_DROPDOWN_ID');
+            if (m) {
+                m = [...m.querySelectorAll('*')].filter(x => x.childNodes.length == 1 && x.firstChild.nodeType == 3).map(x => x.textContent)[0]
+                if (m) myself = 'reddit.com/user/' + m;
+            }
         }
     }
-}
-if (hostname == 'facebook.com') {
-    var m = document.querySelector("[id^='profile_pic_header_']")
-    if (m) myself = 'facebook.com/' + captureRegex(m.id, /header_(\d+)/);
-}
-if (hostname == 'twitter.com') {
-    myself = document.querySelector('.DashUserDropdown-userInfo a');
-
-    disableTwitterCustomCss();
-
-    var style = document.createElement('style');
-    style.textContent = `
-
-    .pretty-link b, .pretty-link s {
-        color: inherit !important;
+    if (hostname == 'facebook.com') {
+        var m = document.querySelector("[id^='profile_pic_header_']")
+        if (m) myself = 'facebook.com/' + captureRegex(m.id, /header_(\d+)/);
     }
-    
-    a.show-thread-link, a.ThreadedConversation-moreRepliesLink {
-        color: inherit !important;
+    if(hostname == 'medium.com') {
+        
+        
+        var style = document.createElement('style');
+        style.textContent = `
+
+        a.show-thread-link, a.ThreadedConversation-moreRepliesLink {
+            color: inherit !important;
+        }
+        .fullname,
+        .stream-item a:hover .fullname,
+        .stream-item a:active .fullname
+        {color:inherit;}
+        
+        `;
+        document.head.appendChild(style);
+
     }
-    .fullname,
-    .stream-item a:hover .fullname,
-    .stream-item a:active .fullname
-    {color:inherit;}
-    
-    `;
-    document.head.appendChild(style);
+    if (hostname == 'twitter.com') {
+        myself = document.querySelector('.DashUserDropdown-userInfo a');
 
-}else if(hostname == 'reddit.com'){
-    var style = document.createElement('style');
-    style.textContent = `
-.author { color: #369 !important;}
-    `;
-    document.head.appendChild(style);
+        var style = document.createElement('style');
+        style.textContent = `
+
+        .pretty-link b, .pretty-link s {
+            color: inherit !important;
+        }
+        
+        a.show-thread-link, a.ThreadedConversation-moreRepliesLink {
+            color: inherit !important;
+        }
+        .fullname,
+        .stream-item a:hover .fullname,
+        .stream-item a:active .fullname
+        {color:inherit;}
+        
+        `;
+        document.head.appendChild(style);
+
+    }else if(hostname == 'reddit.com'){
+        var style = document.createElement('style');
+        style.textContent = `
+    .author { color: #369 !important;}
+        `;
+        document.head.appendChild(style);
+    }
 }
 
-if (isHostedOn(hostname, 'youtube.com')) {
-    setInterval(updateYouTubeChannelHeader, 300);
-}
+function maybeDisableCustomCss(){
+    var shouldDisable = null;
+    if(hostname == 'twitter.com') shouldDisable = x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('user-style');
+    else if(hostname == 'medium.com') shouldDisable = x => x.ownerNode && x.ownerNode.className && x.ownerNode.className == 'js-collectionStyle';
+    else if(hostname == 'disqus.com') shouldDisable = x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('css_');
 
-if (myself && (myself.href || myself.startsWith('http:') || myself.startsWith('https:')))
-    myself = getIdentifier(myself);
-//console.log('Myself: ' + myself)
-
-function disableTwitterCustomCss(){
-    [...document.styleSheets].filter(x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('user-style')).forEach(x => x.disabled = true);
+    if(shouldDisable)
+        [...document.styleSheets].filter(shouldDisable).forEach(x => x.disabled = true);
 }
 
 function init() {
+    fixupSiteStyles();
+   
+    if (isHostedOn(hostname, 'youtube.com')) {
+        setInterval(updateYouTubeChannelHeader, 300);
+    }
+
+    if (myself && (myself.href || myself.startsWith('http:') || myself.startsWith('https:')))
+        myself = getIdentifier(myself);
+    //console.log('Myself: ' + myself)
+
+
+
+    maybeDisableCustomCss();
     updateAllLabels();
     
     var observer = new MutationObserver(mutationsList => {
-        if (hostname == 'twitter.com')
-            disableTwitterCustomCss();
+        maybeDisableCustomCss();
         for (var mutation of mutationsList) {
             if (mutation.type == 'childList') {
                 for (var node of mutation.addedNodes) {
@@ -199,8 +229,6 @@ function initLink(a){
     }
     applyLabel(a, identifier);
 }
-
-var currentlySelectedEntity = null;
 
 function isHostedOn(/** @type {string}*/fullHost, /** @type {string}*/baseHost) {
     if (baseHost.length > fullHost.length) return false;
@@ -352,10 +380,16 @@ function getIdentifierInternal(urlstr) {
         return 'reddit.com' + takeFirstPathComponents(url.pathname.replace('/u/', '/user/'), 2).toLowerCase();
     }
     if (isHostedOn(host, 'twitter.com')) {
-        return 'twitter.com' + takeFirstPathComponents(url.pathname, 1).toLowerCase()
+        return 'twitter.com' + takeFirstPathComponents(url.pathname, 1).toLowerCase();
     }
     if (isHostedOn(host, 'youtube.com')) {
         return 'youtube.com' + takeFirstPathComponents(url.pathname, 2);
+    }
+    if (isHostedOn(host, 'disqus.com') && url.pathname.startsWith('/by/')) {
+        return 'disqus.com' + takeFirstPathComponents(url.pathname, 2);
+    }
+    if (isHostedOn(host, 'medium.com')) {
+        return 'medium.com' + takeFirstPathComponents(url.pathname, 1).toLowerCase();
     }
     if (host.indexOf('.blogspot.') != -1) {
         var m = captureRegex(host, /([a-zA-Z0-9\-]*)\.blogspot/);
@@ -393,6 +427,10 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             if (hostname == 'facebook.com' && node.dataset && node.dataset.ftr) return node;
             if (hostname == 'reddit.com' && (classList.contains('scrollerItem') || classList.contains('thing') || classList.contains('Comment'))) return node;
             if (hostname == 'twitter.com' && (classList.contains('stream-item'))) return node;
+            if (hostname == 'disqus.com' && (classList.contains('post-content'))) return node;
+            if (hostname == 'medium.com' && (classList.contains('streamItemConversationItem'))) return node;
+            if (hostname == 'youtube.com' && node.tagName == 'YTD-COMMENT-RENDERER') return node;
+            
             node = node.parentElement;
         }
         //console.log('Reached the top without a satisfying element')
