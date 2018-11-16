@@ -33,6 +33,9 @@ if (hostname == 'twitter.com') {
         color: inherit !important;
     }
     
+    a.show-thread-link {
+        color: inherit !important;
+    }
     .fullname,
     .stream-item a:hover .fullname,
     .stream-item a:active .fullname
