@@ -9,7 +9,7 @@ A Chrome/Firefox addon that highlights transphobic/anti-LGBT and trans-friendly 
 
 # FAQ
 ## How does it work?
-Whenever you visit Facebook, YouTube, Twitter or Reddit, this extension will color trans-friendly (green) and anti-trans (red) users/pages with different colors.
+Whenever you visit Facebook, YouTube, Twitter, Medium, Reddit, or a site with Disqus comments, this extension will color trans-friendly (green) and anti-trans (red) users/pages with different colors.
 
 ## How does it know how to color each page?
 The initial version has been created through a mix of manual labeling and machine learning. Users can now also contribute with their own labels.
