@@ -33,7 +33,7 @@ if (hostname == 'twitter.com') {
         color: inherit !important;
     }
     
-    a.show-thread-link {
+    a.show-thread-link, a.ThreadedConversation-moreRepliesLink {
         color: inherit !important;
     }
     .fullname,
