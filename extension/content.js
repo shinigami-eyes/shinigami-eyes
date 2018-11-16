@@ -24,7 +24,7 @@ if (hostname == 'facebook.com') {
 if (hostname == 'twitter.com') {
     myself = document.querySelector('.DashUserDropdown-userInfo a');
 
-    [...document.styleSheets].filter(x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('user-style')).forEach(x => x.disabled = true);
+    disableTwitterCustomCss();
 
     var style = document.createElement('style');
     style.textContent = `
@@ -60,11 +60,16 @@ if (myself && (myself.href || myself.startsWith('http:') || myself.startsWith('h
     myself = getIdentifier(myself);
 //console.log('Myself: ' + myself)
 
+function disableTwitterCustomCss(){
+    [...document.styleSheets].filter(x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('user-style')).forEach(x => x.disabled = true);
+}
+
 function init() {
     updateAllLabels();
     
     var observer = new MutationObserver(mutationsList => {
-
+        if (hostname == 'twitter.com')
+            disableTwitterCustomCss();
         for (var mutation of mutationsList) {
             if (mutation.type == 'childList') {
                 for (var node of mutation.addedNodes) {
