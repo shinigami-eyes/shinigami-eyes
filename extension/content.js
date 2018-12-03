@@ -194,17 +194,9 @@ function applyLabel(a, identifier) {
         a.classList.remove('assigned-label-' + a.assignedCssLabel);
         a.classList.remove('has-assigned-label');
     }
-    var label = a.assignedLabel = knownLabels[identifier] || '';
 
-    // https://rationalwiki.org/wiki/RationalWiki:Webshites
-    a.assignedCssLabel =
-        !label ? '' :
-            label == 'liked' ? 'liked' :
-                label == 'disliked' ? 'disliked' :
-                    label == 'rw-radfem' || label == 'terf' || label == 'transphobic' || label == 'anti-lgbt' ? 'transphobic' :
-                        label == 't-friendly' ? 't-friendly' :
-                            label == 'rw-skeptic' || label == 'rw-liberal' || label == 'rw-feminism' || label == 'science' ? 'good' :
-                                'bad';
+    a.assignedCssLabel = knownLabels[identifier] || '';
+
     if (a.assignedCssLabel) {
         a.classList.add('assigned-label-' + a.assignedCssLabel);
         a.classList.add('has-assigned-label');
