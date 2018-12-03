@@ -24,7 +24,7 @@ function loadBloomFilter(name) {
     fetch(url).then(response => {
         response.arrayBuffer().then(arrayBuffer => {
             var array = new Uint32Array(arrayBuffer);
-            var b = new BloomFilter(array, 17);
+            var b = new BloomFilter(array, 10);
             b.name = name;
             bloomFilters.push(b);
         });
