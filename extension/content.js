@@ -200,6 +200,8 @@ function applyLabel(a, identifier) {
     if (a.assignedCssLabel) {
         a.classList.add('assigned-label-' + a.assignedCssLabel);
         a.classList.add('has-assigned-label');
+        if (hostname == 'twitter.com')
+            a.classList.remove('u-textInheritColor');
     }
 }
 
