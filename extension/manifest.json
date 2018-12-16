@@ -19,6 +19,24 @@
                 "*://medium.com/*",
                 "*://disqus.com/*",
                 "*://*.tumblr.com/*",
+
+                "*://*.google.ar/*",
+                "*://*.google.at/*",
+                "*://*.google.be/*",
+                "*://*.google.ca/*",
+                "*://*.google.ch/*",
+                "*://*.google.co.uk/*",
+                "*://*.google.com/*",
+                "*://*.google.de/*",
+                "*://*.google.dk/*",
+                "*://*.google.es/*",
+                "*://*.google.fi/*",
+                "*://*.google.fr/*",
+                "*://*.google.is/*",
+                "*://*.google.it/*",
+                "*://*.google.no/*",
+                "*://*.google.pt/*",
+                "*://*.google.se/*"
             ],
             "js": [
                 "content.js"
