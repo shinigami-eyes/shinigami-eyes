@@ -8,10 +8,10 @@ var installationId = null;
 browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     accepted = v.accepted
     overrides = v.overrides || {}
-    if(!v.installationId){
-        installationId = (Math.random()+ '.' +Math.random() + '.' +Math.random()).replace(/\./g, '');
-        browser.storage.local.set({installationId: installationId});
-    }else{
+    if (!v.installationId) {
+        installationId = (Math.random() + '.' + Math.random() + '.' + Math.random()).replace(/\./g, '');
+        browser.storage.local.set({ installationId: installationId });
+    } else {
         installationId = v.installationId;
     }
 })
@@ -34,11 +34,11 @@ function loadBloomFilter(name) {
 
 
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if(message.acceptClicked !== undefined) {
+    if (message.acceptClicked !== undefined) {
         accepted = message.acceptClicked;
-        browser.storage.local.set({accepted: accepted});
+        browser.storage.local.set({ accepted: accepted });
         browser.tabs.remove(sender.tab.id);
-        if(accepted && uncommittedResponse)
+        if (accepted && uncommittedResponse)
             saveLabel(uncommittedResponse)
         uncommittedResponse = null;
         return;
@@ -53,10 +53,10 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (transphobic) {
             if (id == message.myself) continue;
             var sum = 0;
-            for(var i = 0; i < id.length; i++){
+            for (var i = 0; i < id.length; i++) {
                 sum += id.charCodeAt(i);
             }
-            if(sum % 8 != 0) continue;
+            if (sum % 8 != 0) continue;
         }
         for (var bloomFilter of bloomFilters) {
             if (bloomFilter.test(id)) response[id] = bloomFilter.name;
@@ -94,40 +94,40 @@ createContextMenu('Help', 'help');
 
 var uncommittedResponse = null;
 
-function submitPendingRatings(){
+function submitPendingRatings() {
     var submitted = overrides[PENDING_SUBMISSIONS].map(x => x);
-    var requestBody ={
-         installationId: installationId,
-         entries: submitted
+    var requestBody = {
+        installationId: installationId,
+        entries: submitted
     }
     console.log('Sending request');
     fetch('https://shinigami-eyes.azurewebsites.net/api/submit', {
         body: JSON.stringify(requestBody),
         method: 'POST',
-         credentials: 'omit',
+        credentials: 'omit',
     }).then(response => {
         response.text().then(result => {
             console.log('Response: ' + result);
-            if(result == 'SUCCESS'){
+            if (result == 'SUCCESS') {
                 overrides[PENDING_SUBMISSIONS] = overrides[PENDING_SUBMISSIONS].filter(x => submitted.indexOf(x) == -1);
-                browser.storage.local.set({overrides: overrides});
+                browser.storage.local.set({ overrides: overrides });
             }
         })
-        
+
     });
 }
 
 
 var PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
 
-function saveLabel(response){
-    if(accepted){
-        if(!overrides[PENDING_SUBMISSIONS]){
+function saveLabel(response) {
+    if (accepted) {
+        if (!overrides[PENDING_SUBMISSIONS]) {
             overrides[PENDING_SUBMISSIONS] = Object.getOwnPropertyNames(overrides)
-                .map(x => { return { identifier: x, label: overrides[x] }});
+                .map(x => { return { identifier: x, label: overrides[x] } });
         }
         overrides[response.identifier] = response.mark;
-        browser.storage.local.set({overrides: overrides});
+        browser.storage.local.set({ overrides: overrides });
         overrides[PENDING_SUBMISSIONS].push(response);
         submitPendingRatings();
         //console.log(response);
@@ -139,20 +139,20 @@ function saveLabel(response){
     openHelp();
 }
 
-function openHelp(){
+function openHelp() {
     browser.tabs.create({
         url: browser.extension.getURL('help.html')
     })
 }
 
 browser.contextMenus.onClicked.addListener(function (info, tab) {
-    if(info.menuItemId == 'help'){
+    if (info.menuItemId == 'help') {
         openHelp();
         return;
     }
 
     var label = info.menuItemId.substring('mark-'.length);
-    if(label == 'none') label = '';
+    if (label == 'none') label = '';
     browser.tabs.sendMessage(tab.id, {
         mark: label,
         url: info.linkUrl,

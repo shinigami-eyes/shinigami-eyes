@@ -9,7 +9,7 @@ if (hostname.endsWith('.reddit.com')) hostname = 'reddit.com';
 
 var myself = null;
 
-function fixupSiteStyles(){
+function fixupSiteStyles() {
     if (hostname == 'reddit.com') {
         myself = document.querySelector('#header-bottom-right .user a');
         if (!myself) {
@@ -24,9 +24,9 @@ function fixupSiteStyles(){
         var m = document.querySelector("[id^='profile_pic_header_']")
         if (m) myself = 'facebook.com/' + captureRegex(m.id, /header_(\d+)/);
     }
-    if(hostname == 'medium.com') {
-        
-        
+    if (hostname == 'medium.com') {
+
+
         var style = document.createElement('style');
         style.textContent = `
 
@@ -42,7 +42,7 @@ function fixupSiteStyles(){
         document.head.appendChild(style);
 
     }
-    if(isHostedOn(hostname, 'tumblr.com')) {
+    if (isHostedOn(hostname, 'tumblr.com')) {
         var style = document.createElement('style');
         style.textContent = `
         .assigned-label-transphobic { outline: 2px solid #991515 !important; }
@@ -71,7 +71,7 @@ function fixupSiteStyles(){
         `;
         document.head.appendChild(style);
 
-    }else if(hostname == 'reddit.com'){
+    } else if (hostname == 'reddit.com') {
         var style = document.createElement('style');
         style.textContent = `
     .author { color: #369 !important;}
@@ -80,19 +80,19 @@ function fixupSiteStyles(){
     }
 }
 
-function maybeDisableCustomCss(){
+function maybeDisableCustomCss() {
     var shouldDisable = null;
-    if(hostname == 'twitter.com') shouldDisable = x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('user-style');
-    else if(hostname == 'medium.com') shouldDisable = x => x.ownerNode && x.ownerNode.className && x.ownerNode.className == 'js-collectionStyle';
-    else if(hostname == 'disqus.com') shouldDisable = x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('css_');
+    if (hostname == 'twitter.com') shouldDisable = x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('user-style');
+    else if (hostname == 'medium.com') shouldDisable = x => x.ownerNode && x.ownerNode.className && x.ownerNode.className == 'js-collectionStyle';
+    else if (hostname == 'disqus.com') shouldDisable = x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('css_');
 
-    if(shouldDisable)
+    if (shouldDisable)
         [...document.styleSheets].filter(shouldDisable).forEach(x => x.disabled = true);
 }
 
 function init() {
     fixupSiteStyles();
-   
+
     if (isHostedOn(hostname, 'youtube.com')) {
         setInterval(updateYouTubeChannelHeader, 300);
     }
@@ -105,7 +105,7 @@ function init() {
 
     maybeDisableCustomCss();
     updateAllLabels();
-    
+
     var observer = new MutationObserver(mutationsList => {
         maybeDisableCustomCss();
         for (var mutation of mutationsList) {
@@ -141,19 +141,19 @@ var lastRightClickedElement = null;
 var lastAppliedYouTubeUrl = null;
 var lastAppliedYouTubeTitle = null;
 
-function updateYouTubeChannelHeader(){
+function updateYouTubeChannelHeader() {
     var url = window.location.href;
     var title = document.getElementById('channel-title');
-    if(title && title.tagName == 'H3') title = null; // search results, already a link
+    if (title && title.tagName == 'H3') title = null; // search results, already a link
     var currentTitle = title ? title.textContent : null;
 
-    if(url == lastAppliedYouTubeUrl && currentTitle == lastAppliedYouTubeTitle) return;
+    if (url == lastAppliedYouTubeUrl && currentTitle == lastAppliedYouTubeTitle) return;
     lastAppliedYouTubeUrl = url;
     lastAppliedYouTubeTitle = currentTitle;
-    
-    if(currentTitle) {
+
+    if (currentTitle) {
         var replacement = document.getElementById('channel-title-replacement');
-        if(!replacement) {
+        if (!replacement) {
             replacement = document.createElement('A');
             replacement.id = 'channel-title-replacement'
             replacement.className = title.className;
@@ -215,15 +215,15 @@ function applyLabel(a, identifier) {
     }
 }
 
-function initLink(a){
+function initLink(a) {
     var identifier = getIdentifier(a);
     if (!identifier) return;
 
-    if(hostname == 'reddit.com'){
-        if(a.classList.contains('title')) return; // post title (classic)
+    if (hostname == 'reddit.com') {
+        if (a.classList.contains('title')) return; // post title (classic)
         var parent = a.parentNode;
-        if(parent && parent.parentNode && parent.parentNode.classList.contains('flat-list')) return; // post buttons (classic)
-        if(a.id && a.id.startsWith('CommentTopMeta')) return; // post date (redesign)
+        if (parent && parent.parentNode && parent.parentNode.classList.contains('flat-list')) return; // post buttons (classic)
+        if (a.id && a.id.startsWith('CommentTopMeta')) return; // post date (redesign)
     }
 
     var label = knownLabels[identifier];
@@ -264,10 +264,10 @@ function takeNthPathComponent(/** @type {string}*/path, /** @type {number}*/nth)
     return path.split('/')[nth + 1] || null;
 }
 
-function captureRegex(str, regex){
-    if(!str) return null;
+function captureRegex(str, regex) {
+    if (!str) return null;
     var match = str.match(regex);
-    if(match && match[1]) return match[1];
+    if (match && match[1]) return match[1];
     return null;
 }
 
@@ -295,9 +295,9 @@ function getCurrentFacebookPageId() {
 }
 
 function getIdentifier(urlstr) {
-    try{
+    try {
         return getIdentifierInternal(urlstr);
-    }catch(e){
+    } catch (e) {
         console.warn("Unable to get identifier for " + urlstr);
         return null;
     }
@@ -376,9 +376,9 @@ function getIdentifierInternal(urlstr) {
         if (!match) return null;
         return getIdentifierInternal('http://' + match);
     }
-    if(url.search && url.search.includes('http')){
-        for(var q of url.searchParams){
-            if(q[1].startsWith('http')) return getIdentifierInternal(q[1]);
+    if (url.search && url.search.includes('http')) {
+        for (var q of url.searchParams) {
+            if (q[1].startsWith('http')) return getIdentifierInternal(q[1]);
         }
     }
     /*
@@ -409,18 +409,18 @@ function getIdentifierInternal(urlstr) {
         return 'medium.com' + takeFirstPathComponents(url.pathname, 1).toLowerCase();
     }
     if (isHostedOn(host, 'tumblr.com')) {
-        if(url.pathname.startsWith('/register/follow/')) {
+        if (url.pathname.startsWith('/register/follow/')) {
             var name = takeNthPathComponent(url.pathname, 2);
             return name ? name + '.tumblr.com' : null;
         }
-        if(host != 'www.tumblr.com' && host != 'assets.tumblr.com' && host.indexOf('.media.') == -1) {
+        if (host != 'www.tumblr.com' && host != 'assets.tumblr.com' && host.indexOf('.media.') == -1) {
             if (!url.pathname.startsWith('/tagged/')) return url.host.toLowerCase();
         }
         return null;
     }
     if (host.indexOf('.blogspot.') != -1) {
         var m = captureRegex(host, /([a-zA-Z0-9\-]*)\.blogspot/);
-        if(m) return m.toLowerCase() + '.blogspot.com';
+        if (m) return m.toLowerCase() + '.blogspot.com';
     }
 
     var id = host;
@@ -459,7 +459,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             if (hostname == 'medium.com' && (classList.contains('streamItem') || classList.contains('streamItemConversationItem'))) return node;
             if (hostname == 'youtube.com' && node.tagName == 'YTD-COMMENT-RENDERER') return node;
             if (hostname.endsWith('tumblr.com') && (node.dataset.postId || classList.contains('post'))) return node;
-            
+
             node = node.parentElement;
         }
         //console.log('Reached the top without a satisfying element')
@@ -469,13 +469,12 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     var exact = snippets.filter(x => x && x.contains(lastRightClickedElement))[0] || null;
 
     message.snippet = exact;
-    if(message.debug){
-        var debugClass = 'shinigami-eyes-debug-snippet-highlight';
-        if(exact){
-            exact.classList.add(debugClass);
-            if (message.debug <= 1)
-                setTimeout(() => exact.classList.remove(debugClass), 2500)
-            }
-        }
+    var debugClass = 'shinigami-eyes-debug-snippet-highlight';
+
+    if (exact && message.debug) {
+        exact.classList.add(debugClass);
+        if (message.debug <= 1)
+            setTimeout(() => exact.classList.remove(debugClass), 2500)
+    }
     sendResponse(message);
 })
