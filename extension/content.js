@@ -468,13 +468,13 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     var exact = snippets.filter(x => x && x.contains(lastRightClickedElement))[0] || null;
 
-    message.snippet = exact;
+    message.snippet = exact ? exact.outerHTML : null;
     var debugClass = 'shinigami-eyes-debug-snippet-highlight';
 
     if (exact && message.debug) {
         exact.classList.add(debugClass);
         if (message.debug <= 1)
-            setTimeout(() => exact.classList.remove(debugClass), 2500)
+            setTimeout(() => exact.classList.remove(debugClass), 1500)
     }
     sendResponse(message);
 })
