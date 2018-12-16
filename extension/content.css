@@ -1,7 +1,5 @@
-.assigned-label-transphobic { color: #991515 !important; }
-.assigned-label-t-friendly { color: #77B91E !important; }
-.assigned-label-bad { color: #A87200 !important; }
-.assigned-label-good { color: #014E0B !important; }
+.assigned-label-transphobic, a.assigned-label-transphobic { color: #991515 !important; }
+.assigned-label-t-friendly, a.assigned-label-t-friendly { color: #77B91E !important; }
 
 .has-assigned-label * { color: inherit !important; }
 .shinigami-eyes-debug-snippet-highlight {
