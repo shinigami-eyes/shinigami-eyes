@@ -337,6 +337,7 @@ function getIdentifierInternal(urlstr) {
             }
         }
     }
+    if (urlstr.dataset && urlstr.dataset.expandedUrl) urlstr = urlstr.dataset.expandedUrl;
     if (urlstr.href !== undefined) urlstr = urlstr.href;
     if (!urlstr) return null;
     if (urlstr.endsWith('#')) return null;
