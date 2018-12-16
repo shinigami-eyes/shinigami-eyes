@@ -17,7 +17,8 @@
                 "*://*.reddit.com/*",
                 "*://*.twitter.com/*",
                 "*://medium.com/*",
-                "*://disqus.com/*"
+                "*://disqus.com/*",
+                "*://*.tumblr.com/*",
             ],
             "js": [
                 "content.js"

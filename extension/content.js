@@ -42,6 +42,14 @@ function fixupSiteStyles(){
         document.head.appendChild(style);
 
     }
+    if(isHostedOn(hostname, 'tumblr.com')) {
+        var style = document.createElement('style');
+        style.textContent = `
+        .assigned-label-transphobic { outline: 2px solid #991515 !important; }
+        /*.assigned-label-t-friendly { outline: 2px #77B91E !important; }*/
+        `;
+        document.head.appendChild(style);
+    }
     if (hostname == 'twitter.com') {
         myself = document.querySelector('.DashUserDropdown-userInfo a');
 
@@ -250,6 +258,9 @@ function takeFirstPathComponents(/** @type {string}*/path, /** @type {number}*/n
     if (m.length && !m[m.length - 1]) m.length--;
     return '/' + m.join('/');
 }
+function takeNthPathComponent(/** @type {string}*/path, /** @type {number}*/nth) {
+    return path.split('/')[nth + 1] || null;
+}
 
 function captureRegex(str, regex){
     if(!str) return null;
@@ -285,7 +296,7 @@ function getIdentifier(urlstr) {
     try{
         return getIdentifierInternal(urlstr);
     }catch(e){
-        console.warning("Unable to get identifier for " + urlstr);
+        console.warn("Unable to get identifier for " + urlstr);
         return null;
     }
 }
@@ -360,9 +371,18 @@ function getIdentifierInternal(urlstr) {
     if (isHostedOn(host, 'web.archive.org')) {
         var match = captureRegex(url.href, /\/web\/\w+\/(.*)/);
         if (!match) return null;
-        url = new URL('http://' + match);
-        host = url.hostname;
+        return getIdentifierInternal('http://' + match);
     }
+    if(url.search && url.search.includes('http')){
+        for(var q of url.searchParams){
+            if(q[1].startsWith('http')) return getIdentifierInternal(q[1]);
+        }
+    }
+    /*
+    if(host == 't.umblr.com'){
+        return getIdentifierInternal(url.searchParams.get('z'));
+    }
+    */
     if (host.startsWith('www.')) host = host.substring(4);
 
     if (isHostedOn(host, 'facebook.com')) {
@@ -384,6 +404,16 @@ function getIdentifierInternal(urlstr) {
     }
     if (isHostedOn(host, 'medium.com')) {
         return 'medium.com' + takeFirstPathComponents(url.pathname, 1).toLowerCase();
+    }
+    if (isHostedOn(host, 'tumblr.com')) {
+        if(url.pathname.startsWith('/register/follow/')) {
+            var name = takeNthPathComponent(url.pathname, 2);
+            return name ? name + '.tumblr.com' : null;
+        }
+        if(host != 'www.tumblr.com' && host != 'assets.tumblr.com' && host.indexOf('.media.') == -1) {
+            if (!url.pathname.startsWith('/tagged/')) return url.host.toLowerCase();
+        }
+        return null;
     }
     if (host.indexOf('.blogspot.') != -1) {
         var m = captureRegex(host, /([a-zA-Z0-9\-]*)\.blogspot/);
@@ -424,6 +454,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             if (hostname == 'disqus.com' && (classList.contains('post-content'))) return node;
             if (hostname == 'medium.com' && (classList.contains('streamItemConversationItem'))) return node;
             if (hostname == 'youtube.com' && node.tagName == 'YTD-COMMENT-RENDERER') return node;
+            if (hostname.endsWith('tumblr.com') && classList.contains('post')) return node;
             
             node = node.parentElement;
         }
