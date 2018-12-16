@@ -4,3 +4,21 @@
 .assigned-label-good { color: #014E0B !important; }
 
 .has-assigned-label * { color: inherit !important; }
+.shinigami-eyes-debug-snippet-highlight {
+     outline: 2px dashed darkorchid !important;
+     background-color: darkorchid !important;
+     color: white !important;
+ }
+ .shinigami-eyes-debug-snippet-highlight:after {
+    content: " ";
+    pointer-events: none;
+    z-index: 1000000;
+    display: block;
+    position: absolute;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: darkorchid !important;
+    opacity: 0.5;
+ }

@@ -156,7 +156,8 @@ browser.contextMenus.onClicked.addListener(function (info, tab) {
     browser.tabs.sendMessage(tab.id, {
         mark: label,
         url: info.linkUrl,
-        elementId: info.targetElementId
+        elementId: info.targetElementId,
+        debug: overrides.debug
     }, null, response => {
         if (!response.identifier) return;
         response.tabId = tab.id;

@@ -132,10 +132,12 @@ function init() {
     });
 
 
-
+    document.addEventListener('contextmenu', evt => {
+        lastRightClickedElement = evt.target;
+    }, true);
 }
 
-
+var lastRightClickedElement = null;
 var lastAppliedYouTubeUrl = null;
 var lastAppliedYouTubeTitle = null;
 
@@ -445,6 +447,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     //if (!links.length) console.log('Already empty :(')
     var identifier = links.length ? getIdentifier(links[0]) : getIdentifier(message.url);
     if (!identifier) return;
+    message.identifier = identifier;
     var snippets = links.map(node => {
 
         while (node) {
@@ -462,16 +465,17 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         //console.log('Reached the top without a satisfying element')
         return null;
     })
-    snippets = snippets.filter((item, pos) => item && snippets.indexOf(item) == pos);
-    message.identifier = identifier;
-    message.snippets = snippets.filter((item, pos) => pos <= 10).map(x => {
-        var html = x.outerHTML;
-        if(html){
-            html = html
-                .replace(/ alt=""/g, '')
-                .replace(/__xts__%5B0%5D[\w\.\-]*/g, '__xts__')
+
+    var exact = snippets.filter(x => x && x.contains(lastRightClickedElement))[0] || null;
+
+    message.snippet = exact;
+    if(message.debug){
+        var debugClass = 'shinigami-eyes-debug-snippet-highlight';
+        if(exact){
+            exact.classList.add(debugClass);
+            if (message.debug <= 1)
+                setTimeout(() => exact.classList.remove(debugClass), 10000)
         }
-        return html;
-    });
+        }
     sendResponse(message);
 })
