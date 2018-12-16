@@ -456,9 +456,9 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             if (hostname == 'reddit.com' && (classList.contains('scrollerItem') || classList.contains('thing') || classList.contains('Comment'))) return node;
             if (hostname == 'twitter.com' && (classList.contains('stream-item'))) return node;
             if (hostname == 'disqus.com' && (classList.contains('post-content'))) return node;
-            if (hostname == 'medium.com' && (classList.contains('streamItemConversationItem'))) return node;
+            if (hostname == 'medium.com' && (classList.contains('streamItem') || classList.contains('streamItemConversationItem'))) return node;
             if (hostname == 'youtube.com' && node.tagName == 'YTD-COMMENT-RENDERER') return node;
-            if (hostname.endsWith('tumblr.com') && classList.contains('post')) return node;
+            if (hostname.endsWith('tumblr.com') && (node.dataset.postId || classList.contains('post'))) return node;
             
             node = node.parentElement;
         }
