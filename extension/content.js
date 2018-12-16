@@ -439,7 +439,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return;
     }
     message.contextPage = window.location.href;
-    var target = message.elementId ? browser.menus.getTargetElement(message.elementId) : null;
+    var target = null; // message.elementId ? browser.menus.getTargetElement(message.elementId) : null;
 
     //console.log(message.url)
     var links = target ? [target] : [...document.getElementsByTagName('A')].filter(x => x.href == message.url)
