@@ -99,7 +99,7 @@ function init() {
 
     if (myself && (myself.href || myself.startsWith('http:') || myself.startsWith('https:')))
         myself = getIdentifier(myself);
-    //console.log('Myself: ' + myself)
+    console.log('Self: ' + myself)
 
 
 
@@ -474,8 +474,8 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if(exact){
             exact.classList.add(debugClass);
             if (message.debug <= 1)
-                setTimeout(() => exact.classList.remove(debugClass), 10000)
-        }
+                setTimeout(() => exact.classList.remove(debugClass), 2500)
+            }
         }
     sendResponse(message);
 })
