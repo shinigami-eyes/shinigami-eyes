@@ -432,6 +432,8 @@ function getIdentifierInternal(urlstr) {
 
 init();
 
+var lastGeneratedLinkId = 0;
+
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     if (message.updateAllLabels) {
@@ -468,9 +470,15 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     var exact = snippets.filter(x => x && x.contains(lastRightClickedElement))[0] || null;
 
+    
+    message.linkId = ++lastGeneratedLinkId;
+
+    if (lastRightClickedElement) 
+        lastRightClickedElement.setAttribute('shinigami-eyes-link-id', lastGeneratedLinkId);
+
     message.snippet = exact ? exact.outerHTML : null;
     var debugClass = 'shinigami-eyes-debug-snippet-highlight';
-
+    
     if (exact && message.debug) {
         exact.classList.add(debugClass);
         if (message.debug <= 1)
