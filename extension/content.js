@@ -406,12 +406,16 @@ function getIdentifierInternal(urlstr) {
         return 'facebook.com/' + (s.story_fbid || s.set || s.story_fbid || s._ft_ || s.ft_id || s.id || takeFirstPathComponents(p, p.startsWith('/groups/') ? 2 : 1).substring(1));
     }
     if (isHostedOn(host, 'reddit.com')) {
-        return 'reddit.com' + takeFirstPathComponents(url.pathname.replace('/u/', '/user/'), 2).toLowerCase();
+        var pathname = url.pathname.replace('/u/', '/user/');
+        if (!pathname.startsWith('/user/') && !pathname.startsWith('/r/')) return null;
+        return 'reddit.com' + takeFirstPathComponents(pathname, 2).toLowerCase();
     }
     if (isHostedOn(host, 'twitter.com')) {
         return 'twitter.com' + takeFirstPathComponents(url.pathname, 1).toLowerCase();
     }
     if (isHostedOn(host, 'youtube.com')) {
+        var pathname = url.pathname;
+        if (!pathname.startsWith('/user/') && !pathname.startsWith('/channel/')) return null;
         return 'youtube.com' + takeFirstPathComponents(url.pathname, 2);
     }
     if (isHostedOn(host, 'disqus.com') && url.pathname.startsWith('/by/')) {
@@ -431,7 +435,7 @@ function getIdentifierInternal(urlstr) {
         return null;
     }
     if (isHostedOn(host, 'wikipedia.org') || isHostedOn(host, 'rationalwiki.org')) {
-        if (url.hash) return null;
+        if (url.hash || url.pathname.includes(':')) return null;
         if (url.pathname.startsWith('/wiki/')) return 'wikipedia.org' + takeFirstPathComponents(url.pathname, 2);
         else return null;
     }

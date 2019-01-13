@@ -148,6 +148,64 @@ function openHelp() {
     })
 }
 
+var badIdentifiers = {};
+[
+    'facebook.com/a',
+    'facebook.com/ad_campaign',
+    'facebook.com/ads',
+    'facebook.com/bookmarks',
+    'facebook.com/buddylist.php',
+    'facebook.com/bugnub',
+    'facebook.com/comment',
+    'facebook.com/composer',
+    'facebook.com/events',
+    'facebook.com/findfriends',
+    'facebook.com/friends',
+    'facebook.com/legal',
+    'facebook.com/pg',
+    'facebook.com/page',
+    'facebook.com/fundraisers',
+    'facebook.com/games',
+    'facebook.com/groups',
+    'facebook.com/help',
+    'facebook.com/home.php',
+    'facebook.com/intl',
+    'facebook.com/jobs',
+    'facebook.com/l.php',
+    'facebook.com/language.php',
+    'facebook.com/local_surface',
+    'facebook.com/logout.php',
+    'facebook.com/mbasic',
+    'facebook.com/menu',
+    'facebook.com/messages',
+    'facebook.com/nfx',
+    'facebook.com/notes',
+    'facebook.com/notifications.php',
+    'facebook.com/notifications',
+    'facebook.com/nt',
+    'facebook.com/pages',
+    'facebook.com/people',
+    'facebook.com/photo.php',
+    'facebook.com/policies',
+    'facebook.com/privacy',
+    'facebook.com/reactions',
+    'facebook.com/salegroups',
+    'facebook.com/search',
+    'facebook.com/settings',
+    'facebook.com/story.php',
+    'facebook.com/ufi',
+    'reddit.com/r/all',
+    'reddit.com/r/popular',
+    'twitter.com/hashtag',
+    'twitter.com/i',
+    'twitter.com/search',
+    'twitter.com/settings',
+    'twitter.com/threadreaderapp',
+    'youtube.com/watch',
+].forEach(x => badIdentifiers[x] = true);
+
+
+
 browser.contextMenus.onClicked.addListener(function (info, tab) {
     if (info.menuItemId == 'help') {
         openHelp();
@@ -163,6 +221,9 @@ browser.contextMenus.onClicked.addListener(function (info, tab) {
         debug: overrides.debug
     }, null, response => {
         if (!response.identifier) return;
+        if (badIdentifiers[response.identifier] && response.mark) return;
+        if (response.debug && /^facebook\.com\/[a-zA-Z]/.test(response.identifier))
+            alert('Note: could not find numeric id for ' + response.identifier);
         response.tabId = tab.id;
         saveLabel(response);
     })
