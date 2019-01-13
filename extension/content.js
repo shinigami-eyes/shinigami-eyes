@@ -50,6 +50,15 @@ function fixupSiteStyles() {
         `;
         document.head.appendChild(style);
     }
+    if(hostname.indexOf('wiki') != -1){
+        var style = document.createElement('style');
+        style.textContent = `
+        .assigned-label-transphobic { outline: 1px solid #991515 !important; }
+        .assigned-label-t-friendly { outline: 1px solid #77B91E !important; }
+        
+        `;
+        document.head.appendChild(style);
+    }
     if (hostname == 'twitter.com') {
         myself = document.querySelector('.DashUserDropdown-userInfo a');
 
@@ -417,6 +426,11 @@ function getIdentifierInternal(urlstr) {
             if (!url.pathname.startsWith('/tagged/')) return url.host.toLowerCase();
         }
         return null;
+    }
+    if (isHostedOn(host, 'wikipedia.org') || isHostedOn(host, 'rationalwiki.org')) {
+        if (url.hash) return null;
+        if (url.pathname.startsWith('/wiki/')) return 'wikipedia.org' + takeFirstPathComponents(url.pathname, 2);
+        else return null;
     }
     if (host.indexOf('.blogspot.') != -1) {
         var m = captureRegex(host, /([a-zA-Z0-9\-]*)\.blogspot/);

@@ -82,7 +82,10 @@ function createContextMenu(text, id) {
             "*://*.twitter.com/*",
             "*://medium.com/*",
             "*://disqus.com/*",
-            "*://*.tumblr.com/*"
+            "*://*.tumblr.com/*",
+            "*://*.wikipedia.org/*",
+            "*://*.rationalwiki.org/*",
+            "*://*.google.com/*",
         ]
     });
 }
