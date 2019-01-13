@@ -267,6 +267,7 @@ function takeFirstPathComponents(/** @type {string}*/path, /** @type {number}*/n
     var m = path.split('/')
     m = m.slice(1, 1 + num);
     if (m.length && !m[m.length - 1]) m.length--;
+    if (m.length != num) return '!!'
     return '/' + m.join('/');
 }
 function takeNthPathComponent(/** @type {string}*/path, /** @type {number}*/nth) {
@@ -305,7 +306,9 @@ function getCurrentFacebookPageId() {
 
 function getIdentifier(urlstr) {
     try {
-        return getIdentifierInternal(urlstr);
+        var k = getIdentifierInternal(urlstr);
+        if (k && k.indexOf('!') != -1) return null;
+        return k;
     } catch (e) {
         console.warn("Unable to get identifier for " + urlstr);
         return null;
