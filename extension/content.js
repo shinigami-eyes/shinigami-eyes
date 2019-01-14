@@ -308,7 +308,7 @@ function getIdentifier(urlstr) {
     try {
         var k = getIdentifierInternal(urlstr);
         if (k && k.indexOf('!') != -1) return null;
-        return k;
+        return k.toLowerCase();
     } catch (e) {
         console.warn("Unable to get identifier for " + urlstr);
         return null;
@@ -408,10 +408,10 @@ function getIdentifierInternal(urlstr) {
     if (isHostedOn(host, 'reddit.com')) {
         var pathname = url.pathname.replace('/u/', '/user/');
         if (!pathname.startsWith('/user/') && !pathname.startsWith('/r/')) return null;
-        return 'reddit.com' + takeFirstPathComponents(pathname, 2).toLowerCase();
+        return 'reddit.com' + takeFirstPathComponents(pathname, 2);
     }
     if (isHostedOn(host, 'twitter.com')) {
-        return 'twitter.com' + takeFirstPathComponents(url.pathname, 1).toLowerCase();
+        return 'twitter.com' + takeFirstPathComponents(url.pathname, 1);
     }
     if (isHostedOn(host, 'youtube.com')) {
         var pathname = url.pathname;
@@ -422,7 +422,7 @@ function getIdentifierInternal(urlstr) {
         return 'disqus.com' + takeFirstPathComponents(url.pathname, 2);
     }
     if (isHostedOn(host, 'medium.com')) {
-        return 'medium.com' + takeFirstPathComponents(url.pathname, 1).toLowerCase();
+        return 'medium.com' + takeFirstPathComponents(url.pathname, 1);
     }
     if (isHostedOn(host, 'tumblr.com')) {
         if (url.pathname.startsWith('/register/follow/')) {
@@ -430,7 +430,7 @@ function getIdentifierInternal(urlstr) {
             return name ? name + '.tumblr.com' : null;
         }
         if (host != 'www.tumblr.com' && host != 'assets.tumblr.com' && host.indexOf('.media.') == -1) {
-            if (!url.pathname.startsWith('/tagged/')) return url.host.toLowerCase();
+            if (!url.pathname.startsWith('/tagged/')) return url.host;
         }
         return null;
     }
@@ -441,13 +441,13 @@ function getIdentifierInternal(urlstr) {
     }
     if (host.indexOf('.blogspot.') != -1) {
         var m = captureRegex(host, /([a-zA-Z0-9\-]*)\.blogspot/);
-        if (m) return m.toLowerCase() + '.blogspot.com';
+        if (m) return m + '.blogspot.com';
     }
 
     var id = host;
     if (id.startsWith('www.')) id = id.substr(4);
     if (id.startsWith('m.')) id = id.substr(2);
-    return id.toLowerCase();
+    return id;
 }
 
 

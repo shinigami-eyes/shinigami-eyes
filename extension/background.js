@@ -1,13 +1,119 @@
 var browser = browser || chrome;
 
+var PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
+var MIGRATION = ':MIGRATION'
+
+var badIdentifiersArray = [
+    'archive.is',
+    'archive.org',
+    'assets.tumblr.com',
+    'bit.ly',
+    'blogspot.com',
+    'facebook.com/a',
+    'facebook.com/ad_campaign',
+    'facebook.com/ads',
+    'facebook.com/ajax',
+    'facebook.com/bookmarks',
+    'facebook.com/buddylist.php',
+    'facebook.com/bugnub',
+    'facebook.com/comment',
+    'facebook.com/composer',
+    'facebook.com/events',
+    'facebook.com/findfriends',
+    'facebook.com/friends',
+    'facebook.com/fundraisers',
+    'facebook.com/games',
+    'facebook.com/groups',
+    'facebook.com/help',
+    'facebook.com/home.php',
+    'facebook.com/intl',
+    'facebook.com/jobs',
+    'facebook.com/l.php',
+    'facebook.com/language.php',
+    'facebook.com/legal',
+    'facebook.com/like.php',
+    'facebook.com/local_surface',
+    'facebook.com/logout.php',
+    'facebook.com/mbasic',
+    'facebook.com/menu',
+    'facebook.com/messages',
+    'facebook.com/nfx',
+    'facebook.com/notes',
+    'facebook.com/notifications.php',
+    'facebook.com/notifications',
+    'facebook.com/nt',
+    'facebook.com/page',
+    'facebook.com/pages',
+    'facebook.com/people',
+    'facebook.com/permalink.php',
+    'facebook.com/pg',
+    'facebook.com/photo.php',
+    'facebook.com/policies',
+    'facebook.com/privacy',
+    'facebook.com/profile.php',
+    'facebook.com/rapid_report',
+    'facebook.com/reactions',
+    'facebook.com/salegroups',
+    'facebook.com/search',
+    'facebook.com/settings',
+    'facebook.com/shares',
+    'facebook.com/story.php',
+    'facebook.com/ufi',
+    'media.tumblr.com',
+    'medium.com',
+    'reddit.com',
+    'reddit.com/r/all',
+    'reddit.com/r/popular',
+    'removeddit.com',
+    't.co',
+    't.umblr.com',
+    'tumblr.com',
+    'twitter.com',
+    'twitter.com/hashtag',
+    'twitter.com/i',
+    'twitter.com/search',
+    'twitter.com/settings',
+    'twitter.com/threadreaderapp',
+    'twitter.com/who_to_follow',
+    'wordpress.com',
+    'www.tumblr.com',
+    'youtu.be',
+    'youtube.com',
+    'youtube.com/redirect',
+    'youtube.com/watch',
+];
+var badIdentifiers = {};
+badIdentifiersArray.forEach(x => badIdentifiers[x] = true);
+
 
 var overrides = null;
 
 var accepted = false;
 var installationId = null;
+
 browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     accepted = v.accepted
     overrides = v.overrides || {}
+
+    var migration = overrides[MIGRATION] || 0;
+    var CURRENT_VERSION = 2;
+    if(migration < CURRENT_VERSION){
+
+        for(var key of Object.getOwnPropertyNames(overrides)){
+            if(key.startsWith(':')) continue;
+            if(key != key.toLowerCase()){
+                var v = overrides[key];
+                delete overrides[key];
+                overrides[key.toLowerCase()] = v;
+            }
+        }
+        
+        badIdentifiersArray.forEach(x => delete overrides[x]);
+
+        overrides[MIGRATION] = CURRENT_VERSION;
+        browser.storage.local.set({ overrides: overrides });
+    }
+    
     if (!v.installationId) {
         installationId = (Math.random() + '.' + Math.random() + '.' + Math.random()).replace(/\./g, '');
         browser.storage.local.set({ installationId: installationId });
@@ -121,8 +227,6 @@ function submitPendingRatings() {
 }
 
 
-var PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
-
 function saveLabel(response) {
     if (accepted) {
         if (!overrides[PENDING_SUBMISSIONS]) {
@@ -147,69 +251,6 @@ function openHelp() {
         url: browser.extension.getURL('help.html')
     })
 }
-
-var badIdentifiers = {};
-[
-    'facebook.com/a',
-    'facebook.com/ad_campaign',
-    'facebook.com/ads',
-    'facebook.com/ajax',
-    'facebook.com/bookmarks',
-    'facebook.com/buddylist.php',
-    'facebook.com/bugnub',
-    'facebook.com/comment',
-    'facebook.com/composer',
-    'facebook.com/events',
-    'facebook.com/findfriends',
-    'facebook.com/friends',
-    'facebook.com/fundraisers',
-    'facebook.com/games',
-    'facebook.com/groups',
-    'facebook.com/help',
-    'facebook.com/home.php',
-    'facebook.com/intl',
-    'facebook.com/jobs',
-    'facebook.com/l.php',
-    'facebook.com/language.php',
-    'facebook.com/legal',
-    'facebook.com/like.php',
-    'facebook.com/local_surface',
-    'facebook.com/logout.php',
-    'facebook.com/mbasic',
-    'facebook.com/menu',
-    'facebook.com/messages',
-    'facebook.com/nfx',
-    'facebook.com/notes',
-    'facebook.com/notifications.php',
-    'facebook.com/notifications',
-    'facebook.com/nt',
-    'facebook.com/page',
-    'facebook.com/pages',
-    'facebook.com/people',
-    'facebook.com/permalink.php',
-    'facebook.com/pg',
-    'facebook.com/photo.php',
-    'facebook.com/policies',
-    'facebook.com/privacy',
-    'facebook.com/profile.php',
-    'facebook.com/rapid_report',
-    'facebook.com/reactions',
-    'facebook.com/salegroups',
-    'facebook.com/search',
-    'facebook.com/settings',
-    'facebook.com/shares',
-    'facebook.com/story.php',
-    'facebook.com/ufi',
-    'reddit.com/r/all',
-    'reddit.com/r/popular',
-    'twitter.com/hashtag',
-    'twitter.com/i',
-    'twitter.com/search',
-    'twitter.com/settings',
-    'twitter.com/threadreaderapp',
-    'twitter.com/who_to_follow',
-    'youtube.com/watch',
-].forEach(x => badIdentifiers[x] = true);
 
 
 
