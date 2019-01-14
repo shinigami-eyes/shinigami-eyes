@@ -59,6 +59,8 @@ var badIdentifiersArray = [
     'facebook.com/shares',
     'facebook.com/story.php',
     'facebook.com/ufi',
+    'google.com',
+    'googleusercontent.com',
     'media.tumblr.com',
     'medium.com',
     'reddit.com',
