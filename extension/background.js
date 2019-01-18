@@ -3,6 +3,11 @@ var browser = browser || chrome;
 var PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
 var MIGRATION = ':MIGRATION'
 
+// If a user labels one of these URLs, they're making a mistake. Ignore the label.
+// This list includes:
+// * Social networks that are not supported
+// * System pages of supported social networks
+// * Archival and link shortening sites.
 var badIdentifiersArray = [
     'archive.is',
     'archive.org',
@@ -62,11 +67,13 @@ var badIdentifiersArray = [
     'google.com',
     'googleusercontent.com',
     'instagram.com',
+    'mail.google.com',
     'media.tumblr.com',
     'medium.com',
     'patreon.com',
     'paypal.com',
     'paypal.me',
+    'plus.google.com',
     'reddit.com',
     'reddit.com/r/all',
     'reddit.com/r/popular',
@@ -103,7 +110,7 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     overrides = v.overrides || {}
 
     var migration = overrides[MIGRATION] || 0;
-    var CURRENT_VERSION = 2;
+    var CURRENT_VERSION = 3;
     if(migration < CURRENT_VERSION){
 
         for(var key of Object.getOwnPropertyNames(overrides)){
