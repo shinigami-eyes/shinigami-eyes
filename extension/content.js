@@ -307,7 +307,7 @@ function getCurrentFacebookPageId() {
 function getIdentifier(urlstr) {
     try {
         var k = getIdentifierInternal(urlstr);
-        if (k && k.indexOf('!') != -1) return null;
+        if (!k || k.indexOf('!') != -1) return null;
         return k.toLowerCase();
     } catch (e) {
         console.warn("Unable to get identifier for " + urlstr);
