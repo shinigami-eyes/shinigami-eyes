@@ -14,6 +14,9 @@ var badIdentifiersArray = [
     'assets.tumblr.com',
     'bit.ly',
     'blogspot.com',
+    'change.org',
+    'etsy.com',
+    'play.google.com',
     'facebook.com/a',
     'facebook.com/ad_campaign',
     'facebook.com/ads',
@@ -80,6 +83,7 @@ var badIdentifiersArray = [
     'removeddit.com',
     't.co',
     't.umblr.com',
+    'twitch.tv',
     'tumblr.com',
     'twitter.com',
     'twitter.com/hashtag',
@@ -110,7 +114,7 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     overrides = v.overrides || {}
 
     var migration = overrides[MIGRATION] || 0;
-    var CURRENT_VERSION = 3;
+    var CURRENT_VERSION = 4;
     if(migration < CURRENT_VERSION){
 
         for(var key of Object.getOwnPropertyNames(overrides)){
