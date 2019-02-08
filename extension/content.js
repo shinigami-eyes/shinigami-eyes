@@ -228,13 +228,6 @@ function initLink(a) {
     var identifier = getIdentifier(a);
     if (!identifier) return;
 
-    if (hostname == 'reddit.com') {
-        if (a.classList.contains('title')) return; // post title (classic)
-        var parent = a.parentNode;
-        if (parent && parent.parentNode && parent.parentNode.classList.contains('flat-list')) return; // post buttons (classic)
-        if (a.id && a.id.startsWith('CommentTopMeta')) return; // post date (redesign)
-    }
-
     var label = knownLabels[identifier];
     if (label === undefined) {
         labelsToSolve.push({ element: a, identifier: identifier });
@@ -317,6 +310,11 @@ function getIdentifier(urlstr) {
 
 function getIdentifierInternal(urlstr) {
     if (!urlstr) return null;
+
+    if (hostname == 'reddit.com') {
+        var parent = urlstr.parentElement;
+        if (parent && parent.classList.contains('domain') && urlstr.textContent.startsWith('self.')) return null;
+    }
 
     if (hostname == 'facebook.com') {
         var parent = urlstr.parentElement;
@@ -408,6 +406,7 @@ function getIdentifierInternal(urlstr) {
     if (isHostedOn(host, 'reddit.com')) {
         var pathname = url.pathname.replace('/u/', '/user/');
         if (!pathname.startsWith('/user/') && !pathname.startsWith('/r/')) return null;
+        if(pathname.includes('/comments/')) return null;
         return 'reddit.com' + takeFirstPathComponents(pathname, 2);
     }
     if (isHostedOn(host, 'twitter.com')) {
