@@ -404,7 +404,7 @@ function getIdentifierInternal(urlstr) {
     if (isHostedOn(host, 'facebook.com')) {
         var s = getQuery(url.search);
         var p = url.pathname.replace('/pg/', '/');
-        return 'facebook.com/' + (s.story_fbid || s.set || s.story_fbid || s._ft_ || s.ft_id || s.id || takeFirstPathComponents(p, p.startsWith('/groups/') ? 2 : 1).substring(1));
+        return 'facebook.com/' + (s._ft_ || s.ft_id || s.id || takeFirstPathComponents(p, p.startsWith('/groups/') ? 2 : 1).substring(1));
     }
     if (isHostedOn(host, 'reddit.com')) {
         var pathname = url.pathname.replace('/u/', '/user/');

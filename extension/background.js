@@ -119,11 +119,15 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     overrides = v.overrides || {}
 
     var migration = overrides[MIGRATION] || 0;
-    var CURRENT_VERSION = 4;
+    var CURRENT_VERSION = 5;
     if(migration < CURRENT_VERSION){
 
         for(var key of Object.getOwnPropertyNames(overrides)){
             if(key.startsWith(':')) continue;
+            if(key.startsWith('facebook.com/a.')){
+                delete overrides[key];
+                continue;
+            }
             if(key != key.toLowerCase()){
                 var v = overrides[key];
                 delete overrides[key];
