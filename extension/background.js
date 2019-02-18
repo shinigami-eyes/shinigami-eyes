@@ -233,7 +233,7 @@ function submitPendingRatings() {
         entries: submitted
     }
     console.log('Sending request');
-    fetch('https://shinigami-eyes.azurewebsites.net/api/submit', {
+    fetch('https://k5kk18774h.execute-api.us-east-1.amazonaws.com/default/shinigamiEyesSubmission', {
         body: JSON.stringify(requestBody),
         method: 'POST',
         credentials: 'omit',
