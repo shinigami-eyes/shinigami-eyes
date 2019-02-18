@@ -315,6 +315,9 @@ function getIdentifierInternal(urlstr) {
         var parent = urlstr.parentElement;
         if (parent && parent.classList.contains('domain') && urlstr.textContent.startsWith('self.')) return null;
     }
+    if (hostname == 'disqus.com') {
+        if (urlstr.classList && urlstr.classList.contains('time-ago')) return null;
+    }
 
     if (hostname == 'facebook.com') {
         var parent = urlstr.parentElement;
