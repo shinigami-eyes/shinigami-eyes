@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "Shinigami Eyes",
     "author": "Shinigami Eyes",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "homepage_url": "https://shinigami-eyes.github.io/",
     "description": "Highlights transphobic/anti-LGBT and trans-friendly subreddits/users/facebook pages/groups with different colors.",
     "icons": {
