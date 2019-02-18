@@ -1,0 +1,126 @@
+html {
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+body {
+    margin: 0;
+    padding: 0;
+}
+
+
+.assigned-label-transphobic { color: #991515 !important; }
+.assigned-label-t-friendly { color: #77B91E !important; }
+
+h1 {
+    font-size: 40pt;
+}
+
+a {
+    color: rgb(76, 44, 119);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.fb-user, .fb-text, .fb-timestamp {
+    cursor: default;
+}
+
+.social-links {
+    text-align: center;
+}
+.social-links a {
+    font-weight: normal;
+}
+
+section { 
+    width: 100%;
+    margin: 0;
+    display: block;
+}
+.section-inner {
+    max-width: 1050px;
+    margin: 0 auto;
+    padding: 20px 20px;
+}
+.section-top {
+    background-color: rgb(213, 183, 255);
+    text-align: center;
+}
+.section-header {
+    background: white;
+}
+.section-faq {
+    background-color: rgb(213, 183, 255);
+}
+.section-guidelines {
+    background-color: white;
+    /*background-color: rgb(190, 245, 151);*/
+}
+
+.section-footer {
+    background-color: rgb(213, 183, 255);
+    text-align: center;
+    padding-bottom: 20px;
+    padding-top: 20px;
+}
+
+
+.example {
+
+    width: 330px;
+    background:  #f8f8f8;
+    box-shadow: 2px 2px 3px 3px  #ccc;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 10px;
+}
+
+.fb-post {
+    font-family: Arial;
+    padding: 15px;
+}
+
+.fb-user {
+    color: #365899;
+    font-weight: 600;
+    font-size: 14px;
+    margin-left: 50px;
+    padding-top: 4px;
+}
+
+.fb-timestamp {
+    color: rgb(97, 103, 112);
+    font-size: 12px;
+    margin-left: 50px;
+}
+
+.fb-thumb {
+    width: 40px;
+    position: absolute;
+}
+
+.fb-text {
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.summary,
+.reasoning {
+    color: #444;
+    font-style: italic;
+    font-family: Arial;
+    margin: 0 15px;
+}
+
+.summary {
+    margin-top: 3px;
+}
+
+.reasoning {
+    font-size: 10pt;
+}
+
+
