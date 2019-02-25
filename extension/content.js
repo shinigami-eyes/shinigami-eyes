@@ -5,6 +5,7 @@ if (hostname.startsWith('www.')) {
     hostname = hostname.substring(4);
 }
 if (hostname.endsWith('.reddit.com')) hostname = 'reddit.com';
+if (hostname.endsWith('.facebook.com')) hostname = 'facebook.com';
 
 
 var myself = null;
@@ -341,6 +342,8 @@ function getIdentifierInternal(urlstr) {
                     return 'facebook.com/' + gtParsed.engagement.eng_tid;
                 }
             }
+            var sigil = urlstr.dataset.sigil;
+            if (sigil) return null;
             var p = urlstr;
             while (p) {
                 var bt = p.dataset.bt;
@@ -404,7 +407,7 @@ function getIdentifierInternal(urlstr) {
     if (isHostedOn(host, 'facebook.com')) {
         var s = getQuery(url.search);
         var p = url.pathname.replace('/pg/', '/');
-        return 'facebook.com/' + (s._ft_ || s.ft_id || s.id || takeFirstPathComponents(p, p.startsWith('/groups/') ? 2 : 1).substring(1));
+        return 'facebook.com/' + (s.id || takeFirstPathComponents(p, p.startsWith('/groups/') ? 2 : 1).substring(1));
     }
     if (isHostedOn(host, 'reddit.com')) {
         var pathname = url.pathname.replace('/u/', '/user/');
