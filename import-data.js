@@ -2,7 +2,7 @@ var bloomfilter = require("./extension/bloomfilter.js");
 var fs = require('fs');
 
 function importFile(txt, name) {
-    var b = new bloomfilter.BloomFilter(/*bits*/ 1037100, 10);
+    var b = new bloomfilter.BloomFilter(/*bits*/ 1207718, 20);
 
     for (var line of fs.readFileSync(txt).toString().split('\n')) {
         line = line.trim();
