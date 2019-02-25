@@ -36,6 +36,7 @@ var badIdentifiersArray = [
     'facebook.com/fundraisers',
     'facebook.com/games',
     'facebook.com/groups',
+    'facebook.com/hashtag',
     'facebook.com/help',
     'facebook.com/home.php',
     'facebook.com/intl',
@@ -68,6 +69,7 @@ var badIdentifiersArray = [
     'facebook.com/salegroups',
     'facebook.com/search',
     'facebook.com/settings',
+    'facebook.com/sharer.php',
     'facebook.com/shares',
     'facebook.com/story.php',
     'facebook.com/ufi',
@@ -126,7 +128,7 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     overrides = v.overrides || {}
 
     var migration = overrides[MIGRATION] || 0;
-    var CURRENT_VERSION = 6;
+    var CURRENT_VERSION = 7;
     if(migration < CURRENT_VERSION){
 
         for(var key of Object.getOwnPropertyNames(overrides)){
