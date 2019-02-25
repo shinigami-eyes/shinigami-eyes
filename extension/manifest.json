@@ -21,6 +21,7 @@
                 "*://*.tumblr.com/*",
                 "*://*.wikipedia.org/*",
                 "*://*.rationalwiki.org/*",
+                "*://shinigami-eyes.localhost/*",
 
                 "*://*.google.ar/*",
                 "*://*.google.at/*",
