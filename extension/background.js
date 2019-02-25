@@ -101,6 +101,7 @@ var badIdentifiersArray = [
     'twitter.com/i',
     'twitter.com/search',
     'twitter.com/settings',
+    'twitter.com/threader_app',
     'twitter.com/threadreaderapp',
     'twitter.com/who_to_follow',
     'vk.com',
@@ -125,7 +126,7 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     overrides = v.overrides || {}
 
     var migration = overrides[MIGRATION] || 0;
-    var CURRENT_VERSION = 5;
+    var CURRENT_VERSION = 6;
     if(migration < CURRENT_VERSION){
 
         for(var key of Object.getOwnPropertyNames(overrides)){
