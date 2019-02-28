@@ -23,6 +23,9 @@
                 "*://*.rationalwiki.org/*",
                 "*://shinigami-eyes.localhost/*",
 
+                "*://duckduckgo.com/*",
+                "*://*.bing.com/*",
+                
                 "*://*.google.ar/*",
                 "*://*.google.at/*",
                 "*://*.google.be/*",

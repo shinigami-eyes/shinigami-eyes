@@ -12,6 +12,7 @@ var badIdentifiersArray = [
     'archive.is',
     'archive.org',
     'assets.tumblr.com',
+    'bing.com',
     'bit.ly',
     'blogspot.com',
     'change.org',
@@ -19,6 +20,7 @@ var badIdentifiersArray = [
     'deviantart.com',
     'discord-store.com',
     'discordapp.com',
+    'duckduckgo.com',
     'en.wikiquote.org',
     'etsy.com',
     'facebook.com/a',
@@ -228,6 +230,8 @@ function createContextMenu(text, id) {
             "*://*.wikipedia.org/*",
             "*://*.rationalwiki.org/*",
             "*://*.google.com/*",
+            "*://*.bing.com/*",
+            "*://duckduckgo.com/*",
         ]
     });
 }
