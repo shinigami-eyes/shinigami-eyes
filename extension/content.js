@@ -320,7 +320,7 @@ function getIdentifierInternal(urlstr) {
         if (urlstr.classList && urlstr.classList.contains('time-ago')) return null;
     }
 
-    if (hostname == 'facebook.com') {
+    if (hostname == 'facebook.com' && urlstr.tagName) {
         var parent = urlstr.parentElement;
         if (parent && (parent.tagName == 'H1' || parent.id == 'fb-timeline-cover-name')) {
             var id = getCurrentFacebookPageId();
@@ -328,6 +328,17 @@ function getIdentifierInternal(urlstr) {
             if (id)
                 return 'facebook.com/' + id;
         }
+
+        // comment timestamp
+        if (urlstr.firstChild && urlstr.firstChild.tagName == 'ABBR' && urlstr.lastChild == urlstr.firstChild) return null;
+        
+        // post 'see more'
+        if (urlstr.classList.contains('see_more_link')) return null;
+
+        // post 'continue reading'
+        if (parent && parent.classList.contains('text_exposed_link')) return null;
+
+
         if (urlstr.dataset) {
             var hovercard = urlstr.dataset.hovercard;
             if (hovercard) {
@@ -335,6 +346,16 @@ function getIdentifierInternal(urlstr) {
                 if (id)
                     return 'facebook.com/' + id;
             }
+
+            // post Comments link
+            if (urlstr.dataset.testid == 'UFI2CommentsCount/root') return null;
+            
+            // post Comments link
+            if (urlstr.dataset.commentPreludeRef) return null;
+
+            // page left sidebar
+            if (urlstr.dataset.endpoint) return null;
+
             var gt = urlstr.dataset.gt;
             if (gt) {
                 var gtParsed = JSON.parse(gt);
@@ -342,8 +363,10 @@ function getIdentifierInternal(urlstr) {
                     return 'facebook.com/' + gtParsed.engagement.eng_tid;
                 }
             }
-            var sigil = urlstr.dataset.sigil;
-            if (sigil) return null;
+
+            // comment interaction buttons
+            if (urlstr.dataset.sigil) return null;
+
             var p = urlstr;
             while (p) {
                 var bt = p.dataset.bt;
@@ -365,6 +388,9 @@ function getIdentifierInternal(urlstr) {
         return null;
     }
     if (url.protocol != 'http:' && url.protocol != 'https:') return null;
+
+    // fb group member badge
+    if (url.pathname.includes('/badge_member_list/')) return null;
 
     if (url.href.indexOf('http', 1) != -1) {
         var s = getQuery(url.search);
@@ -393,6 +419,7 @@ function getIdentifierInternal(urlstr) {
         return getIdentifierInternal('http://' + match);
     }
     if (url.search && url.search.includes('http')) {
+        if (url.pathname.startsWith('/intl/')) return null; // facebook language switch links
         for (var q of url.searchParams) {
             if (q[1].startsWith('http')) return getIdentifierInternal(q[1]);
         }
