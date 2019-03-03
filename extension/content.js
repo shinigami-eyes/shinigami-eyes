@@ -6,6 +6,7 @@ if (hostname.startsWith('www.')) {
 }
 if (hostname.endsWith('.reddit.com')) hostname = 'reddit.com';
 if (hostname.endsWith('.facebook.com')) hostname = 'facebook.com';
+if (hostname.endsWith('.youtube.com')) hostname = 'youtube.com';
 
 
 var myself = null;
@@ -178,6 +179,7 @@ function updateYouTubeChannelHeader() {
         replacement.href = lastAppliedYouTubeUrl;
     }
     updateAllLabels();
+    setTimeout(updateAllLabels, 2000);
 }
 
 function updateAllLabels(refresh) {
@@ -227,7 +229,11 @@ function applyLabel(a, identifier) {
 
 function initLink(a) {
     var identifier = getIdentifier(a);
-    if (!identifier) return;
+    if (!identifier){
+        if(hostname == 'youtube.com')
+            applyLabel(a, '');
+        return;
+    }
 
     var label = knownLabels[identifier];
     if (label === undefined) {
