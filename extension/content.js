@@ -487,24 +487,7 @@ init();
 
 var lastGeneratedLinkId = 0;
 
-browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-
-    if (message.updateAllLabels) {
-        updateAllLabels(true);
-        return;
-    }
-    message.contextPage = window.location.href;
-    var target = null; // message.elementId ? browser.menus.getTargetElement(message.elementId) : null;
-
-    //console.log(message.url)
-    var links = target ? [target] : [...document.getElementsByTagName('A')].filter(x => x.href == message.url)
-
-    //if (!links.length) console.log('Already empty :(')
-    var identifier = links.length ? getIdentifier(links[0]) : getIdentifier(message.url);
-    if (!identifier) return;
-    message.identifier = identifier;
-    var snippets = links.map(node => {
-
+function getSnippet(node){
         while (node) {
             var classList = node.classList;
             if (hostname == 'facebook.com' && node.dataset && node.dataset.ftr) return node;
@@ -517,25 +500,47 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
             node = node.parentElement;
         }
-        //console.log('Reached the top without a satisfying element')
         return null;
-    })
+}
 
-    var exact = snippets.filter(x => x && x.contains(lastRightClickedElement))[0] || null;
 
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+
+    if (message.updateAllLabels) {
+        updateAllLabels(true);
+        return;
+    }
     
+    message.contextPage = window.location.href;
+    var target = lastRightClickedElement; // message.elementId ? browser.menus.getTargetElement(message.elementId) : null;
+    
+    while(target){
+        if(target.href) break;
+        target = target.parentElement;
+    }
+
+    if (target && target.href != message.url) target = null;
+
+    var identifier = target ? getIdentifier(target) : getIdentifier(message.url);
+    if (!identifier) return;
+
+    message.identifier = identifier;
+    if (identifier.startsWith('facebook.com/'))
+        message.secondaryIdentifier = getIdentifier(message.url);
+    
+    var snippet = getSnippet(target);    
     message.linkId = ++lastGeneratedLinkId;
 
-    if (lastRightClickedElement) 
-        lastRightClickedElement.setAttribute('shinigami-eyes-link-id', lastGeneratedLinkId);
+    if (target) 
+        target.setAttribute('shinigami-eyes-link-id', lastGeneratedLinkId);
 
-    message.snippet = exact ? exact.outerHTML : null;
+    message.snippet = snippet ? snippet.outerHTML : null;
     var debugClass = 'shinigami-eyes-debug-snippet-highlight';
     
-    if (exact && message.debug) {
-        exact.classList.add(debugClass);
+    if (snippet && message.debug) {
+        snippet.classList.add(debugClass);
         if (message.debug <= 1)
-            setTimeout(() => exact.classList.remove(debugClass), 1500)
+            setTimeout(() => snippet.classList.remove(debugClass), 1500)
     }
     sendResponse(message);
 })

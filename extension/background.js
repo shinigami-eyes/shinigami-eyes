@@ -274,6 +274,8 @@ function saveLabel(response) {
                 .map(x => { return { identifier: x, label: overrides[x] } });
         }
         overrides[response.identifier] = response.mark;
+        if (response.secondaryIdentifier)
+            overrides[response.secondaryIdentifier] = response.mark;
         browser.storage.local.set({ overrides: overrides });
         overrides[PENDING_SUBMISSIONS].push(response);
         submitPendingRatings();
@@ -309,7 +311,11 @@ browser.contextMenus.onClicked.addListener(function (info, tab) {
         debug: overrides.debug
     }, null, response => {
         if (!response.identifier) return;
-        if (badIdentifiers[response.identifier] && response.mark) return;
+        if (response.mark){
+            if (badIdentifiers[response.identifier]) return;
+            if (response.secondaryIdentifier && badIdentifiers[response.secondaryIdentifier])
+                response.secondaryIdentifier = null;
+        }
         if (response.debug && /^facebook\.com\/[a-zA-Z]/.test(response.identifier))
             alert('Note: could not find numeric id for ' + response.identifier);
         response.tabId = tab.id;
