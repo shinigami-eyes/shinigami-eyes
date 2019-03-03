@@ -356,6 +356,9 @@ function getIdentifierInternal(urlstr) {
             // page left sidebar
             if (urlstr.dataset.endpoint) return null;
 
+            // profile tabs
+            if (urlstr.dataset.tabKey) return null;
+
             var gt = urlstr.dataset.gt;
             if (gt) {
                 var gtParsed = JSON.parse(gt);
@@ -488,19 +491,19 @@ init();
 var lastGeneratedLinkId = 0;
 
 function getSnippet(node){
-        while (node) {
-            var classList = node.classList;
-            if (hostname == 'facebook.com' && node.dataset && node.dataset.ftr) return node;
-            if (hostname == 'reddit.com' && (classList.contains('scrollerItem') || classList.contains('thing') || classList.contains('Comment'))) return node;
-            if (hostname == 'twitter.com' && (classList.contains('stream-item'))) return node;
-            if (hostname == 'disqus.com' && (classList.contains('post-content'))) return node;
-            if (hostname == 'medium.com' && (classList.contains('streamItem') || classList.contains('streamItemConversationItem'))) return node;
-            if (hostname == 'youtube.com' && node.tagName == 'YTD-COMMENT-RENDERER') return node;
-            if (hostname.endsWith('tumblr.com') && (node.dataset.postId || classList.contains('post'))) return node;
+    while (node) {
+        var classList = node.classList;
+        if (hostname == 'facebook.com' && node.dataset && node.dataset.ftr) return node;
+        if (hostname == 'reddit.com' && (classList.contains('scrollerItem') || classList.contains('thing') || classList.contains('Comment'))) return node;
+        if (hostname == 'twitter.com' && (classList.contains('stream-item'))) return node;
+        if (hostname == 'disqus.com' && (classList.contains('post-content'))) return node;
+        if (hostname == 'medium.com' && (classList.contains('streamItem') || classList.contains('streamItemConversationItem'))) return node;
+        if (hostname == 'youtube.com' && node.tagName == 'YTD-COMMENT-RENDERER') return node;
+        if (hostname.endsWith('tumblr.com') && (node.dataset.postId || classList.contains('post'))) return node;
 
-            node = node.parentElement;
-        }
-        return null;
+        node = node.parentElement;
+    }
+    return null;
 }
 
 
@@ -527,7 +530,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     message.identifier = identifier;
     if (identifier.startsWith('facebook.com/'))
         message.secondaryIdentifier = getIdentifier(message.url);
-    
+
     var snippet = getSnippet(target);    
     message.linkId = ++lastGeneratedLinkId;
 
