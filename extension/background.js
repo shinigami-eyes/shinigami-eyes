@@ -113,6 +113,7 @@ var badIdentifiersArray = [
     'www.tumblr.com',
     'youtu.be',
     'youtube.com',
+    'youtube.com/playlist',
     'youtube.com/redirect',
     'youtube.com/watch',
 ];
@@ -130,7 +131,7 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     overrides = v.overrides || {}
 
     var migration = overrides[MIGRATION] || 0;
-    var CURRENT_VERSION = 7;
+    var CURRENT_VERSION = 8;
     if(migration < CURRENT_VERSION){
 
         for(var key of Object.getOwnPropertyNames(overrides)){
