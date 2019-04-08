@@ -15,7 +15,7 @@ cd ..
 
 
 copy ShinigamiEyes.xpi $out
-7z a "$archiveDir\shinigami-eyes-lists-$version.7z" -mx9 C:\ML\facebook\transphobic.txt C:\ML\facebook\t-friendly.txt
+7z a "$archiveDir\shinigami-eyes-lists-$version.7z" -mx9 C:\ML\facebook\decisions.pb
 CheckExitCode
 
 
