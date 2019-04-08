@@ -20,9 +20,12 @@ var badIdentifiersArray = [
     'deviantart.com',
     'discord-store.com',
     'discordapp.com',
+    'disqus.com',
     'duckduckgo.com',
+    'en.wikipedia.org',
     'en.wikiquote.org',
     'etsy.com',
+    'facebook.com',
     'facebook.com/a',
     'facebook.com/ad_campaign',
     'facebook.com/ads',
@@ -90,6 +93,7 @@ var badIdentifiersArray = [
     'paypal.me',
     'play.google.com',
     'plus.google.com',
+    'rationalwiki.org',
     'reddit.com',
     'reddit.com/r/all',
     'reddit.com/r/popular',
@@ -109,6 +113,7 @@ var badIdentifiersArray = [
     'twitter.com/threadreaderapp',
     'twitter.com/who_to_follow',
     'vk.com',
+    'wikipedia.org',
     'wordpress.com',
     'www.tumblr.com',
     'youtu.be',
@@ -131,7 +136,7 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     overrides = v.overrides || {}
 
     var migration = overrides[MIGRATION] || 0;
-    var CURRENT_VERSION = 8;
+    var CURRENT_VERSION = 9;
     if(migration < CURRENT_VERSION){
 
         for(var key of Object.getOwnPropertyNames(overrides)){
