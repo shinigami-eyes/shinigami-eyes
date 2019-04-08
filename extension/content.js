@@ -455,9 +455,9 @@ function getIdentifierInternal(urlstr) {
         return 'twitter.com' + takeFirstPathComponents(url.pathname, 1);
     }
     if (isHostedOn(host, 'youtube.com')) {
-        var pathname = url.pathname;
+        var pathname = url.pathname.replace('/c/', '/user/');
         if (!pathname.startsWith('/user/') && !pathname.startsWith('/channel/')) return null;
-        return 'youtube.com' + takeFirstPathComponents(url.pathname, 2);
+        return 'youtube.com' + takeFirstPathComponents(pathname, 2);
     }
     if (isHostedOn(host, 'disqus.com') && url.pathname.startsWith('/by/')) {
         return 'disqus.com' + takeFirstPathComponents(url.pathname, 2);
