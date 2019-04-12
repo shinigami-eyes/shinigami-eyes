@@ -4,7 +4,7 @@ $version = (gc .\extension\manifest.json | convertfrom-json).version
 $archiveDir = "C:\ML\shinigami-eyes-releases"
 
 
-$out = "$archiveDir\shinigami-eyes-$version.xpi"
+$out = "$archiveDir\xpi\shinigami-eyes-$version.xpi"
 if(Test-Path $out){ throw 'Release already exists.' }
 
 node import-data.js
@@ -15,8 +15,7 @@ cd ..
 
 
 copy ShinigamiEyes.xpi $out
-7z a "$archiveDir\shinigami-eyes-lists-$version.7z" -mx9 C:\ML\facebook\decisions.pb
-CheckExitCode
+copy "C:\ML\facebook\decisions.pb" "$archiveDir\data\shinigami-eyes-$version.pb"
 
 
 
