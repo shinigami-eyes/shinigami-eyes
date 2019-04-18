@@ -8,6 +8,7 @@ var MIGRATION = ':MIGRATION'
 // * Social networks that are not supported
 // * System pages of supported social networks
 // * Archival and link shortening sites.
+// * Reddit bots.
 var badIdentifiersArray = [
     'archive.is',
     'archive.org',
