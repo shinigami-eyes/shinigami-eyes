@@ -449,7 +449,7 @@ function getIdentifierInternal(urlstr) {
     if (isHostedOn(host, 'reddit.com')) {
         var pathname = url.pathname.replace('/u/', '/user/');
         if (!pathname.startsWith('/user/') && !pathname.startsWith('/r/')) return null;
-        if(pathname.includes('/comments/')) return null;
+        if(pathname.includes('/comments/') && hostname == 'reddit.com') return null;
         return 'reddit.com' + takeFirstPathComponents(pathname, 2);
     }
     if (isHostedOn(host, 'twitter.com')) {
