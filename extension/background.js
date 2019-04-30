@@ -36,6 +36,7 @@ var badIdentifiersArray = [
     'facebook.com/bugnub',
     'facebook.com/comment',
     'facebook.com/composer',
+    'facebook.com/donate',
     'facebook.com/events',
     'facebook.com/findfriends',
     'facebook.com/friends',
@@ -102,9 +103,9 @@ var badIdentifiersArray = [
     'reddit.com/user/animalfactsbot',
     'reddit.com/user/anti-gif-bot',
     'reddit.com/user/areyoudeaf',
+    'reddit.com/user/auto-xkcd37',
     'reddit.com/user/automoderator',
     'reddit.com/user/autotldr',
-    'reddit.com/user/auto-xkcd37',
     'reddit.com/user/biglebowskibot',
     'reddit.com/user/bots_rise_up',
     'reddit.com/user/cheer_up_bot',
@@ -127,8 +128,8 @@ var badIdentifiersArray = [
     'reddit.com/user/goodbot_badbot',
     'reddit.com/user/goodmod_badmod',
     'reddit.com/user/gyazo_bot',
-    'reddit.com/user/haikubot-1911',
     'reddit.com/user/haiku-detector',
+    'reddit.com/user/haikubot-1911',
     'reddit.com/user/helperbot_',
     'reddit.com/user/hug-bot',
     'reddit.com/user/i_am_a_haiku_bot',
@@ -169,13 +170,13 @@ var badIdentifiersArray = [
     'reddit.com/user/smallsubbot',
     'reddit.com/user/snapshillbot',
     'reddit.com/user/sneakpeekbot',
-    'reddit.com/user/stabbot',
     'reddit.com/user/stabbot_crop',
+    'reddit.com/user/stabbot',
     'reddit.com/user/steamnewsbot',
     'reddit.com/user/subjunctive__bot',
     'reddit.com/user/table_it_bot',
-    'reddit.com/user/thehelperdroid',
     'reddit.com/user/the-paranoid-android',
+    'reddit.com/user/thehelperdroid',
     'reddit.com/user/thiscatmightcheeryou',
     'reddit.com/user/timestamp_bot',
     'reddit.com/user/timezone_bot',
@@ -200,6 +201,7 @@ var badIdentifiersArray = [
     't.co',
     't.umblr.com',
     'tapatalk.com',
+    'tmblr.co',
     'tumblr.com',
     'twitch.tv',
     'twitter.com',
@@ -234,7 +236,7 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     overrides = v.overrides || {}
 
     var migration = overrides[MIGRATION] || 0;
-    var CURRENT_VERSION = 10;
+    var CURRENT_VERSION = 11;
     if(migration < CURRENT_VERSION){
 
         for(var key of Object.getOwnPropertyNames(overrides)){
