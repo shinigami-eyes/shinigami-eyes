@@ -55,6 +55,7 @@ var badIdentifiersArray = [
     'facebook.com/local_surface',
     'facebook.com/logout.php',
     'facebook.com/mbasic',
+    'facebook.com/media',
     'facebook.com/menu',
     'facebook.com/messages',
     'facebook.com/nfx',
