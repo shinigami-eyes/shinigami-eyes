@@ -3,6 +3,8 @@ var browser = browser || chrome;
 var PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
 var MIGRATION = ':MIGRATION'
 
+var CURRENT_VERSION = 11;
+
 // If a user labels one of these URLs, they're making a mistake. Ignore the label.
 // This list includes:
 // * Social networks that are not supported
@@ -239,7 +241,6 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     overrides = v.overrides || {}
 
     var migration = overrides[MIGRATION] || 0;
-    var CURRENT_VERSION = 11;
     if(migration < CURRENT_VERSION){
 
         for(var key of Object.getOwnPropertyNames(overrides)){
