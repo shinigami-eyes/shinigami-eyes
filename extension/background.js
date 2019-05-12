@@ -387,6 +387,7 @@ function saveLabel(response) {
         if (response.secondaryIdentifier)
             overrides[response.secondaryIdentifier] = response.mark;
         browser.storage.local.set({ overrides: overrides });
+        response.version = CURRENT_VERSION;
         overrides[PENDING_SUBMISSIONS].push(response);
         submitPendingRatings();
         //console.log(response);
