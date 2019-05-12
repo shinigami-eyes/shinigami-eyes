@@ -1,4 +1,4 @@
-var browser = browser || chrome;
+﻿var browser = browser || chrome;
 
 var PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
 var MIGRATION = ':MIGRATION'
@@ -231,12 +231,28 @@ var badIdentifiers = {};
 badIdentifiersArray.forEach(x => badIdentifiers[x] = true);
 
 
+var needsInfiniteResubmissionWorkaround = [
+    '046775268347','094745034139','059025030493','016970595453','016488055088','028573603939',
+    '047702135398','035965787127','069722626647','044482561296','068530257405','071378971311',
+    '050784255720','074169481269','001621982155','014636303566','016313013148','051923868290',
+    '025348057349','059525793150','047081840457','086106188740','080095076304','059341889183',
+    '095799487873','099003666813','002434495335','009844923475','034297166260','065739632127',
+    '040689448048','048816243838','018152001078','059285890303','073205501344','096068619182'
+]
+
 var overrides = null;
 
 var accepted = false;
 var installationId = null;
 
 browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
+    if (!v.installationId) {
+        installationId = (Math.random() + '.' + Math.random() + '.' + Math.random()).replace(/\./g, '');
+        browser.storage.local.set({ installationId: installationId });
+    } else {
+        installationId = v.installationId;
+    }
+
     accepted = v.accepted
     overrides = v.overrides || {}
 
@@ -258,15 +274,10 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
         
         badIdentifiersArray.forEach(x => delete overrides[x]);
 
+        if (needsInfiniteResubmissionWorkaround.indexOf(installationId.substring(0, 12)) != -1)
+            overrides[PENDING_SUBMISSIONS] = [];
         overrides[MIGRATION] = CURRENT_VERSION;
         browser.storage.local.set({ overrides: overrides });
-    }
-    
-    if (!v.installationId) {
-        installationId = (Math.random() + '.' + Math.random() + '.' + Math.random()).replace(/\./g, '');
-        browser.storage.local.set({ installationId: installationId });
-    } else {
-        installationId = v.installationId;
     }
 })
 
