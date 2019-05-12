@@ -68,6 +68,8 @@ var badIdentifiersArray = [
     'facebook.com/people',
     'facebook.com/permalink.php',
     'facebook.com/pg',
+    'facebook.com/docs',
+    
     'facebook.com/photo.php',
     'facebook.com/policies',
     'facebook.com/privacy',
