@@ -3,7 +3,7 @@
 var PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
 var MIGRATION = ':MIGRATION'
 
-var CURRENT_VERSION = 11;
+var CURRENT_VERSION = 100017;
 
 // If a user labels one of these URLs, they're making a mistake. Ignore the label.
 // This list includes:
