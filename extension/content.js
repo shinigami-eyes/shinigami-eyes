@@ -106,6 +106,7 @@ function init() {
 
     if (isHostedOn(hostname, 'youtube.com')) {
         setInterval(updateYouTubeChannelHeader, 300);
+        setInterval(updateAllLabels, 6000);
     }
 
     if (myself && (myself.href || myself.startsWith('http:') || myself.startsWith('https:')))
@@ -181,6 +182,7 @@ function updateYouTubeChannelHeader() {
     }
     updateAllLabels();
     setTimeout(updateAllLabels, 2000);
+    setTimeout(updateAllLabels, 4000);
 }
 
 function updateAllLabels(refresh) {
