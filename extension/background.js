@@ -230,6 +230,7 @@ var badIdentifiersArray = [
 var badIdentifiers = {};
 badIdentifiersArray.forEach(x => badIdentifiers[x] = true);
 
+var lastSubmissionError = null;
 
 var needsInfiniteResubmissionWorkaround = [
     '046775268347','094745034139','059025030493','016970595453','016488055088','028573603939',
@@ -364,27 +365,32 @@ createContextMenu('Help', 'help');
 
 var uncommittedResponse = null;
 
-function submitPendingRatings() {
+async function submitPendingRatings() {
     var submitted = overrides[PENDING_SUBMISSIONS].map(x => x);
     var requestBody = {
         installationId: installationId,
+        lastError: lastSubmissionError,
         entries: submitted
     }
+    lastSubmissionError = null;
     console.log('Sending request');
-    fetch('https://k5kk18774h.execute-api.us-east-1.amazonaws.com/default/shinigamiEyesSubmission', {
-        body: JSON.stringify(requestBody),
-        method: 'POST',
-        credentials: 'omit',
-    }).then(response => {
-        response.text().then(result => {
-            console.log('Response: ' + result);
-            if (result == 'SUCCESS') {
-                overrides[PENDING_SUBMISSIONS] = overrides[PENDING_SUBMISSIONS].filter(x => submitted.indexOf(x) == -1);
-                browser.storage.local.set({ overrides: overrides });
-            }
-        })
+    try {
+        var response = await fetch('https://k5kk18774h.execute-api.us-east-1.amazonaws.com/default/shinigamiEyesSubmission', {
+            body: JSON.stringify(requestBody),
+            method: 'POST',
+            credentials: 'omit',
+        });
+        if (response.status != 200) throw ('HTTP status: ' + response.status)
+        var result = await response.text();    
+        
+        if (result != 'SUCCESS') throw 'Bad response: ' + ('' + result).substring(0, 20);
 
-    });
+        overrides[PENDING_SUBMISSIONS] = overrides[PENDING_SUBMISSIONS].filter(x => submitted.indexOf(x) == -1);
+        browser.storage.local.set({ overrides: overrides });
+    } catch(e) {
+        lastSubmissionError = '' + e
+    }
+
 }
 
 
