@@ -6,5 +6,4 @@
 .vs/VSWorkspaceState.json
 slnx.sqlite
 *.suo
-extension/data/transphobic.dat
-extension/data/t-friendly.dat
+extension
