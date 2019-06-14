@@ -466,7 +466,7 @@ function getIdentifierInternal(urlstr) {
         return 'disqus.com' + takeFirstPathComponents(url.pathname, 2);
     }
     if (isHostedOn(host, 'medium.com')) {
-        return 'medium.com' + takeFirstPathComponents(url.pathname, 1);
+        return 'medium.com' + takeFirstPathComponents(url.pathname.replace('/t/', '/'), 1);
     }
     if (isHostedOn(host, 'tumblr.com')) {
         if (url.pathname.startsWith('/register/follow/')) {
