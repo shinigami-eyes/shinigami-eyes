@@ -431,14 +431,19 @@ browser.contextMenus.onClicked.addListener(function (info, tab) {
         return;
     }
 
+    var tabId = tab.id;
+    var frameId = info.frameId;
+
     var label = info.menuItemId.substring('mark-'.length);
     if (label == 'none') label = '';
-    browser.tabs.sendMessage(tab.id, {
+    browser.tabs.sendMessage(tabId, {
         mark: label,
         url: info.linkUrl,
+        tabId: tabId,
+        frameId: frameId,
         // elementId: info.targetElementId,
         debug: overrides.debug
-    }, null, response => {
+    }, { frameId: frameId }, response => {
         if (!response.identifier) return;
         if (response.mark){
             if (badIdentifiers[response.identifier]) return;
@@ -447,7 +452,8 @@ browser.contextMenus.onClicked.addListener(function (info, tab) {
         }
         if (response.debug && /^facebook\.com\/[a-zA-Z]/.test(response.identifier))
             alert('Note: could not find numeric id for ' + response.identifier);
-        response.tabId = tab.id;
+        response.tabId = tabId;
+        response.frameId = frameId;
         saveLabel(response);
     })
 
