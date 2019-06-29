@@ -3,7 +3,7 @@
 const PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
 const MIGRATION = ':MIGRATION'
 
-const CURRENT_VERSION = 100018;
+const CURRENT_VERSION = 100019;
 
 // If a user labels one of these URLs, they're making a mistake. Ignore the label.
 // This list includes:
@@ -11,7 +11,7 @@ const CURRENT_VERSION = 100018;
 // * System pages of supported social networks
 // * Archival and link shortening sites.
 // * Reddit bots.
-var badIdentifiersArray = [
+const badIdentifiersArray = [
     'archive.is',
     'archive.org',
     'assets.tumblr.com',
@@ -232,12 +232,12 @@ var badIdentifiersArray = [
     'youtube.com/redirect',
     'youtube.com/watch',
 ];
-var badIdentifiers : {[id: string]: true} = {};
+const badIdentifiers : {[id: string]: true} = {};
 badIdentifiersArray.forEach(x => badIdentifiers[x] = true);
 
-var lastSubmissionError = null;
+var lastSubmissionError : string = null;
 
-var needsInfiniteResubmissionWorkaround = [
+const needsInfiniteResubmissionWorkaround = [
     '046775268347','094745034139','059025030493','016970595453','016488055088','028573603939',
     '047702135398','035965787127','069722626647','044482561296','068530257405','071378971311',
     '050784255720','074169481269','001621982155','014636303566','016313013148','051923868290',
@@ -246,10 +246,10 @@ var needsInfiniteResubmissionWorkaround = [
     '040689448048','048816243838','018152001078','059285890303','073205501344','096068619182'
 ]
 
-var overrides = null;
+var overrides : LabelMap = null;
 
 var accepted = false;
-var installationId = null;
+var installationId : string = null;
 
 browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     if (!v.installationId) {
@@ -262,17 +262,17 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     accepted = v.accepted
     overrides = v.overrides || {}
 
-    var migration = overrides[MIGRATION] || 0;
-    if(migration < CURRENT_VERSION){
+    const migration = overrides[MIGRATION] || 0;
+    if (migration < CURRENT_VERSION){
 
-        for(var key of Object.getOwnPropertyNames(overrides)){
-            if(key.startsWith(':')) continue;
-            if(key.startsWith('facebook.com/a.')){
+        for (const key of Object.getOwnPropertyNames(overrides)){
+            if (key.startsWith(':')) continue;
+            if (key.startsWith('facebook.com/a.')){
                 delete overrides[key];
                 continue;
             }
-            if(key != key.toLowerCase()){
-                var v = overrides[key];
+            if (key != key.toLowerCase()){
+                let v = overrides[key];
                 delete overrides[key];
                 overrides[key.toLowerCase()] = v;
             }
@@ -281,30 +281,29 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
         badIdentifiersArray.forEach(x => delete overrides[x]);
 
         if (needsInfiniteResubmissionWorkaround.indexOf(installationId.substring(0, 12)) != -1)
-            overrides[PENDING_SUBMISSIONS] = [];
-        overrides[MIGRATION] = CURRENT_VERSION;
+            overrides[PENDING_SUBMISSIONS] = <any>[];
+        overrides[MIGRATION] = <any>CURRENT_VERSION;
         browser.storage.local.set({ overrides: overrides });
     }
 })
 
 const bloomFilters : BloomFilter[] = [];
 
-function loadBloomFilter(name: string) {
+async function loadBloomFilter(name: LabelKind) {
 
-    var url = browser.extension.getURL('data/' + name + '.dat');
-    fetch(url).then(response => {
-        response.arrayBuffer().then(arrayBuffer => {
-            var array = new Uint32Array(arrayBuffer);
-            var b = new BloomFilter(array, 20);
-            b.name = name;
-            bloomFilters.push(b);
-        });
-    });
+    const url = browser.extension.getURL('data/' + name + '.dat');
+    const response = await fetch(url);
+    const arrayBuffer = await response.arrayBuffer();
+
+    const array = new Uint32Array(arrayBuffer);
+    const b = new BloomFilter(array, 20);
+    b.name = name;
+    bloomFilters.push(b);
 }
 
 
 
-browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesMessage | LabelMap>((message, sender, sendResponse) => {
     if (message.acceptClicked !== undefined) {
         accepted = message.acceptClicked;
         browser.storage.local.set({ accepted: accepted });
@@ -314,22 +313,22 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         uncommittedResponse = null;
         return;
     }
-    var response = {};
-    var transphobic = message.myself && bloomFilters.filter(x => x.name == 'transphobic')[0].test(message.myself);
-    for (var id of message.ids) {
+    const response : LabelMap = {};
+    const transphobic = message.myself && bloomFilters.filter(x => x.name == 'transphobic')[0].test(message.myself);
+    for (const id of message.ids) {
         if (overrides[id] !== undefined) {
             response[id] = overrides[id];
             continue;
         }
         if (transphobic) {
             if (id == message.myself) continue;
-            var sum = 0;
-            for (var i = 0; i < id.length; i++) {
+            let sum = 0;
+            for (let i = 0; i < id.length; i++) {
                 sum += id.charCodeAt(i);
             }
             if (sum % 8 != 0) continue;
         }
-        for (var bloomFilter of bloomFilters) {
+        for (const bloomFilter of bloomFilters) {
             if (bloomFilter.test(id)) response[id] = bloomFilter.name;
         }
     }
@@ -368,11 +367,11 @@ createContextMenu('Mark as t-friendly', 'mark-t-friendly');
 createContextMenu('Clear', 'mark-none');
 createContextMenu('Help', 'help');
 
-var uncommittedResponse = null;
+var uncommittedResponse : ShinigamiEyesSubmission = null;
 
 async function submitPendingRatings() {
-    var submitted = overrides[PENDING_SUBMISSIONS].map(x => x);
-    var requestBody = {
+    const submitted = getPendingSubmissions().map(x => x);
+    const requestBody = {
         installationId: installationId,
         lastError: lastSubmissionError,
         entries: submitted
@@ -380,17 +379,17 @@ async function submitPendingRatings() {
     lastSubmissionError = null;
     console.log('Sending request');
     try {
-        var response = await fetch('https://k5kk18774h.execute-api.us-east-1.amazonaws.com/default/shinigamiEyesSubmission', {
+        const response = await fetch('https://k5kk18774h.execute-api.us-east-1.amazonaws.com/default/shinigamiEyesSubmission', {
             body: JSON.stringify(requestBody),
             method: 'POST',
             credentials: 'omit',
         });
         if (response.status != 200) throw ('HTTP status: ' + response.status)
-        var result = await response.text();    
+        const result = await response.text();    
         
         if (result != 'SUCCESS') throw 'Bad response: ' + ('' + result).substring(0, 20);
 
-        overrides[PENDING_SUBMISSIONS] = overrides[PENDING_SUBMISSIONS].filter(x => submitted.indexOf(x) == -1);
+        overrides[PENDING_SUBMISSIONS] = <any>getPendingSubmissions().filter(x => submitted.indexOf(x) == -1);
         browser.storage.local.set({ overrides: overrides });
     } catch(e) {
         lastSubmissionError = '' + e
@@ -398,12 +397,16 @@ async function submitPendingRatings() {
 
 }
 
+function getPendingSubmissions() : ShinigamiEyesSubmission[]{
+    return <any>overrides[PENDING_SUBMISSIONS];
+}
 
-function saveLabel(response) {
+
+function saveLabel(response: ShinigamiEyesSubmission) {
     if (accepted) {
-        if (!overrides[PENDING_SUBMISSIONS]) {
-            overrides[PENDING_SUBMISSIONS] = Object.getOwnPropertyNames(overrides)
-                .map(x => { return { identifier: x, label: overrides[x] } });
+        if (!getPendingSubmissions()) {
+            overrides[PENDING_SUBMISSIONS] = <any>Object.getOwnPropertyNames(overrides)
+                .map<ShinigamiEyesSubmission>(x => { return { identifier: x, label: overrides[x] } });
         }
         overrides[response.identifier] = response.mark;
         if (response.secondaryIdentifier)
@@ -411,7 +414,7 @@ function saveLabel(response) {
         browser.storage.local.set({ overrides: overrides });
         response.version = CURRENT_VERSION;
         response.submissionId = (Math.random() + '').replace('.', '');
-        overrides[PENDING_SUBMISSIONS].push(response);
+        getPendingSubmissions().push(response);
         submitPendingRatings();
         //console.log(response);
         browser.tabs.sendMessage(response.tabId, { updateAllLabels: true });
@@ -436,18 +439,18 @@ browser.contextMenus.onClicked.addListener(function (info, tab) {
         return;
     }
 
-    var tabId = tab.id;
-    var frameId = info.frameId;
+    const tabId = tab.id;
+    const frameId = info.frameId;
 
     var label = <LabelKind>info.menuItemId.substring('mark-'.length);
     if (label == 'none') label = '';
-    browser.tabs.sendMessage<ShinigamiSubmission, ShinigamiSubmission>(tabId, {
+    browser.tabs.sendMessage<ShinigamiEyesSubmission, ShinigamiEyesSubmission>(tabId, {
         mark: label,
         url: info.linkUrl,
         tabId: tabId,
         frameId: frameId,
         // elementId: info.targetElementId,
-        debug: overrides.debug
+        debug: <any>overrides.debug
     }, { frameId: frameId }, response => {
         if (!response.identifier) return;
         if (response.mark){

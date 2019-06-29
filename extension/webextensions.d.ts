@@ -1,9 +1,9 @@
 declare type Browser = {
 
     runtime: {
-        sendMessage<TRequest, TResponse>(request: TRequest, response: (response: TResponse) => void);
+        sendMessage<TRequest, TResponse>(request: TRequest, response: (response: TResponse) => void): void;
         onMessage: {
-            addListener(listener: (message, any, sendResponse) => void)
+            addListener<TRequest, TResponse>(listener: (message: TRequest, sender: MessageSender, sendResponse: (response: TResponse) => void) => void): void
         }
     }
 
@@ -11,13 +11,13 @@ declare type Browser = {
         local: BrowserStorage
     }
     tabs: {
-        remove(id: number)
+        remove(id: number): void
         sendMessage<TRequest, TResponse>(tabId: number, request: TRequest, options?: {
             frameId: number
-        }, callback?: (response: TResponse) => void)
+        }, callback?: (response: TResponse) => void): void
         create(options: {
             url: string
-        })
+        }): void
     }
     extension: {
         getURL(relativeUrl: string): string
@@ -36,13 +36,20 @@ declare type Browser = {
                 linkUrl: string
             }, tab: {
                 id: number
-            }) => void)
+            }) => void): void
         }
     }
 }
+type MessageSender = {
+    tab?: {id: number};
+    frameId?: number;
+    id?: string;
+    url?: string;
+    tlsChannelId?: string;
+  };
 declare type BrowserStorage = {
-    get(names: string[], callback: (obj: any) => void)
-    set(obj: { [name: string]: any });
+    get(names: string[], callback: (obj: any) => void): void
+    set(obj: { [name: string]: any }): void;
 }
 declare var browser: Browser;
 declare var chrome: Browser;

@@ -8,112 +8,87 @@ if (hostname.endsWith('.reddit.com')) hostname = 'reddit.com';
 if (hostname.endsWith('.facebook.com')) hostname = 'facebook.com';
 if (hostname.endsWith('.youtube.com')) hostname = 'youtube.com';
 
-
-var myself = null;
+var myself : string = null;
 
 function fixupSiteStyles() {
-    if (hostname == 'reddit.com') {
-        myself = document.querySelector('#header-bottom-right .user a');
+    if (hostname == 'facebook.com') {
+        let m = document.querySelector("[id^='profile_pic_header_']")
+        if (m) myself = 'facebook.com/' + captureRegex(m.id, /header_(\d+)/);
+    } else if (hostname == 'medium.com') {
+        addStyleSheet(`
+            a.show-thread-link, a.ThreadedConversation-moreRepliesLink {
+                color: inherit !important;
+            }
+            .fullname,
+            .stream-item a:hover .fullname,
+            .stream-item a:active .fullname
+            {color:inherit;}
+        `);
+    } else if (domainIs(hostname, 'tumblr.com')) {
+        addStyleSheet(`
+            .assigned-label-transphobic { outline: 2px solid #991515 !important; }
+            .assigned-label-t-friendly { outline: 1px solid #77B91E !important; }
+        `);
+    } else if (hostname.indexOf('wiki') != -1){
+        addStyleSheet(`
+            .assigned-label-transphobic { outline: 1px solid #991515 !important; }
+            .assigned-label-t-friendly { outline: 1px solid #77B91E !important; }
+        `);
+    } else if (hostname == 'twitter.com') {
+        myself = getIdentifier(<HTMLAnchorElement>document.querySelector('.DashUserDropdown-userInfo a'));
+        addStyleSheet(`
+            .pretty-link b, .pretty-link s {
+                color: inherit !important;
+            }
+            
+            a.show-thread-link, a.ThreadedConversation-moreRepliesLink {
+                color: inherit !important;
+            }
+            .fullname,
+            .stream-item a:hover .fullname,
+            .stream-item a:active .fullname
+            {color:inherit;}
+        `);
+    } else if (hostname == 'reddit.com') {
+        myself = getIdentifier(<HTMLAnchorElement>document.querySelector('#header-bottom-right .user a'));
         if (!myself) {
-            var m : any = document.querySelector('#USER_DROPDOWN_ID');
+            let m = document.querySelector('#USER_DROPDOWN_ID');
             if (m) {
-                m = [...m.querySelectorAll('*')].filter(x => x.childNodes.length == 1 && x.firstChild.nodeType == 3).map(x => x.textContent)[0]
-                if (m) myself = 'reddit.com/user/' + m;
+                let username = [...m.querySelectorAll('*')].filter(x => x.childNodes.length == 1 && x.firstChild.nodeType == 3).map(x => x.textContent)[0]
+                if (username) myself = 'reddit.com/user/' + username;
             }
         }
-    }
-    if (hostname == 'facebook.com') {
-        var m : any = document.querySelector("[id^='profile_pic_header_']")
-        if (m) myself = 'facebook.com/' + captureRegex(m.id, /header_(\d+)/);
-    }
-    if (hostname == 'medium.com') {
-
-
-        var style = document.createElement('style');
-        style.textContent = `
-
-        a.show-thread-link, a.ThreadedConversation-moreRepliesLink {
-            color: inherit !important;
-        }
-        .fullname,
-        .stream-item a:hover .fullname,
-        .stream-item a:active .fullname
-        {color:inherit;}
-        
-        `;
-        document.head.appendChild(style);
-
-    }
-    if (isHostedOn(hostname, 'tumblr.com')) {
-        var style = document.createElement('style');
-        style.textContent = `
-        .assigned-label-transphobic { outline: 2px solid #991515 !important; }
-        .assigned-label-t-friendly { outline: 1px solid #77B91E !important; }
-        `;
-        document.head.appendChild(style);
-    }
-    if(hostname.indexOf('wiki') != -1){
-        var style = document.createElement('style');
-        style.textContent = `
-        .assigned-label-transphobic { outline: 1px solid #991515 !important; }
-        .assigned-label-t-friendly { outline: 1px solid #77B91E !important; }
-        
-        `;
-        document.head.appendChild(style);
-    }
-    if (hostname == 'twitter.com') {
-        myself = document.querySelector('.DashUserDropdown-userInfo a');
-
-        var style = document.createElement('style');
-        style.textContent = `
-
-        .pretty-link b, .pretty-link s {
-            color: inherit !important;
-        }
-        
-        a.show-thread-link, a.ThreadedConversation-moreRepliesLink {
-            color: inherit !important;
-        }
-        .fullname,
-        .stream-item a:hover .fullname,
-        .stream-item a:active .fullname
-        {color:inherit;}
-        
-        `;
-        document.head.appendChild(style);
-
-    } else if (hostname == 'reddit.com') {
-        var style = document.createElement('style');
-        style.textContent = `
-    .author { color: #369 !important;}
-        `;
-        document.head.appendChild(style);
+        addStyleSheet(`
+            .author { color: #369 !important;}
+        `);
     }
 }
 
+function addStyleSheet(css: string){
+    const style = document.createElement('style');
+    style.textContent = css;
+    document.head.appendChild(style);
+}
+
 function maybeDisableCustomCss() {
-    var shouldDisable = null;
+    var shouldDisable: (s: {ownerNode: HTMLElement}) => boolean = null;
     if (hostname == 'twitter.com') shouldDisable = x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('user-style');
     else if (hostname == 'medium.com') shouldDisable = x => x.ownerNode && x.ownerNode.className && x.ownerNode.className == 'js-collectionStyle';
     else if (hostname == 'disqus.com') shouldDisable = x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('css_');
 
     if (shouldDisable)
-        [...document.styleSheets].filter(shouldDisable).forEach(x => x.disabled = true);
+        [...document.styleSheets].filter(<any>shouldDisable).forEach(x => x.disabled = true);
 }
 
 function init() {
     fixupSiteStyles();
 
-    if (isHostedOn(hostname, 'youtube.com')) {
+    if (domainIs(hostname, 'youtube.com')) {
         setInterval(updateYouTubeChannelHeader, 300);
         setInterval(updateAllLabels, 6000);
     }
 
-    if (myself && (myself.href || myself.startsWith('http:') || myself.startsWith('https:')))
-        myself = getIdentifier(myself);
     console.log('Self: ' + myself)
-
-
 
     maybeDisableCustomCss();
     updateAllLabels();
@@ -135,7 +110,6 @@ function init() {
             }
         }
         solvePendingLabels();
-
     });
 
     observer.observe(document.body, {
@@ -143,15 +117,14 @@ function init() {
         subtree: true
     });
 
-
     document.addEventListener('contextmenu', evt => {
-        lastRightClickedElement = evt.target;
+        lastRightClickedElement = <HTMLElement>evt.target;
     }, true);
 }
 
-var lastRightClickedElement = null;
-var lastAppliedYouTubeUrl = null;
-var lastAppliedYouTubeTitle = null;
+var lastRightClickedElement : HTMLElement = null;
+var lastAppliedYouTubeUrl : string = null;
+var lastAppliedYouTubeTitle : string = null;
 
 function updateYouTubeChannelHeader() {
     var url = window.location.href;
@@ -187,24 +160,21 @@ function updateYouTubeChannelHeader() {
 
 function updateAllLabels(refresh?: boolean) {
     if (refresh) knownLabels = {};
-    var links = document.links;
-    for (var i = 0; i < links.length; i++) {
-        var a = <HTMLAnchorElement>links[i];
+    for (const a of document.getElementsByTagName('a')) {
         initLink(a);
     }
     solvePendingLabels();
 }
 
+var knownLabels: LabelMap = {};
 
-var knownLabels = {};
-
-var labelsToSolve = [];
+var labelsToSolve : LabelToSolve[] = [];
 function solvePendingLabels() {
     if (!labelsToSolve.length) return;
     var uniqueIdentifiers = Array.from(new Set(labelsToSolve.map(x => x.identifier)));
     var tosolve = labelsToSolve;
     labelsToSolve = [];
-    browser.runtime.sendMessage({ ids: uniqueIdentifiers, myself: myself }, response => {
+    browser.runtime.sendMessage<ShinigamiEyesCommand, LabelMap>({ ids: uniqueIdentifiers, myself: <string>myself }, (response: LabelMap) => {
         for (const item of tosolve) {
             var label = response[item.identifier];
             knownLabels[item.identifier] = label || '';
@@ -213,8 +183,7 @@ function solvePendingLabels() {
     });
 }
 
-function applyLabel(a, identifier) {
-
+function applyLabel(a: HTMLAnchorElement, identifier: string) {
     if (a.assignedCssLabel) {
         a.classList.remove('assigned-label-' + a.assignedCssLabel);
         a.classList.remove('has-assigned-label');
@@ -246,38 +215,26 @@ function initLink(a: HTMLAnchorElement) {
     applyLabel(a, identifier);
 }
 
-function isHostedOn(/** @type {string}*/fullHost, /** @type {string}*/baseHost) {
-    if (baseHost.length > fullHost.length) return false;
-    if (baseHost.length == fullHost.length) return baseHost == fullHost;
-    var k = fullHost.charCodeAt(fullHost.length - baseHost.length - 1);
-    if (k == 0x2E) return fullHost.endsWith(baseHost);
+function domainIs(host: string, baseDomain: string) {
+    if (baseDomain.length > host.length) return false;
+    if (baseDomain.length == host.length) return baseDomain == host;
+    var k = host.charCodeAt(host.length - baseDomain.length - 1);
+    if (k == 0x2E /* . */) return host.endsWith(baseDomain);
     else return false;
 }
 
-function getQuery(search: string) : any {
-    if (!search) return {};
-    var s = {};
-    if (search.startsWith('?')) search = search.substring(1);
-    for (var pair of search.split('&')) {
-        var z = pair.split('=');
-        if (z.length != 2) continue;
-        s[decodeURIComponent(z[0]).replace(/\+/g, ' ')] = decodeURIComponent(z[1].replace(/\+/g, ' '));
-    }
-    return s;
-}
-
-function takeFirstPathComponents(path: string, num: number) {
+function getPartialPath(path: string, num: number) {
     var m = path.split('/')
     m = m.slice(1, 1 + num);
     if (m.length && !m[m.length - 1]) m.length--;
     if (m.length != num) return '!!'
     return '/' + m.join('/');
 }
-function takeNthPathComponent(path: string, nth: number) {
-    return path.split('/')[nth + 1] || null;
+function getPathPart(path: string, index: number) {
+    return path.split('/')[index + 1] || null;
 }
 
-function captureRegex(str, regex) {
+function captureRegex(str: string, regex: RegExp) {
     if (!str) return null;
     var match = str.match(regex);
     if (match && match[1]) return match[1];
@@ -307,30 +264,29 @@ function getCurrentFacebookPageId() {
     return null;
 }
 
-function getIdentifier(urlstr) {
+function getIdentifier(link: string | HTMLAnchorElement) {
     try {
-        var k = getIdentifierInternal(urlstr);
+        var k = link instanceof Node ? getIdentifierFromElementImpl(link) : getIdentifierFromURLImpl(tryParseURL(link));
         if (!k || k.indexOf('!') != -1) return null;
         return k.toLowerCase();
     } catch (e) {
-        console.warn("Unable to get identifier for " + urlstr);
+        console.warn("Unable to get identifier for " + link);
         return null;
     }
 }
 
-function getIdentifierInternal(urlstr) {
-    if (!urlstr) return null;
+function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
+    if (!element) return null;
+
+    const dataset = element.dataset;
 
     if (hostname == 'reddit.com') {
-        const parent = urlstr.parentElement;
-        if (parent && parent.classList.contains('domain') && urlstr.textContent.startsWith('self.')) return null;
-    }
-    if (hostname == 'disqus.com') {
-        if (urlstr.classList && urlstr.classList.contains('time-ago')) return null;
-    }
-
-    if (hostname == 'facebook.com' && urlstr.tagName) {
-        const parent = urlstr.parentElement;
+        const parent = element.parentElement;
+        if (parent && parent.classList.contains('domain') && element.textContent.startsWith('self.')) return null;
+    } else if (hostname == 'disqus.com') {
+        if (element.classList && element.classList.contains('time-ago')) return null;
+    } else if (hostname == 'facebook.com') {
+        const parent = element.parentElement;
         if (parent && (parent.tagName == 'H1' || parent.id == 'fb-timeline-cover-name')) {
             const id = getCurrentFacebookPageId();
             //console.log('Current fb page: ' + id)
@@ -339,17 +295,17 @@ function getIdentifierInternal(urlstr) {
         }
 
         // comment timestamp
-        if (urlstr.firstChild && urlstr.firstChild.tagName == 'ABBR' && urlstr.lastChild == urlstr.firstChild) return null;
+        if (element.firstChild && (<HTMLElement>element.firstChild).tagName == 'ABBR' && element.lastChild == element.firstChild) return null;
         
         // post 'see more'
-        if (urlstr.classList.contains('see_more_link')) return null;
+        if (element.classList.contains('see_more_link')) return null;
 
         // post 'continue reading'
         if (parent && parent.classList.contains('text_exposed_link')) return null;
 
 
-        if (urlstr.dataset) {
-            const hovercard = urlstr.dataset.hovercard;
+        if (dataset) {
+            const hovercard = dataset.hovercard;
             if (hovercard) {
                 const id = captureRegex(hovercard, /id=(\d+)/);
                 if (id)
@@ -357,18 +313,18 @@ function getIdentifierInternal(urlstr) {
             }
 
             // post Comments link
-            if (urlstr.dataset.testid == 'UFI2CommentsCount/root') return null;
+            if (dataset.testid == 'UFI2CommentsCount/root') return null;
             
             // post Comments link
-            if (urlstr.dataset.commentPreludeRef) return null;
+            if (dataset.commentPreludeRef) return null;
 
             // page left sidebar
-            if (urlstr.dataset.endpoint) return null;
+            if (dataset.endpoint) return null;
 
             // profile tabs
-            if (urlstr.dataset.tabKey) return null;
+            if (dataset.tabKey) return null;
 
-            const gt = urlstr.dataset.gt;
+            const gt = dataset.gt;
             if (gt) {
                 const gtParsed = JSON.parse(gt);
                 if (gtParsed.engagement && gtParsed.engagement.eng_tid) {
@@ -377,9 +333,9 @@ function getIdentifierInternal(urlstr) {
             }
 
             // comment interaction buttons
-            if (urlstr.dataset.sigil) return null;
+            if (dataset.sigil) return null;
 
-            let p = <HTMLElement>urlstr;
+            let p = <HTMLElement>element;
             while (p) {
                 const bt = p.dataset.bt;
                 if (bt) {
@@ -390,109 +346,98 @@ function getIdentifierInternal(urlstr) {
             }
         }
     }
-    if (urlstr.dataset && urlstr.dataset.expandedUrl) urlstr = urlstr.dataset.expandedUrl;
-    if (urlstr.href !== undefined) urlstr = urlstr.href;
+    if (dataset && dataset.expandedUrl) return getIdentifierFromURLImpl(tryParseURL(dataset.expandedUrl));
+    const href = element.href;
+    if(href && !href.endsWith('#')) return getIdentifierFromURLImpl(tryParseURL(href));
+    return null;
+}
+
+function tryParseURL(urlstr: string){
     if (!urlstr) return null;
-    if (urlstr.endsWith('#')) return null;
-    let url;
     try {
-        url = new URL(urlstr);
-    } catch (e) {
+        const url = new URL(urlstr);
+        if (url.protocol != 'http:' && url.protocol != 'https:') return null;
+        return url;
+    } catch(e) {
         return null;
     }
-    if (url.protocol != 'http:' && url.protocol != 'https:') return null;
+}
+
+function getIdentifierFromURLImpl(url: URL): string{
+    if(!url) return null;
+
+    // nested urls
+    if (url.href.indexOf('http', 1) != -1) {
+        if (url.pathname.startsWith('/intl/')) return null; // facebook language switch links
+
+        // const values = url.searchParams.values()
+        // HACK: values(...) is not iterable on facebook (babel polyfill?)
+        const values = url.search.split('&').map(x => {
+            const eq = x.indexOf('=');
+            return eq == -1 ? '' : decodeURIComponent(x.substr(eq + 1));
+        });
+
+        for (const value of values) {
+            if (value.startsWith('http:') || value.startsWith('https:')) {
+                return getIdentifierFromURLImpl(tryParseURL(value));
+            }
+        }
+        const newurl = tryParseURL(url.href.substring(url.href.indexOf('http', 1)));
+        if(newurl) return getIdentifierFromURLImpl(newurl);
+    }
 
     // fb group member badge
     if (url.pathname.includes('/badge_member_list/')) return null;
 
-    if (url.href.indexOf('http', 1) != -1) {
-        const s = getQuery(url.search);
-        urlstr = null;
-        for (const key in s) {
-            if (s.hasOwnProperty(key)) {
-                const element = s[key];
-                if (element.startsWith('http:') || element.startsWith('https')) {
-                    urlstr = element;
-                    break;
-                }
-            }
-        }
-        if (urlstr == null) {
-            urlstr = url.href.substring(url.href.indexOf('http', 1))
-        }
-        try {
-            url = new URL(urlstr);
-        } catch (e) { }
-    }
-
     let host = url.hostname;
-    if (isHostedOn(host, 'web.archive.org')) {
+    if (domainIs(host, 'web.archive.org')) {
         const match = captureRegex(url.href, /\/web\/\w+\/(.*)/);
         if (!match) return null;
-        return getIdentifierInternal('http://' + match);
+        return getIdentifierFromURLImpl(tryParseURL('http://' + match));
     }
-    if (url.search && url.search.includes('http')) {
-        if (url.pathname.startsWith('/intl/')) return null; // facebook language switch links
-        for (const q of url.searchParams) {
-            if (q[1].startsWith('http')) return getIdentifierInternal(q[1]);
-        }
-    }
-    /*
-    if(host == 't.umblr.com'){
-        return getIdentifierInternal(url.searchParams.get('z'));
-    }
-    */
+
     if (host.startsWith('www.')) host = host.substring(4);
 
-    if (isHostedOn(host, 'facebook.com')) {
-        const s = getQuery(url.search);
+    if (domainIs(host, 'facebook.com')) {
+        const fbId = url.searchParams.get('id');
         const p = url.pathname.replace('/pg/', '/');
-        return 'facebook.com/' + (s.id || takeFirstPathComponents(p, p.startsWith('/groups/') ? 2 : 1).substring(1));
-    }
-    if (isHostedOn(host, 'reddit.com')) {
+        return 'facebook.com/' + (fbId || getPartialPath(p, p.startsWith('/groups/') ? 2 : 1).substring(1));
+    } else if (domainIs(host, 'reddit.com')) {
         const pathname = url.pathname.replace('/u/', '/user/');
         if (!pathname.startsWith('/user/') && !pathname.startsWith('/r/')) return null;
         if(pathname.includes('/comments/') && hostname == 'reddit.com') return null;
-        return 'reddit.com' + takeFirstPathComponents(pathname, 2);
-    }
-    if (isHostedOn(host, 'twitter.com')) {
-        return 'twitter.com' + takeFirstPathComponents(url.pathname, 1);
-    }
-    if (isHostedOn(host, 'youtube.com')) {
+        return 'reddit.com' + getPartialPath(pathname, 2);
+    } else if (domainIs(host, 'twitter.com')) {
+        return 'twitter.com' + getPartialPath(url.pathname, 1);
+    } else if (domainIs(host, 'youtube.com')) {
         const pathname = url.pathname.replace('/c/', '/user/');
         if (!pathname.startsWith('/user/') && !pathname.startsWith('/channel/')) return null;
-        return 'youtube.com' + takeFirstPathComponents(pathname, 2);
-    }
-    if (isHostedOn(host, 'disqus.com') && url.pathname.startsWith('/by/')) {
-        return 'disqus.com' + takeFirstPathComponents(url.pathname, 2);
-    }
-    if (isHostedOn(host, 'medium.com')) {
-        return 'medium.com' + takeFirstPathComponents(url.pathname.replace('/t/', '/'), 1);
-    }
-    if (isHostedOn(host, 'tumblr.com')) {
+        return 'youtube.com' + getPartialPath(pathname, 2);
+    } else if (domainIs(host, 'disqus.com') && url.pathname.startsWith('/by/')) {
+        return 'disqus.com' + getPartialPath(url.pathname, 2);
+    } else if (domainIs(host, 'medium.com')) {
+        return 'medium.com' + getPartialPath(url.pathname.replace('/t/', '/'), 1);
+    } else if (domainIs(host, 'tumblr.com')) {
         if (url.pathname.startsWith('/register/follow/')) {
-            const name = takeNthPathComponent(url.pathname, 2);
+            const name = getPathPart(url.pathname, 2);
             return name ? name + '.tumblr.com' : null;
         }
         if (host != 'www.tumblr.com' && host != 'assets.tumblr.com' && host.indexOf('.media.') == -1) {
             if (!url.pathname.startsWith('/tagged/')) return url.host;
         }
         return null;
-    }
-    if (isHostedOn(host, 'wikipedia.org') || isHostedOn(host, 'rationalwiki.org')) {
+    } else if (domainIs(host, 'wikipedia.org') || domainIs(host, 'rationalwiki.org')) {
         if (url.hash || url.pathname.includes(':')) return null;
-        if (url.pathname.startsWith('/wiki/')) return 'wikipedia.org' + takeFirstPathComponents(url.pathname, 2);
+        if (url.pathname.startsWith('/wiki/')) return 'wikipedia.org' + getPartialPath(url.pathname, 2);
         else return null;
-    }
-    if (host.indexOf('.blogspot.') != -1) {
+    } else if (host.indexOf('.blogspot.') != -1) {
         const m = captureRegex(host, /([a-zA-Z0-9\-]*)\.blogspot/);
         if (m) return m + '.blogspot.com';
+        else return null;
+    } else {
+        if (host.startsWith('m.')) host = host.substr(2);
+        return host;
     }
-
-    let id = host;
-    if (id.startsWith('www.')) id = id.substr(4);
-    if (id.startsWith('m.')) id = id.substr(2);
-    return id;
 }
 
 
@@ -500,7 +445,7 @@ init();
 
 var lastGeneratedLinkId = 0;
 
-function getSnippet(node){
+function getSnippet(node: HTMLElement){
     while (node) {
         var classList = node.classList;
         if (hostname == 'facebook.com' && node.dataset && node.dataset.ftr) return node;
@@ -517,7 +462,7 @@ function getSnippet(node){
 }
 
 
-browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesSubmission>((message, sender, sendResponse) => {
 
     if (message.updateAllLabels) {
         updateAllLabels(true);
@@ -528,13 +473,13 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     var target = lastRightClickedElement; // message.elementId ? browser.menus.getTargetElement(message.elementId) : null;
     
     while(target){
-        if(target.href) break;
+        if((<HTMLAnchorElement>target).href) break;
         target = target.parentElement;
     }
 
-    if (target && target.href != message.url) target = null;
+    if (target && (<HTMLAnchorElement>target).href != message.url) target = null;
 
-    var identifier = target ? getIdentifier(target) : getIdentifier(message.url);
+    var identifier = target ? getIdentifier(<HTMLAnchorElement>target) : getIdentifier(message.url);
     if (!identifier) return;
 
     message.identifier = identifier;
@@ -545,7 +490,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     message.linkId = ++lastGeneratedLinkId;
 
     if (target) 
-        target.setAttribute('shinigami-eyes-link-id', lastGeneratedLinkId);
+        target.setAttribute('shinigami-eyes-link-id', '' + lastGeneratedLinkId);
 
     message.snippet = snippet ? snippet.outerHTML : null;
     var debugClass = 'shinigami-eyes-debug-snippet-highlight';
