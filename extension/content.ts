@@ -1,4 +1,4 @@
-var browser = browser || chrome;
+var browser : Browser = browser || chrome;
 
 var hostname = typeof (location) != 'undefined' ? location.hostname : '';
 if (hostname.startsWith('www.')) {
@@ -15,7 +15,7 @@ function fixupSiteStyles() {
     if (hostname == 'reddit.com') {
         myself = document.querySelector('#header-bottom-right .user a');
         if (!myself) {
-            var m = document.querySelector('#USER_DROPDOWN_ID');
+            var m : any = document.querySelector('#USER_DROPDOWN_ID');
             if (m) {
                 m = [...m.querySelectorAll('*')].filter(x => x.childNodes.length == 1 && x.firstChild.nodeType == 3).map(x => x.textContent)[0]
                 if (m) myself = 'reddit.com/user/' + m;
@@ -23,7 +23,7 @@ function fixupSiteStyles() {
         }
     }
     if (hostname == 'facebook.com') {
-        var m = document.querySelector("[id^='profile_pic_header_']")
+        var m : any = document.querySelector("[id^='profile_pic_header_']")
         if (m) myself = 'facebook.com/' + captureRegex(m.id, /header_(\d+)/);
     }
     if (hostname == 'medium.com') {

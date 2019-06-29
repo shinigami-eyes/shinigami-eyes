@@ -1,9 +1,9 @@
-﻿var browser = browser || chrome;
+﻿var browser : Browser = browser || chrome;
 
-var PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
-var MIGRATION = ':MIGRATION'
+const PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
+const MIGRATION = ':MIGRATION'
 
-var CURRENT_VERSION = 100018;
+const CURRENT_VERSION = 100018;
 
 // If a user labels one of these URLs, they're making a mistake. Ignore the label.
 // This list includes:
@@ -232,7 +232,7 @@ var badIdentifiersArray = [
     'youtube.com/redirect',
     'youtube.com/watch',
 ];
-var badIdentifiers = {};
+var badIdentifiers : {[id: string]: true} = {};
 badIdentifiersArray.forEach(x => badIdentifiers[x] = true);
 
 var lastSubmissionError = null;
@@ -287,9 +287,9 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     }
 })
 
-var bloomFilters = [];
+const bloomFilters : BloomFilter[] = [];
 
-function loadBloomFilter(name) {
+function loadBloomFilter(name: string) {
 
     var url = browser.extension.getURL('data/' + name + '.dat');
     fetch(url).then(response => {
@@ -341,7 +341,7 @@ loadBloomFilter('t-friendly');
 
 
 
-function createContextMenu(text, id) {
+function createContextMenu(text: string, id: ContextMenuCommand) {
     browser.contextMenus.create({
         id: id,
         title: text,
