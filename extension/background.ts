@@ -439,9 +439,9 @@ browser.contextMenus.onClicked.addListener(function (info, tab) {
     var tabId = tab.id;
     var frameId = info.frameId;
 
-    var label = info.menuItemId.substring('mark-'.length);
+    var label = <LabelKind>info.menuItemId.substring('mark-'.length);
     if (label == 'none') label = '';
-    browser.tabs.sendMessage(tabId, {
+    browser.tabs.sendMessage<ShinigamiSubmission, ShinigamiSubmission>(tabId, {
         mark: label,
         url: info.linkUrl,
         tabId: tabId,

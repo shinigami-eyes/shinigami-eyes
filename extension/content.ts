@@ -120,14 +120,14 @@ function init() {
 
     var observer = new MutationObserver(mutationsList => {
         maybeDisableCustomCss();
-        for (var mutation of mutationsList) {
+        for (const mutation of mutationsList) {
             if (mutation.type == 'childList') {
-                for (var node of mutation.addedNodes) {
-                    if (node.tagName == 'A') {
+                for (const node of mutation.addedNodes) {
+                    if (node instanceof HTMLAnchorElement) {
                         initLink(node);
                     }
-                    if (node.querySelectorAll) {
-                        for (var subnode of node.querySelectorAll('a')) {
+                    if (node instanceof HTMLElement) {
+                        for (const subnode of node.querySelectorAll('a')) {
                             initLink(subnode);
                         }
                     }
@@ -164,9 +164,9 @@ function updateYouTubeChannelHeader() {
     lastAppliedYouTubeTitle = currentTitle;
 
     if (currentTitle) {
-        var replacement = document.getElementById('channel-title-replacement');
+        var replacement = <HTMLAnchorElement>document.getElementById('channel-title-replacement');
         if (!replacement) {
-            replacement = document.createElement('A');
+            replacement = <HTMLAnchorElement>document.createElement('A');
             replacement.id = 'channel-title-replacement'
             replacement.className = title.className;
             title.parentNode.insertBefore(replacement, title.nextSibling);
@@ -185,11 +185,11 @@ function updateYouTubeChannelHeader() {
     setTimeout(updateAllLabels, 4000);
 }
 
-function updateAllLabels(refresh) {
+function updateAllLabels(refresh?: boolean) {
     if (refresh) knownLabels = {};
     var links = document.links;
     for (var i = 0; i < links.length; i++) {
-        var a = links[i];
+        var a = <HTMLAnchorElement>links[i];
         initLink(a);
     }
     solvePendingLabels();
@@ -205,7 +205,7 @@ function solvePendingLabels() {
     var tosolve = labelsToSolve;
     labelsToSolve = [];
     browser.runtime.sendMessage({ ids: uniqueIdentifiers, myself: myself }, response => {
-        for (item of tosolve) {
+        for (const item of tosolve) {
             var label = response[item.identifier];
             knownLabels[item.identifier] = label || '';
             applyLabel(item.element, item.identifier);
@@ -230,7 +230,7 @@ function applyLabel(a, identifier) {
     }
 }
 
-function initLink(a) {
+function initLink(a: HTMLAnchorElement) {
     var identifier = getIdentifier(a);
     if (!identifier){
         if(hostname == 'youtube.com')
@@ -254,7 +254,7 @@ function isHostedOn(/** @type {string}*/fullHost, /** @type {string}*/baseHost) 
     else return false;
 }
 
-function getQuery(/** @type {string}*/search) {
+function getQuery(search: string) : any {
     if (!search) return {};
     var s = {};
     if (search.startsWith('?')) search = search.substring(1);
@@ -266,14 +266,14 @@ function getQuery(/** @type {string}*/search) {
     return s;
 }
 
-function takeFirstPathComponents(/** @type {string}*/path, /** @type {number}*/num) {
+function takeFirstPathComponents(path: string, num: number) {
     var m = path.split('/')
     m = m.slice(1, 1 + num);
     if (m.length && !m[m.length - 1]) m.length--;
     if (m.length != num) return '!!'
     return '/' + m.join('/');
 }
-function takeNthPathComponent(/** @type {string}*/path, /** @type {number}*/nth) {
+function takeNthPathComponent(path: string, nth: number) {
     return path.split('/')[nth + 1] || null;
 }
 
@@ -287,7 +287,7 @@ function captureRegex(str, regex) {
 function getCurrentFacebookPageId() {
 
     // page
-    var elem = document.querySelector("a[rel=theater][aria-label='Profile picture']");
+    var elem = <HTMLAnchorElement>document.querySelector("a[rel=theater][aria-label='Profile picture']");
     if (elem) {
         var p = captureRegex(elem.href, /facebook\.com\/(\d+)/)
         if (p) return p;
@@ -322,7 +322,7 @@ function getIdentifierInternal(urlstr) {
     if (!urlstr) return null;
 
     if (hostname == 'reddit.com') {
-        var parent = urlstr.parentElement;
+        const parent = urlstr.parentElement;
         if (parent && parent.classList.contains('domain') && urlstr.textContent.startsWith('self.')) return null;
     }
     if (hostname == 'disqus.com') {
@@ -330,9 +330,9 @@ function getIdentifierInternal(urlstr) {
     }
 
     if (hostname == 'facebook.com' && urlstr.tagName) {
-        var parent = urlstr.parentElement;
+        const parent = urlstr.parentElement;
         if (parent && (parent.tagName == 'H1' || parent.id == 'fb-timeline-cover-name')) {
-            var id = getCurrentFacebookPageId();
+            const id = getCurrentFacebookPageId();
             //console.log('Current fb page: ' + id)
             if (id)
                 return 'facebook.com/' + id;
@@ -349,9 +349,9 @@ function getIdentifierInternal(urlstr) {
 
 
         if (urlstr.dataset) {
-            var hovercard = urlstr.dataset.hovercard;
+            const hovercard = urlstr.dataset.hovercard;
             if (hovercard) {
-                var id = captureRegex(hovercard, /id=(\d+)/);
+                const id = captureRegex(hovercard, /id=(\d+)/);
                 if (id)
                     return 'facebook.com/' + id;
             }
@@ -368,9 +368,9 @@ function getIdentifierInternal(urlstr) {
             // profile tabs
             if (urlstr.dataset.tabKey) return null;
 
-            var gt = urlstr.dataset.gt;
+            const gt = urlstr.dataset.gt;
             if (gt) {
-                var gtParsed = JSON.parse(gt);
+                const gtParsed = JSON.parse(gt);
                 if (gtParsed.engagement && gtParsed.engagement.eng_tid) {
                     return 'facebook.com/' + gtParsed.engagement.eng_tid;
                 }
@@ -379,11 +379,11 @@ function getIdentifierInternal(urlstr) {
             // comment interaction buttons
             if (urlstr.dataset.sigil) return null;
 
-            var p = urlstr;
+            let p = <HTMLElement>urlstr;
             while (p) {
-                var bt = p.dataset.bt;
+                const bt = p.dataset.bt;
                 if (bt) {
-                    var btParsed = JSON.parse(bt);
+                    const btParsed = JSON.parse(bt);
                     if (btParsed.id) return 'facebook.com/' + btParsed.id;
                 }
                 p = p.parentElement;
@@ -394,8 +394,9 @@ function getIdentifierInternal(urlstr) {
     if (urlstr.href !== undefined) urlstr = urlstr.href;
     if (!urlstr) return null;
     if (urlstr.endsWith('#')) return null;
+    let url;
     try {
-        var url = new URL(urlstr);
+        url = new URL(urlstr);
     } catch (e) {
         return null;
     }
@@ -405,11 +406,11 @@ function getIdentifierInternal(urlstr) {
     if (url.pathname.includes('/badge_member_list/')) return null;
 
     if (url.href.indexOf('http', 1) != -1) {
-        var s = getQuery(url.search);
+        const s = getQuery(url.search);
         urlstr = null;
-        for (var key in s) {
+        for (const key in s) {
             if (s.hasOwnProperty(key)) {
-                var element = s[key];
+                const element = s[key];
                 if (element.startsWith('http:') || element.startsWith('https')) {
                     urlstr = element;
                     break;
@@ -424,15 +425,15 @@ function getIdentifierInternal(urlstr) {
         } catch (e) { }
     }
 
-    var host = url.hostname;
+    let host = url.hostname;
     if (isHostedOn(host, 'web.archive.org')) {
-        var match = captureRegex(url.href, /\/web\/\w+\/(.*)/);
+        const match = captureRegex(url.href, /\/web\/\w+\/(.*)/);
         if (!match) return null;
         return getIdentifierInternal('http://' + match);
     }
     if (url.search && url.search.includes('http')) {
         if (url.pathname.startsWith('/intl/')) return null; // facebook language switch links
-        for (var q of url.searchParams) {
+        for (const q of url.searchParams) {
             if (q[1].startsWith('http')) return getIdentifierInternal(q[1]);
         }
     }
@@ -444,12 +445,12 @@ function getIdentifierInternal(urlstr) {
     if (host.startsWith('www.')) host = host.substring(4);
 
     if (isHostedOn(host, 'facebook.com')) {
-        var s = getQuery(url.search);
-        var p = url.pathname.replace('/pg/', '/');
+        const s = getQuery(url.search);
+        const p = url.pathname.replace('/pg/', '/');
         return 'facebook.com/' + (s.id || takeFirstPathComponents(p, p.startsWith('/groups/') ? 2 : 1).substring(1));
     }
     if (isHostedOn(host, 'reddit.com')) {
-        var pathname = url.pathname.replace('/u/', '/user/');
+        const pathname = url.pathname.replace('/u/', '/user/');
         if (!pathname.startsWith('/user/') && !pathname.startsWith('/r/')) return null;
         if(pathname.includes('/comments/') && hostname == 'reddit.com') return null;
         return 'reddit.com' + takeFirstPathComponents(pathname, 2);
@@ -458,7 +459,7 @@ function getIdentifierInternal(urlstr) {
         return 'twitter.com' + takeFirstPathComponents(url.pathname, 1);
     }
     if (isHostedOn(host, 'youtube.com')) {
-        var pathname = url.pathname.replace('/c/', '/user/');
+        const pathname = url.pathname.replace('/c/', '/user/');
         if (!pathname.startsWith('/user/') && !pathname.startsWith('/channel/')) return null;
         return 'youtube.com' + takeFirstPathComponents(pathname, 2);
     }
@@ -470,7 +471,7 @@ function getIdentifierInternal(urlstr) {
     }
     if (isHostedOn(host, 'tumblr.com')) {
         if (url.pathname.startsWith('/register/follow/')) {
-            var name = takeNthPathComponent(url.pathname, 2);
+            const name = takeNthPathComponent(url.pathname, 2);
             return name ? name + '.tumblr.com' : null;
         }
         if (host != 'www.tumblr.com' && host != 'assets.tumblr.com' && host.indexOf('.media.') == -1) {
@@ -484,11 +485,11 @@ function getIdentifierInternal(urlstr) {
         else return null;
     }
     if (host.indexOf('.blogspot.') != -1) {
-        var m = captureRegex(host, /([a-zA-Z0-9\-]*)\.blogspot/);
+        const m = captureRegex(host, /([a-zA-Z0-9\-]*)\.blogspot/);
         if (m) return m + '.blogspot.com';
     }
 
-    var id = host;
+    let id = host;
     if (id.startsWith('www.')) id = id.substr(4);
     if (id.startsWith('m.')) id = id.substr(2);
     return id;
