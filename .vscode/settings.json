@@ -1,0 +1,7 @@
+{
+    "files.exclude": {
+        "extension/background.js": true,
+        "extension/content.js": true,
+        "extension/help.js": true,
+    }
+}

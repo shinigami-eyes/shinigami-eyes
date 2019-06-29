@@ -8,3 +8,6 @@ slnx.sqlite
 *.suo
 extension/data/transphobic.dat
 extension/data/t-friendly.dat
+extension/background.js
+extension/content.js
+extension/help.js
