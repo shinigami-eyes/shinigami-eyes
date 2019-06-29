@@ -31,9 +31,9 @@ interface ShinigamiEyesCommand {
     ids?: string[]
     updateAllLabels?: boolean
 }
-type LabelMap = {[identifier: string]: LabelKind};
+type LabelMap = { [identifier: string]: LabelKind };
 
-interface ShinigamiEyesMessage extends ShinigamiEyesSubmission, ShinigamiEyesCommand{
+interface ShinigamiEyesMessage extends ShinigamiEyesSubmission, ShinigamiEyesCommand {
 }
 
 type ContextMenuCommand = 'mark-t-friendly' | 'mark-transphobic' | 'mark-none' | 'help';

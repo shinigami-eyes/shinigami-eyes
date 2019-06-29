@@ -1,4 +1,4 @@
-var browser : Browser = browser || chrome;
+var browser: Browser = browser || chrome;
 
 var hostname = typeof (location) != 'undefined' ? location.hostname : '';
 if (hostname.startsWith('www.')) {
@@ -8,7 +8,7 @@ if (hostname.endsWith('.reddit.com')) hostname = 'reddit.com';
 if (hostname.endsWith('.facebook.com')) hostname = 'facebook.com';
 if (hostname.endsWith('.youtube.com')) hostname = 'youtube.com';
 
-var myself : string = null;
+var myself: string = null;
 
 function fixupSiteStyles() {
     if (hostname == 'facebook.com') {
@@ -29,7 +29,7 @@ function fixupSiteStyles() {
             .assigned-label-transphobic { outline: 2px solid #991515 !important; }
             .assigned-label-t-friendly { outline: 1px solid #77B91E !important; }
         `);
-    } else if (hostname.indexOf('wiki') != -1){
+    } else if (hostname.indexOf('wiki') != -1) {
         addStyleSheet(`
             .assigned-label-transphobic { outline: 1px solid #991515 !important; }
             .assigned-label-t-friendly { outline: 1px solid #77B91E !important; }
@@ -64,14 +64,14 @@ function fixupSiteStyles() {
     }
 }
 
-function addStyleSheet(css: string){
+function addStyleSheet(css: string) {
     const style = document.createElement('style');
     style.textContent = css;
     document.head.appendChild(style);
 }
 
 function maybeDisableCustomCss() {
-    var shouldDisable: (s: {ownerNode: HTMLElement}) => boolean = null;
+    var shouldDisable: (s: { ownerNode: HTMLElement }) => boolean = null;
     if (hostname == 'twitter.com') shouldDisable = x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('user-style');
     else if (hostname == 'medium.com') shouldDisable = x => x.ownerNode && x.ownerNode.className && x.ownerNode.className == 'js-collectionStyle';
     else if (hostname == 'disqus.com') shouldDisable = x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('css_');
@@ -122,9 +122,9 @@ function init() {
     }, true);
 }
 
-var lastRightClickedElement : HTMLElement = null;
-var lastAppliedYouTubeUrl : string = null;
-var lastAppliedYouTubeTitle : string = null;
+var lastRightClickedElement: HTMLElement = null;
+var lastAppliedYouTubeUrl: string = null;
+var lastAppliedYouTubeTitle: string = null;
 
 function updateYouTubeChannelHeader() {
     var url = window.location.href;
@@ -168,7 +168,7 @@ function updateAllLabels(refresh?: boolean) {
 
 var knownLabels: LabelMap = {};
 
-var labelsToSolve : LabelToSolve[] = [];
+var labelsToSolve: LabelToSolve[] = [];
 function solvePendingLabels() {
     if (!labelsToSolve.length) return;
     var uniqueIdentifiers = Array.from(new Set(labelsToSolve.map(x => x.identifier)));
@@ -201,8 +201,8 @@ function applyLabel(a: HTMLAnchorElement, identifier: string) {
 
 function initLink(a: HTMLAnchorElement) {
     var identifier = getIdentifier(a);
-    if (!identifier){
-        if(hostname == 'youtube.com')
+    if (!identifier) {
+        if (hostname == 'youtube.com')
             applyLabel(a, '');
         return;
     }
@@ -296,7 +296,7 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
 
         // comment timestamp
         if (element.firstChild && (<HTMLElement>element.firstChild).tagName == 'ABBR' && element.lastChild == element.firstChild) return null;
-        
+
         // post 'see more'
         if (element.classList.contains('see_more_link')) return null;
 
@@ -314,7 +314,7 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
 
             // post Comments link
             if (dataset.testid == 'UFI2CommentsCount/root') return null;
-            
+
             // post Comments link
             if (dataset.commentPreludeRef) return null;
 
@@ -348,23 +348,23 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
     }
     if (dataset && dataset.expandedUrl) return getIdentifierFromURLImpl(tryParseURL(dataset.expandedUrl));
     const href = element.href;
-    if(href && !href.endsWith('#')) return getIdentifierFromURLImpl(tryParseURL(href));
+    if (href && !href.endsWith('#')) return getIdentifierFromURLImpl(tryParseURL(href));
     return null;
 }
 
-function tryParseURL(urlstr: string){
+function tryParseURL(urlstr: string) {
     if (!urlstr) return null;
     try {
         const url = new URL(urlstr);
         if (url.protocol != 'http:' && url.protocol != 'https:') return null;
         return url;
-    } catch(e) {
+    } catch (e) {
         return null;
     }
 }
 
-function getIdentifierFromURLImpl(url: URL): string{
-    if(!url) return null;
+function getIdentifierFromURLImpl(url: URL): string {
+    if (!url) return null;
 
     // nested urls
     if (url.href.indexOf('http', 1) != -1) {
@@ -383,7 +383,7 @@ function getIdentifierFromURLImpl(url: URL): string{
             }
         }
         const newurl = tryParseURL(url.href.substring(url.href.indexOf('http', 1)));
-        if(newurl) return getIdentifierFromURLImpl(newurl);
+        if (newurl) return getIdentifierFromURLImpl(newurl);
     }
 
     // fb group member badge
@@ -405,7 +405,7 @@ function getIdentifierFromURLImpl(url: URL): string{
     } else if (domainIs(host, 'reddit.com')) {
         const pathname = url.pathname.replace('/u/', '/user/');
         if (!pathname.startsWith('/user/') && !pathname.startsWith('/r/')) return null;
-        if(pathname.includes('/comments/') && hostname == 'reddit.com') return null;
+        if (pathname.includes('/comments/') && hostname == 'reddit.com') return null;
         return 'reddit.com' + getPartialPath(pathname, 2);
     } else if (domainIs(host, 'twitter.com')) {
         return 'twitter.com' + getPartialPath(url.pathname, 1);
@@ -445,7 +445,7 @@ init();
 
 var lastGeneratedLinkId = 0;
 
-function getSnippet(node: HTMLElement){
+function getSnippet(node: HTMLElement) {
     while (node) {
         var classList = node.classList;
         if (hostname == 'facebook.com' && node.dataset && node.dataset.ftr) return node;
@@ -468,12 +468,12 @@ browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesSubmiss
         updateAllLabels(true);
         return;
     }
-    
+
     message.contextPage = window.location.href;
     var target = lastRightClickedElement; // message.elementId ? browser.menus.getTargetElement(message.elementId) : null;
-    
-    while(target){
-        if((<HTMLAnchorElement>target).href) break;
+
+    while (target) {
+        if ((<HTMLAnchorElement>target).href) break;
         target = target.parentElement;
     }
 
@@ -486,15 +486,15 @@ browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesSubmiss
     if (identifier.startsWith('facebook.com/'))
         message.secondaryIdentifier = getIdentifier(message.url);
 
-    var snippet = getSnippet(target);    
+    var snippet = getSnippet(target);
     message.linkId = ++lastGeneratedLinkId;
 
-    if (target) 
+    if (target)
         target.setAttribute('shinigami-eyes-link-id', '' + lastGeneratedLinkId);
 
     message.snippet = snippet ? snippet.outerHTML : null;
     var debugClass = 'shinigami-eyes-debug-snippet-highlight';
-    
+
     if (snippet && message.debug) {
         snippet.classList.add(debugClass);
         if (message.debug <= 1)

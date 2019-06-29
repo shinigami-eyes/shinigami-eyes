@@ -1,4 +1,4 @@
-﻿var browser : Browser = browser || chrome;
+﻿var browser: Browser = browser || chrome;
 
 const PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
 const MIGRATION = ':MIGRATION'
@@ -232,24 +232,24 @@ const badIdentifiersArray = [
     'youtube.com/redirect',
     'youtube.com/watch',
 ];
-const badIdentifiers : {[id: string]: true} = {};
+const badIdentifiers: { [id: string]: true } = {};
 badIdentifiersArray.forEach(x => badIdentifiers[x] = true);
 
-var lastSubmissionError : string = null;
+var lastSubmissionError: string = null;
 
 const needsInfiniteResubmissionWorkaround = [
-    '046775268347','094745034139','059025030493','016970595453','016488055088','028573603939',
-    '047702135398','035965787127','069722626647','044482561296','068530257405','071378971311',
-    '050784255720','074169481269','001621982155','014636303566','016313013148','051923868290',
-    '025348057349','059525793150','047081840457','086106188740','080095076304','059341889183',
-    '095799487873','099003666813','002434495335','009844923475','034297166260','065739632127',
-    '040689448048','048816243838','018152001078','059285890303','073205501344','096068619182'
+    '046775268347', '094745034139', '059025030493', '016970595453', '016488055088', '028573603939',
+    '047702135398', '035965787127', '069722626647', '044482561296', '068530257405', '071378971311',
+    '050784255720', '074169481269', '001621982155', '014636303566', '016313013148', '051923868290',
+    '025348057349', '059525793150', '047081840457', '086106188740', '080095076304', '059341889183',
+    '095799487873', '099003666813', '002434495335', '009844923475', '034297166260', '065739632127',
+    '040689448048', '048816243838', '018152001078', '059285890303', '073205501344', '096068619182'
 ]
 
-var overrides : LabelMap = null;
+var overrides: LabelMap = null;
 
 var accepted = false;
-var installationId : string = null;
+var installationId: string = null;
 
 browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     if (!v.installationId) {
@@ -263,21 +263,21 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     overrides = v.overrides || {}
 
     const migration = overrides[MIGRATION] || 0;
-    if (migration < CURRENT_VERSION){
+    if (migration < CURRENT_VERSION) {
 
-        for (const key of Object.getOwnPropertyNames(overrides)){
+        for (const key of Object.getOwnPropertyNames(overrides)) {
             if (key.startsWith(':')) continue;
-            if (key.startsWith('facebook.com/a.')){
+            if (key.startsWith('facebook.com/a.')) {
                 delete overrides[key];
                 continue;
             }
-            if (key != key.toLowerCase()){
+            if (key != key.toLowerCase()) {
                 let v = overrides[key];
                 delete overrides[key];
                 overrides[key.toLowerCase()] = v;
             }
         }
-        
+
         badIdentifiersArray.forEach(x => delete overrides[x]);
 
         if (needsInfiniteResubmissionWorkaround.indexOf(installationId.substring(0, 12)) != -1)
@@ -287,7 +287,7 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
     }
 })
 
-const bloomFilters : BloomFilter[] = [];
+const bloomFilters: BloomFilter[] = [];
 
 async function loadBloomFilter(name: LabelKind) {
 
@@ -313,7 +313,7 @@ browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesMessage
         uncommittedResponse = null;
         return;
     }
-    const response : LabelMap = {};
+    const response: LabelMap = {};
     const transphobic = message.myself && bloomFilters.filter(x => x.name == 'transphobic')[0].test(message.myself);
     for (const id of message.ids) {
         if (overrides[id] !== undefined) {
@@ -367,7 +367,7 @@ createContextMenu('Mark as t-friendly', 'mark-t-friendly');
 createContextMenu('Clear', 'mark-none');
 createContextMenu('Help', 'help');
 
-var uncommittedResponse : ShinigamiEyesSubmission = null;
+var uncommittedResponse: ShinigamiEyesSubmission = null;
 
 async function submitPendingRatings() {
     const submitted = getPendingSubmissions().map(x => x);
@@ -385,19 +385,19 @@ async function submitPendingRatings() {
             credentials: 'omit',
         });
         if (response.status != 200) throw ('HTTP status: ' + response.status)
-        const result = await response.text();    
-        
+        const result = await response.text();
+
         if (result != 'SUCCESS') throw 'Bad response: ' + ('' + result).substring(0, 20);
 
         overrides[PENDING_SUBMISSIONS] = <any>getPendingSubmissions().filter(x => submitted.indexOf(x) == -1);
         browser.storage.local.set({ overrides: overrides });
-    } catch(e) {
+    } catch (e) {
         lastSubmissionError = '' + e
     }
 
 }
 
-function getPendingSubmissions() : ShinigamiEyesSubmission[]{
+function getPendingSubmissions(): ShinigamiEyesSubmission[] {
     return <any>overrides[PENDING_SUBMISSIONS];
 }
 
@@ -453,7 +453,7 @@ browser.contextMenus.onClicked.addListener(function (info, tab) {
         debug: <any>overrides.debug
     }, { frameId: frameId }, response => {
         if (!response.identifier) return;
-        if (response.mark){
+        if (response.mark) {
             if (badIdentifiers[response.identifier]) return;
             if (response.secondaryIdentifier && badIdentifiers[response.secondaryIdentifier])
                 response.secondaryIdentifier = null;

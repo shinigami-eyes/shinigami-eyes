@@ -1,4 +1,4 @@
-var browser : Browser = browser || chrome;
+var browser: Browser = browser || chrome;
 
 document.getElementById('cancelButton').addEventListener('click', () => {
     browser.runtime.sendMessage({ acceptClicked: false }, () => { });
