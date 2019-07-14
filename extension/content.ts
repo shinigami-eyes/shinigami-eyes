@@ -315,6 +315,9 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
             // post Comments link
             if (dataset.testid == 'UFI2CommentsCount/root') return null;
 
+            // notification
+            if (dataset.testid == 'notif_list_item_link') return null;
+
             // post Comments link
             if (dataset.commentPreludeRef) return null;
 
