@@ -347,6 +347,9 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
         }
     }
     if (dataset && dataset.expandedUrl) return getIdentifierFromURLImpl(tryParseURL(dataset.expandedUrl));
+
+    if (element.classList.contains('tumblelog')) return element.textContent.substr(1) + '.tumblr.com';
+
     const href = element.href;
     if (href && !href.endsWith('#')) return getIdentifierFromURLImpl(tryParseURL(href));
     return null;
