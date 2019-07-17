@@ -18,16 +18,18 @@ declare type Browser = {
         create(options: {
             url: string
         }): void
+        query(query: {}, callback: (tabs: { id: number }[]) => void): void;
     }
     extension: {
         getURL(relativeUrl: string): string
     }
     contextMenus: {
         create(options: {
-            id: string
-            title: string
-            contexts: 'link'[]
-            targetUrlPatterns: string[]
+            id?: string
+            title?: string
+            contexts?: 'link'[]
+            targetUrlPatterns?: string[]
+            type?: 'normal' | 'separator'
         }): void
         onClicked: {
             addListener(listener: (info: {
@@ -41,12 +43,12 @@ declare type Browser = {
     }
 }
 type MessageSender = {
-    tab?: {id: number};
+    tab?: { id: number };
     frameId?: number;
     id?: string;
     url?: string;
     tlsChannelId?: string;
-  };
+};
 declare type BrowserStorage = {
     get(names: string[], callback: (obj: any) => void): void
     set(obj: { [name: string]: any }): void;

@@ -63,7 +63,7 @@
         ]
     },
     "options_ui": {
-        "page": "help.html",
+        "page": "options.html",
         "open_in_tab": true
     },
     "permissions": [

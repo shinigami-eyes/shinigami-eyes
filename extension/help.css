@@ -7,9 +7,10 @@ body {
     padding: 0;
 }
 
-
-.assigned-label-transphobic { color: #991515 !important; }
-.assigned-label-t-friendly { color: #77B91E !important; }
+.assigned-label-unknown {
+    color: rgb(56, 88, 152); /* Facebook default link color */
+    cursor: help;
+}
 
 h1 {
     font-size: 40pt;
@@ -52,9 +53,8 @@ section {
 .section-faq {
     background-color: rgb(213, 183, 255);
 }
-.section-guidelines {
+.section-guidelines, .section-options {
     background-color: white;
-    /*background-color: rgb(190, 245, 151);*/
 }
 
 .section-footer {
@@ -123,4 +123,24 @@ section {
     font-size: 10pt;
 }
 
+.website-checkbox {
+    display: block;
+    user-select: none;
+}
+.website-checkbox i {
+    color: gray;
+}
+#theme-settings label {
+    user-select: none;
+    font-weight: bold;
+    display: block;
+}
 
+#save-button {
+    font-weight: bold;
+    background-color: rgb(108, 212, 76);
+}
+
+label, button {
+    cursor: pointer;
+}

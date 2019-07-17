@@ -3,5 +3,6 @@
         "extension/background.js": true,
         "extension/content.js": true,
         "extension/help.js": true,
+        "extension/options.js": true,
     }
 }

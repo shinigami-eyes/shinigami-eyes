@@ -1,5 +1,25 @@
-.assigned-label-transphobic, a.assigned-label-transphobic { color: #991515 !important; }
-.assigned-label-t-friendly, a.assigned-label-t-friendly { color: #77B91E !important; }
+body {
+   --ShinigamiEyesTFriendly: #77B91E;
+   --ShinigamiEyesTransphobic: #991515;
+}
+
+.shinigami-eyes-theme-green-red-max {
+   --ShinigamiEyesTFriendly: #00FF00;
+   --ShinigamiEyesTransphobic: #FF0000;
+}
+
+.shinigami-eyes-theme-purple-yellow {
+   --ShinigamiEyesTFriendly: rgb(153, 0, 255);
+   --ShinigamiEyesTransphobic: rgb(179, 152, 0);
+}
+
+.shinigami-eyes-theme-cyan-orange {
+   --ShinigamiEyesTFriendly: rgb(98, 161, 197);
+   --ShinigamiEyesTransphobic: #FB6A4A;
+}
+
+.assigned-label-transphobic, a.assigned-label-transphobic { color: var(--ShinigamiEyesTransphobic) !important; }
+.assigned-label-t-friendly, a.assigned-label-t-friendly { color: var(--ShinigamiEyesTFriendly) !important; }
 
 .has-assigned-label * { color: inherit !important; }
 .shinigami-eyes-debug-snippet-highlight {

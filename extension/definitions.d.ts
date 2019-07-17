@@ -30,10 +30,12 @@ interface ShinigamiEyesCommand {
     myself?: string
     ids?: string[]
     updateAllLabels?: boolean
+    closeCallingTab?: boolean
+    setTheme?: string
 }
 type LabelMap = { [identifier: string]: LabelKind };
 
 interface ShinigamiEyesMessage extends ShinigamiEyesSubmission, ShinigamiEyesCommand {
 }
 
-type ContextMenuCommand = 'mark-t-friendly' | 'mark-transphobic' | 'mark-none' | 'help';
+type ContextMenuCommand = 'mark-t-friendly' | 'mark-transphobic' | 'mark-none' | 'help' | 'options';

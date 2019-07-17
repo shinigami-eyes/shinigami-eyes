@@ -26,13 +26,13 @@ function fixupSiteStyles() {
         `);
     } else if (domainIs(hostname, 'tumblr.com')) {
         addStyleSheet(`
-            .assigned-label-transphobic { outline: 2px solid #991515 !important; }
-            .assigned-label-t-friendly { outline: 1px solid #77B91E !important; }
+            .assigned-label-transphobic { outline: 2px solid var(--ShinigamiEyesTransphobic) !important; }
+            .assigned-label-t-friendly { outline: 1px solid var(--ShinigamiEyesTFriendly) !important; }
         `);
     } else if (hostname.indexOf('wiki') != -1) {
         addStyleSheet(`
-            .assigned-label-transphobic { outline: 1px solid #991515 !important; }
-            .assigned-label-t-friendly { outline: 1px solid #77B91E !important; }
+            .assigned-label-transphobic { outline: 1px solid var(--ShinigamiEyesTransphobic) !important; }
+            .assigned-label-t-friendly { outline: 1px solid var(--ShinigamiEyesTFriendly) !important; }
         `);
     } else if (hostname == 'twitter.com') {
         myself = getIdentifier(<HTMLAnchorElement>document.querySelector('.DashUserDropdown-userInfo a'));
@@ -167,6 +167,7 @@ function updateAllLabels(refresh?: boolean) {
 }
 
 var knownLabels: LabelMap = {};
+var currentlyAppliedTheme = '_none_';
 
 var labelsToSolve: LabelToSolve[] = [];
 function solvePendingLabels() {
@@ -175,8 +176,14 @@ function solvePendingLabels() {
     var tosolve = labelsToSolve;
     labelsToSolve = [];
     browser.runtime.sendMessage<ShinigamiEyesCommand, LabelMap>({ ids: uniqueIdentifiers, myself: <string>myself }, (response: LabelMap) => {
+        const theme = response[':theme'];
+        if (theme != currentlyAppliedTheme) {
+            if (currentlyAppliedTheme) document.body.classList.remove('shinigami-eyes-theme-' + currentlyAppliedTheme);
+            if (theme) document.body.classList.add('shinigami-eyes-theme-' + theme);
+            currentlyAppliedTheme = theme;
+        }
         for (const item of tosolve) {
-            var label = response[item.identifier];
+            const label = response[item.identifier];
             knownLabels[item.identifier] = label || '';
             applyLabel(item.element, item.identifier);
         }

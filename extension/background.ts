@@ -258,8 +258,9 @@ var overrides: LabelMap = null;
 
 var accepted = false;
 var installationId: string = null;
+var theme: string = '';
 
-browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
+browser.storage.local.get(['overrides', 'accepted', 'installationId', 'theme'], v => {
     if (!v.installationId) {
         installationId = (Math.random() + '.' + Math.random() + '.' + Math.random()).replace(/\./g, '');
         browser.storage.local.set({ installationId: installationId });
@@ -269,6 +270,7 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId'], v => {
 
     accepted = v.accepted
     overrides = v.overrides || {}
+    theme = v.theme;
 
     const migration = overrides[MIGRATION] || 0;
     if (migration < CURRENT_VERSION) {
@@ -312,13 +314,26 @@ async function loadBloomFilter(name: LabelKind) {
 
 
 browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesMessage | LabelMap>((message, sender, sendResponse) => {
+    if (message.setTheme) {
+        theme = message.setTheme;
+        browser.storage.local.set({ theme: message.setTheme });
+        chrome.tabs.query({}, function (tabs) {
+            for (var i = 0; i < tabs.length; ++i) {
+                try {
+                    browser.tabs.sendMessage(tabs[i].id, <ShinigamiEyesCommand>{ updateAllLabels: true });
+                } catch (e) { }
+            }
+        });
+    }
     if (message.acceptClicked !== undefined) {
         accepted = message.acceptClicked;
         browser.storage.local.set({ accepted: accepted });
-        browser.tabs.remove(sender.tab.id);
         if (accepted && uncommittedResponse)
             saveLabel(uncommittedResponse)
         uncommittedResponse = null;
+    }
+    if (message.closeCallingTab) {
+        browser.tabs.remove(sender.tab.id);
         return;
     }
     const response: LabelMap = {};
@@ -340,6 +355,7 @@ browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesMessage
             if (bloomFilter.test(id)) response[id] = bloomFilter.name;
         }
     }
+    response[':theme'] = <any>theme;
     sendResponse(response);
 });
 
@@ -373,6 +389,8 @@ function createContextMenu(text: string, id: ContextMenuCommand) {
 createContextMenu('Mark as anti-trans', 'mark-transphobic');
 createContextMenu('Mark as t-friendly', 'mark-t-friendly');
 createContextMenu('Clear', 'mark-none');
+browser.contextMenus.create({ type: 'separator' });
+createContextMenu('Settings', 'options');
 createContextMenu('Help', 'help');
 
 var uncommittedResponse: ShinigamiEyesSubmission = null;
@@ -440,10 +458,19 @@ function openHelp() {
 }
 
 
+function openOptions() {
+    browser.tabs.create({
+        url: browser.extension.getURL('options.html')
+    })
+}
 
 browser.contextMenus.onClicked.addListener(function (info, tab) {
     if (info.menuItemId == 'help') {
         openHelp();
+        return;
+    }
+    if (info.menuItemId == 'options') {
+        openOptions();
         return;
     }
 
