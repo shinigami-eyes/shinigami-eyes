@@ -403,6 +403,7 @@ function getIdentifierFromURLImpl(url: URL): string {
     if (url.pathname.includes('/badge_member_list/')) return null;
 
     let host = url.hostname;
+    const searchParams = url.searchParams;
     if (domainIs(host, 'web.archive.org')) {
         const match = captureRegex(url.href, /\/web\/\w+\/(.*)/);
         if (!match) return null;
@@ -412,7 +413,7 @@ function getIdentifierFromURLImpl(url: URL): string {
     if (host.startsWith('www.')) host = host.substring(4);
 
     if (domainIs(host, 'facebook.com')) {
-        const fbId = url.searchParams.get('id');
+        const fbId = searchParams.get('id');
         const p = url.pathname.replace('/pg/', '/');
         return 'facebook.com/' + (fbId || getPartialPath(p, p.startsWith('/groups/') ? 2 : 1).substring(1));
     } else if (domainIs(host, 'reddit.com')) {
@@ -447,6 +448,12 @@ function getIdentifierFromURLImpl(url: URL): string {
         const m = captureRegex(host, /([a-zA-Z0-9\-]*)\.blogspot/);
         if (m) return m + '.blogspot.com';
         else return null;
+    } else if(host.includes('google.')){
+        if(url.pathname == '/search' && searchParams.get('stick') && !searchParams.get('tbm') && !searchParams.get('start')){
+            const q = searchParams.get('q');
+            if(q) return 'wikipedia.org/wiki/' + q.replace(/\s/g, '_');
+        }
+        return null;
     } else {
         if (host.startsWith('m.')) host = host.substr(2);
         return host;
