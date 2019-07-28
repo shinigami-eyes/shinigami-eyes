@@ -374,7 +374,7 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
             if (title && (title.startsWith('http://') || title.startsWith('https://')))
                 return getIdentifier(title);
             const content = element.textContent;
-            if (!content.includes(' ') && content.includes('.'))
+            if (!content.includes(' ') && content.includes('.') && !content.includes('…'))
                 return getIdentifier('http://' + content);
         }
     } else if (domainIs(hostname, 'wikipedia.org')) {
