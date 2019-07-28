@@ -87,6 +87,9 @@ function init() {
         setInterval(updateYouTubeChannelHeader, 300);
         setInterval(updateAllLabels, 6000);
     }
+    if (hostname == 'twitter.com') {
+        setInterval(updateTwitterClasses, 800);
+    }
 
     console.log('Self: ' + myself)
 
@@ -125,6 +128,15 @@ function init() {
 var lastRightClickedElement: HTMLElement = null;
 var lastAppliedYouTubeUrl: string = null;
 var lastAppliedYouTubeTitle: string = null;
+
+function updateTwitterClasses(){
+    for (const a of document.querySelectorAll('a')) {
+        if (a.assignedCssLabel && !a.classList.contains('has-assigned-label')) {
+            a.classList.add('assigned-label-' + a.assignedCssLabel);
+            a.classList.add('has-assigned-label');    
+        }
+    }
+}
 
 function updateYouTubeChannelHeader() {
     var url = window.location.href;
