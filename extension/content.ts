@@ -470,7 +470,7 @@ function getSnippet(node: HTMLElement) {
         var classList = node.classList;
         if (hostname == 'facebook.com' && node.dataset && node.dataset.ftr) return node;
         if (hostname == 'reddit.com' && (classList.contains('scrollerItem') || classList.contains('thing') || classList.contains('Comment'))) return node;
-        if (hostname == 'twitter.com' && (classList.contains('stream-item') || classList.contains('permalink-tweet-container'))) return node;
+        if (hostname == 'twitter.com' && (classList.contains('stream-item') || classList.contains('permalink-tweet-container') || node.tagName == 'ARTICLE')) return node;
         if (hostname == 'disqus.com' && (classList.contains('post-content'))) return node;
         if (hostname == 'medium.com' && (classList.contains('streamItem') || classList.contains('streamItemConversationItem'))) return node;
         if (hostname == 'youtube.com' && node.tagName == 'YTD-COMMENT-RENDERER') return node;
