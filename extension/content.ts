@@ -129,11 +129,11 @@ var lastRightClickedElement: HTMLElement = null;
 var lastAppliedYouTubeUrl: string = null;
 var lastAppliedYouTubeTitle: string = null;
 
-function updateTwitterClasses(){
+function updateTwitterClasses() {
     for (const a of document.querySelectorAll('a')) {
         if (a.assignedCssLabel && !a.classList.contains('has-assigned-label')) {
             a.classList.add('assigned-label-' + a.assignedCssLabel);
-            a.classList.add('has-assigned-label');    
+            a.classList.add('has-assigned-label');
         }
     }
 }
@@ -367,14 +367,14 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
                 p = p.parentElement;
             }
         }
-    } else if(hostname == 'twitter.com') {
+    } else if (hostname == 'twitter.com') {
         if (dataset && dataset.expandedUrl) return getIdentifier(dataset.expandedUrl);
         if (element.href.startsWith('https://t.co/')) {
             const title = element.title;
             if (title && (title.startsWith('http://') || title.startsWith('https://')))
                 return getIdentifier(title);
             const content = element.textContent;
-            if(!content.includes(' ') && content.includes('.'))
+            if (!content.includes(' ') && content.includes('.'))
                 return getIdentifier('http://' + content);
         }
     }
@@ -469,10 +469,10 @@ function getIdentifierFromURLImpl(url: URL): string {
         const m = captureRegex(host, /([a-zA-Z0-9\-]*)\.blogspot/);
         if (m) return m + '.blogspot.com';
         else return null;
-    } else if(host.includes('google.')){
-        if(url.pathname == '/search' && searchParams.get('stick') && !searchParams.get('tbm') && !searchParams.get('start')){
+    } else if (host.includes('google.')) {
+        if (url.pathname == '/search' && searchParams.get('stick') && !searchParams.get('tbm') && !searchParams.get('start')) {
             const q = searchParams.get('q');
-            if(q) return 'wikipedia.org/wiki/' + q.replace(/\s/g, '_');
+            if (q) return 'wikipedia.org/wiki/' + q.replace(/\s/g, '_');
         }
         return null;
     } else {
