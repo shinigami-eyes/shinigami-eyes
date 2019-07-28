@@ -3,7 +3,7 @@
 const PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
 const MIGRATION = ':MIGRATION'
 
-const CURRENT_VERSION = 100019;
+const CURRENT_VERSION = 100020;
 
 // If a user labels one of these URLs, they're making a mistake. Ignore the label.
 // This list includes:
