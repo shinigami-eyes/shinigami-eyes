@@ -377,6 +377,8 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
             if (!content.includes(' ') && content.includes('.'))
                 return getIdentifier('http://' + content);
         }
+    } else if (domainIs(hostname, 'wikipedia.org')) {
+        if (element.classList.contains('interlanguage-link-target')) return null;
     }
 
     if (element.classList.contains('tumblelog')) return element.textContent.substr(1) + '.tumblr.com';
