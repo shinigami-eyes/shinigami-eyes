@@ -367,8 +367,17 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
                 p = p.parentElement;
             }
         }
+    } else if(hostname == 'twitter.com') {
+        if (dataset && dataset.expandedUrl) return getIdentifier(dataset.expandedUrl);
+        if (element.href.startsWith('https://t.co/')) {
+            const title = element.title;
+            if (title && (title.startsWith('http://') || title.startsWith('https://')))
+                return getIdentifier(title);
+            const content = element.textContent;
+            if(!content.includes(' ') && content.includes('.'))
+                return getIdentifier('http://' + content);
+        }
     }
-    if (dataset && dataset.expandedUrl) return getIdentifierFromURLImpl(tryParseURL(dataset.expandedUrl));
 
     if (element.classList.contains('tumblelog')) return element.textContent.substr(1) + '.tumblr.com';
 
