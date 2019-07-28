@@ -465,7 +465,7 @@ function getIdentifierFromURLImpl(url: URL): string {
         return null;
     } else if (domainIs(host, 'wikipedia.org') || domainIs(host, 'rationalwiki.org')) {
         if (url.hash || url.pathname.includes(':')) return null;
-        if (url.pathname.startsWith('/wiki/')) return 'wikipedia.org' + getPartialPath(url.pathname, 2);
+        if (url.pathname.startsWith('/wiki/')) return 'wikipedia.org' + decodeURIComponent(getPartialPath(url.pathname, 2));
         else return null;
     } else if (host.indexOf('.blogspot.') != -1) {
         const m = captureRegex(host, /([a-zA-Z0-9\-]*)\.blogspot/);
