@@ -129,7 +129,13 @@ var lastRightClickedElement: HTMLElement = null;
 var lastAppliedYouTubeUrl: string = null;
 var lastAppliedYouTubeTitle: string = null;
 
+var lastAppliedTwitterUrl: string = null;
+
 function updateTwitterClasses() {
+    if (location.href != lastAppliedTwitterUrl) {
+        setTimeout(updateAllLabels, 200);
+        lastAppliedTwitterUrl = location.href;
+    }
     for (const a of document.querySelectorAll('a')) {
         if (a.assignedCssLabel && !a.classList.contains('has-assigned-label')) {
             a.classList.add('assigned-label-' + a.assignedCssLabel);
@@ -221,7 +227,7 @@ function applyLabel(a: HTMLAnchorElement, identifier: string) {
 function initLink(a: HTMLAnchorElement) {
     var identifier = getIdentifier(a);
     if (!identifier) {
-        if (hostname == 'youtube.com')
+        if (hostname == 'youtube.com' || hostname == 'twitter.com')
             applyLabel(a, '');
         return;
     }
