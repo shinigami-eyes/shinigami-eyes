@@ -146,8 +146,8 @@ function updateTwitterClasses() {
 
 function updateYouTubeChannelHeader() {
     var url = window.location.href;
-    var title = document.getElementById('channel-title');
-    if (title && title.tagName == 'H3') title = null; // search results, already a link
+    var title = <HTMLElement>document.querySelector('#channel-header ytd-channel-name yt-formatted-string');
+    if (title && !title.parentElement.offsetParent) title = null;
     var currentTitle = title ? title.textContent : null;
 
     if (url == lastAppliedYouTubeUrl && currentTitle == lastAppliedYouTubeTitle) return;
