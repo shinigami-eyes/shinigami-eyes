@@ -5,34 +5,37 @@ const MIGRATION = ':MIGRATION'
 
 const CURRENT_VERSION = 100021;
 
+const badIdentifiersReasons: { [id: string]: BadIdentifierReason } = {};
+const badIdentifiers: { [id: string]: true } = {};
+
 // If a user labels one of these URLs, they're making a mistake. Ignore the label.
 // This list includes:
-// * Social networks that are not supported
+// * Social networks that are not supported (SN)
 // * System pages of supported social networks
-// * Archival and link shortening sites.
+// * Archival and link shortening sites. (AR)
 // * Reddit bots.
 const badIdentifiersArray = [
-    'archive.is',
-    'archive.org',
-    'ask.fm',
+    'archive.is=AR',
+    'archive.org=AR',
+    'ask.fm=SN',
     'assets.tumblr.com',
     'bing.com',
     'bit.ly',
     'blogspot.com',
     'change.org',
     'chrome.google.com',
-    'curiouscat.me',
-    'deviantart.com',
-    'discord-store.com',
-    'discord.gg',
-    'discordapp.com',
+    'curiouscat.me=SN',
+    'deviantart.com=SN',
+    'discord-store.com=SN',
+    'discord.gg=SN',
+    'discordapp.com=SN',
     'disqus.com',
     'docs.google.com',
     'drive.google.com',
     'duckduckgo.com',
     'en.wikipedia.org',
     'en.wikiquote.org',
-    'etsy.com',
+    'etsy.com=SN',
     'facebook.com',
     'facebook.com/a',
     'facebook.com/ad_campaign',
@@ -99,25 +102,25 @@ const badIdentifiersArray = [
     'facebook.com/story.php',
     'facebook.com/ufi',
     'facebook.com/watch',
-    'flickr.com',
+    'flickr.com=SN',
     'goo.gl',
     'google.com',
     'googleusercontent.com',
     'i.imgur.com',
     'i.reddituploads.com',
-    'imdb.com',
+    'imdb.com=SN',
     'imgur.com',
-    'instagram.com',
-    'itunes.apple.com',
-    'ko-fi.com',
-    'linkedin.com',
+    'instagram.com=SN',
+    'itunes.apple.com=SN',
+    'ko-fi.com=SN',
+    'linkedin.com=SN',
     'mail.google.com',
     'media.tumblr.com',
     'medium.com',
     'news.google.com',
-    'patreon.com',
-    'paypal.com',
-    'paypal.me',
+    'patreon.com=SN',
+    'paypal.com=SN',
+    'paypal.me=SN',
     'play.google.com',
     'plus.google.com',
     'rationalwiki.org',
@@ -224,25 +227,29 @@ const badIdentifiersArray = [
     'reddituploads.com',
     'removeddit.com',
     'sites.google.com',
-    'snapchat.com',
-    'soundcloud.com',
-    'steamcommunity.com',
+    'snapchat.com=SN',
+    'soundcloud.com=SN',
+    'steamcommunity.com=SN',
     't.co',
     't.umblr.com',
-    'tapatalk.com',
+    'tapatalk.com=SN',
     'tmblr.co',
     'tumblr.com',
-    'twitch.tv',
+    'twitch.tv=SN',
     'twitter.com',
+    'twitter.com/explore',
     'twitter.com/hashtag',
+    'twitter.com/home',
     'twitter.com/i',
+    'twitter.com/messages',
+    'twitter.com/notifications',
     'twitter.com/search',
     'twitter.com/settings',
     'twitter.com/threader_app',
     'twitter.com/threadreaderapp',
     'twitter.com/who_to_follow',
-    'vimeo.com',
-    'vk.com',
+    'vimeo.com=SN',
+    'vk.com=SN',
     'wikipedia.org',
     'wordpress.com',
     'www.tumblr.com',
@@ -251,9 +258,13 @@ const badIdentifiersArray = [
     'youtube.com/playlist',
     'youtube.com/redirect',
     'youtube.com/watch',
-];
-const badIdentifiers: { [id: string]: true } = {};
-badIdentifiersArray.forEach(x => badIdentifiers[x] = true);
+].map(x => {
+    const arr = x.split('=');
+    const id = arr[0];
+    if (arr[1]) badIdentifiersReasons[id] = <BadIdentifierReason>arr[1];
+    badIdentifiers[id] = true;
+    return id;
+});
 
 var lastSubmissionError: string = null;
 
@@ -321,7 +332,7 @@ browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesMessage
         chrome.tabs.query({}, function (tabs) {
             for (var i = 0; i < tabs.length; ++i) {
                 try {
-                    browser.tabs.sendMessage(tabs[i].id, <ShinigamiEyesCommand>{ updateAllLabels: true });
+                    sendMessageToContent(tabs[i].id, null, { updateAllLabels: true });
                 } catch (e) { }
             }
         });
@@ -457,11 +468,11 @@ function saveLabel(response: ShinigamiEyesSubmission) {
         getPendingSubmissions().push(response);
         submitPendingRatings();
         //console.log(response);
-        browser.tabs.sendMessage(response.tabId, <ShinigamiEyesCommand>{ 
+        sendMessageToContent(response.tabId, response.frameId, {
             updateAllLabels: true,
             confirmSetIdentifier: response.identifier,
-            confirmSetLabel: response.mark
-         });
+            confirmSetLabel: response.mark || 'none'
+        });
         //browser.tabs.executeScript(response.tabId, {code: 'updateAllLabels()'});
         return;
     }
@@ -480,6 +491,14 @@ function openOptions() {
     browser.tabs.create({
         url: browser.extension.getURL('options.html')
     })
+}
+
+
+
+function sendMessageToContent(tabId: number, frameId: number, message: ShinigamiEyesCommand) {
+    const options = frameId === null ? undefined : { frameId: frameId };
+    console.log(message);
+    browser.tabs.sendMessage<ShinigamiEyesCommand, void>(tabId, message, options);
 }
 
 browser.contextMenus.onClicked.addListener(function (info, tab) {
@@ -505,16 +524,18 @@ browser.contextMenus.onClicked.addListener(function (info, tab) {
         // elementId: info.targetElementId,
         debug: <any>overrides.debug
     }, { frameId: frameId }, response => {
-        if (!response.identifier){
-            browser.tabs.sendMessage(response.tabId, <ShinigamiEyesCommand>{ 
-                updateAllLabels: true,
-                confirmSetIdentifier: response.identifier,
-                confirmSetLabel: response.mark
-            });
+        if (!response || !response.identifier) {
             return;
         }
         if (response.mark) {
-            if (badIdentifiers[response.identifier]) return;
+            if (badIdentifiers[response.identifier]) {
+                sendMessageToContent(tabId, frameId, {
+                    confirmSetIdentifier: response.identifier,
+                    confirmSetLabel: 'bad-identifier',
+                    badIdentifierReason: badIdentifiersReasons[response.identifier]
+                });
+                return;
+            }
             if (response.secondaryIdentifier && badIdentifiers[response.secondaryIdentifier])
                 response.secondaryIdentifier = null;
         }

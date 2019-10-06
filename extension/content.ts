@@ -530,26 +530,72 @@ function getSnippet(node: HTMLElement) {
     return null;
 }
 
-function displayConfirmation(identifier: string, label: LabelKind){
+function getBadIdentifierReason(identifier: string, url: string) {
+    identifier = identifier || '';
+    url = url || '';
+    if (
+        identifier.startsWith('reddit.com/user/') ||
+        identifier == 'twitter.com/threadreaderapp' ||
+        identifier == 'twitter.com/threader_app') return 'This is user is a bot.';
+    if (identifier == 'twitter.com/hashtag') return 'Hashtags cannot be labeled, only users.';
+    if (url.includes('youtube.com/watch')) return 'Only channels can be labeled, not specific videos.';
+    if (url.includes('wiki') && url.includes('#')) return 'Wiki paragraphs cannot be labeled, only whole articles.';
+    return null;
+}
+
+var previousConfirmationMessage: HTMLElement = null;
+
+function displayConfirmation(identifier: string, label: LabelKind, badIdentifierReason: BadIdentifierReason, url: string) {
+    if (previousConfirmationMessage) {
+        previousConfirmationMessage.remove();
+        previousConfirmationMessage = null;
+    }
+    if (!label) return;
+    if (isSocialNetwork && label != 'bad-identifier') return;
+
     const confirmation = document.createElement('div');
-    confirmation.style.cssText = 'position: fixed; padding: 15px; z-index: 99999999;';
-    confirmation.textContent = identifier + (
-        label == 't-friendly' ? ' will be displayed as trans-friendly' :
-        label == 'transphobic' ? ' will be displayed as anti-trans' :
-        ' has been cleared.'
-    ) + ' on search engines and social networks.'
+    const background =
+        label == 't-friendly' ? '#eaffcf' :
+            label == 'transphobic' ? '#f5d7d7' :
+                '#eeeeee';
+    confirmation.style.cssText = `transition: opacity 7s ease-in-out; opacity: 1; position: fixed; padding: 30px 15px; z-index: 99999999; white-space: pre-wrap; top: 200px; left: 30%; right: 30%; background: ${background}; color: black; font-weight: bold; font-family: Arial; box-shadow: 0px 5px 10px #ddd; border: 1px solid #ccc; font-size: 11pt;`;
+    let text: string;
+
+    if (label == 'bad-identifier') {
+        const displayReason = getBadIdentifierReason(identifier, url);
+        if (displayReason) text = displayReason;
+        else if (badIdentifierReason == 'SN') text = 'This social network is not supported: ' + identifier + '.';
+        else if (badIdentifierReason == 'AR') text = 'This is an archival link, it cannot be labeled: ' + identifier;
+        else text = `This item could not be labeled. Possible reasons:
+ • It doesn't represent a specific user or page
+ • It's not a kind of object supported by Shinigami Eyes
+
+ ${identifier || url}
+`;
+    } else {
+        text = identifier + (
+            label == 't-friendly' ? ' will be displayed as trans-friendly on search engines and social networks.' :
+                label == 'transphobic' ? ' will be displayed as anti-trans on search engines and social networks.' :
+                    ' has been cleared.'
+        );
+    }
+    confirmation.textContent = text;
     document.body.appendChild(confirmation);
+    previousConfirmationMessage = confirmation;
+    confirmation.addEventListener('mousedown', () => confirmation.remove());
+    setTimeout(() => {
+        confirmation.style.opacity = '0';
+    }, 2000);
+
     setTimeout(() => {
         confirmation.remove();
-    }, 3000);
+    }, 9000);
 }
 
 browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesSubmission>((message, sender, sendResponse) => {
 
-    if (message.updateAllLabels) {
-        if(!isSocialNetwork && message.confirmSetLabel){
-            displayConfirmation(message.confirmSetIdentifier, message.confirmSetLabel);
-        }
+    if (message.updateAllLabels || message.confirmSetLabel) {
+        displayConfirmation(message.confirmSetIdentifier, message.confirmSetLabel, message.badIdentifierReason, message.url);
         updateAllLabels(true);
         return;
     }
@@ -565,7 +611,10 @@ browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesSubmiss
     if (target && (<HTMLAnchorElement>target).href != message.url) target = null;
 
     var identifier = target ? getIdentifier(<HTMLAnchorElement>target) : getIdentifier(message.url);
-    if (!identifier) return;
+    if (!identifier) {
+        displayConfirmation(null, 'bad-identifier', null, message.url);
+        return;
+    }
 
     message.identifier = identifier;
     if (identifier.startsWith('facebook.com/'))
