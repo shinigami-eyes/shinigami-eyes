@@ -25,7 +25,7 @@
 
                 "*://duckduckgo.com/*",
                 "*://*.bing.com/*",
-                
+
                 "*://*.google.ar/*",
                 "*://*.google.at/*",
                 "*://*.google.be/*",
@@ -44,11 +44,17 @@
                 "*://*.google.pt/*",
                 "*://*.google.se/*"
             ],
-            "js": [
-                "content.js"
-            ],
             "css": [
                 "content.css"
+            ]
+        },
+        {
+            "all_frames": true,
+            "matches": [
+                "*://*/*"
+            ],
+            "js": [
+                "content.js"
             ]
         }
     ],

@@ -9,6 +9,7 @@ if (hostname.endsWith('.facebook.com')) hostname = 'facebook.com';
 if (hostname.endsWith('.youtube.com')) hostname = 'youtube.com';
 
 var myself: string = null;
+var isSocialNetwork: boolean = null;
 
 function fixupSiteStyles() {
     if (hostname == 'facebook.com') {
@@ -81,6 +82,21 @@ function maybeDisableCustomCss() {
 }
 
 function init() {
+    isSocialNetwork = [
+        'facebook.com',
+        'youtube.com',
+        'reddit.com',
+        'twitter.com',
+        'medium.com',
+        'disqus.com',
+        'rationalwiki.org',
+        'duckduckgo.com',
+        'bing.com',
+    ].includes(hostname) ||
+        domainIs(hostname, 'tumblr.com') ||
+        domainIs(hostname, 'wikipedia.org') ||
+        /^google(\.co)?\.\w+$/.test(hostname);
+
     fixupSiteStyles();
 
     if (domainIs(hostname, 'youtube.com')) {
@@ -93,36 +109,38 @@ function init() {
 
     console.log('Self: ' + myself)
 
+    document.addEventListener('contextmenu', evt => {
+        lastRightClickedElement = <HTMLElement>evt.target;
+    }, true);
+
     maybeDisableCustomCss();
     updateAllLabels();
 
-    var observer = new MutationObserver(mutationsList => {
-        maybeDisableCustomCss();
-        for (const mutation of mutationsList) {
-            if (mutation.type == 'childList') {
-                for (const node of mutation.addedNodes) {
-                    if (node instanceof HTMLAnchorElement) {
-                        initLink(node);
-                    }
-                    if (node instanceof HTMLElement) {
-                        for (const subnode of node.querySelectorAll('a')) {
-                            initLink(subnode);
+    if (isSocialNetwork) {
+        var observer = new MutationObserver(mutationsList => {
+            maybeDisableCustomCss();
+            for (const mutation of mutationsList) {
+                if (mutation.type == 'childList') {
+                    for (const node of mutation.addedNodes) {
+                        if (node instanceof HTMLAnchorElement) {
+                            initLink(node);
+                        }
+                        if (node instanceof HTMLElement) {
+                            for (const subnode of node.querySelectorAll('a')) {
+                                initLink(subnode);
+                            }
                         }
                     }
                 }
             }
-        }
-        solvePendingLabels();
-    });
+            solvePendingLabels();
+        });
 
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
-
-    document.addEventListener('contextmenu', evt => {
-        lastRightClickedElement = <HTMLElement>evt.target;
-    }, true);
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
 }
 
 var lastRightClickedElement: HTMLElement = null;
@@ -178,8 +196,10 @@ function updateYouTubeChannelHeader() {
 
 function updateAllLabels(refresh?: boolean) {
     if (refresh) knownLabels = {};
-    for (const a of document.getElementsByTagName('a')) {
-        initLink(a);
+    if (isSocialNetwork) {
+        for (const a of document.getElementsByTagName('a')) {
+            initLink(a);
+        }
     }
     solvePendingLabels();
 }

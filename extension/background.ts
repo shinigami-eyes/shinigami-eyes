@@ -384,6 +384,18 @@ function createContextMenu(text: string, id: ContextMenuCommand) {
             "*://*.google.com/*",
             "*://*.bing.com/*",
             "*://duckduckgo.com/*",
+
+            "*://*/",
+            "*://*/about*",
+            "*://*/contact*",
+            "*://*/faq*",
+            "*://*/blog",
+            "*://*/blog/",
+            "*://*/news",
+            "*://*/news/",
+            "*://*/en/",
+            "*://*/index.html",
+            "*://*/index.php",
         ]
     });
 }
