@@ -390,7 +390,7 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
     if (element.classList.contains('tumblelog')) return element.textContent.substr(1) + '.tumblr.com';
 
     const href = element.href;
-    if (href && !href.endsWith('#')) return getIdentifierFromURLImpl(tryParseURL(href));
+    if (href && (!href.endsWith('#') || href.includes('&stick='))) return getIdentifierFromURLImpl(tryParseURL(href));
     return null;
 }
 
