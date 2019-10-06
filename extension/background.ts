@@ -58,6 +58,7 @@ const badIdentifiersArray = [
     'facebook.com/hashtag',
     'facebook.com/help',
     'facebook.com/home.php',
+    'facebook.com/instantgames',
     'facebook.com/intl',
     'facebook.com/jobs',
     'facebook.com/l.php',
