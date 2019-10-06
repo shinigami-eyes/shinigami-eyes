@@ -29,7 +29,7 @@ function fixupSiteStyles() {
             .assigned-label-transphobic { outline: 2px solid var(--ShinigamiEyesTransphobic) !important; }
             .assigned-label-t-friendly { outline: 1px solid var(--ShinigamiEyesTFriendly) !important; }
         `);
-    } else if (hostname.indexOf('wiki') != -1) {
+    } else if (hostname == 'rationalwiki.org' || hostname.endsWith('wikipedia.org')) {
         addStyleSheet(`
             .assigned-label-transphobic { outline: 1px solid var(--ShinigamiEyesTransphobic) !important; }
             .assigned-label-t-friendly { outline: 1px solid var(--ShinigamiEyesTFriendly) !important; }
