@@ -457,7 +457,11 @@ function saveLabel(response: ShinigamiEyesSubmission) {
         getPendingSubmissions().push(response);
         submitPendingRatings();
         //console.log(response);
-        browser.tabs.sendMessage(response.tabId, { updateAllLabels: true });
+        browser.tabs.sendMessage(response.tabId, <ShinigamiEyesCommand>{ 
+            updateAllLabels: true,
+            confirmSetIdentifier: response.identifier,
+            confirmSetLabel: response.mark
+         });
         //browser.tabs.executeScript(response.tabId, {code: 'updateAllLabels()'});
         return;
     }
@@ -501,7 +505,14 @@ browser.contextMenus.onClicked.addListener(function (info, tab) {
         // elementId: info.targetElementId,
         debug: <any>overrides.debug
     }, { frameId: frameId }, response => {
-        if (!response.identifier) return;
+        if (!response.identifier){
+            browser.tabs.sendMessage(response.tabId, <ShinigamiEyesCommand>{ 
+                updateAllLabels: true,
+                confirmSetIdentifier: response.identifier,
+                confirmSetLabel: response.mark
+            });
+            return;
+        }
         if (response.mark) {
             if (badIdentifiers[response.identifier]) return;
             if (response.secondaryIdentifier && badIdentifiers[response.secondaryIdentifier])

@@ -24,6 +24,7 @@ interface ShinigamiEyesSubmission {
     contextPage?: string
     linkId?: number
     snippet?: string
+    isSocialNetwork?: boolean
 }
 interface ShinigamiEyesCommand {
     acceptClicked?: boolean
@@ -32,6 +33,8 @@ interface ShinigamiEyesCommand {
     updateAllLabels?: boolean
     closeCallingTab?: boolean
     setTheme?: string
+    confirmSetIdentifier?: string
+    confirmSetLabel?: LabelKind
 }
 type LabelMap = { [identifier: string]: LabelKind };
 

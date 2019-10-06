@@ -530,10 +530,26 @@ function getSnippet(node: HTMLElement) {
     return null;
 }
 
+function displayConfirmation(identifier: string, label: LabelKind){
+    const confirmation = document.createElement('div');
+    confirmation.style.cssText = 'position: fixed; padding: 15px; z-index: 99999999;';
+    confirmation.textContent = identifier + (
+        label == 't-friendly' ? ' will be displayed as trans-friendly' :
+        label == 'transphobic' ? ' will be displayed as anti-trans' :
+        ' has been cleared.'
+    ) + ' on search engines and social networks.'
+    document.body.appendChild(confirmation);
+    setTimeout(() => {
+        confirmation.remove();
+    }, 3000);
+}
 
 browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesSubmission>((message, sender, sendResponse) => {
 
     if (message.updateAllLabels) {
+        if(!isSocialNetwork && message.confirmSetLabel){
+            displayConfirmation(message.confirmSetIdentifier, message.confirmSetLabel);
+        }
         updateAllLabels(true);
         return;
     }
@@ -569,5 +585,6 @@ browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesSubmiss
         if (message.debug <= 1)
             setTimeout(() => snippet.classList.remove(debugClass), 1500)
     }
+    message.isSocialNetwork = isSocialNetwork;
     sendResponse(message);
 })
