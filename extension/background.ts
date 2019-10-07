@@ -471,6 +471,7 @@ function saveLabel(response: ShinigamiEyesSubmission) {
         sendMessageToContent(response.tabId, response.frameId, {
             updateAllLabels: true,
             confirmSetIdentifier: response.identifier,
+            confirmSetUrl: response.url,
             confirmSetLabel: response.mark || 'none'
         });
         //browser.tabs.executeScript(response.tabId, {code: 'updateAllLabels()'});
@@ -531,6 +532,7 @@ browser.contextMenus.onClicked.addListener(function (info, tab) {
             if (badIdentifiers[response.identifier]) {
                 sendMessageToContent(tabId, frameId, {
                     confirmSetIdentifier: response.identifier,
+                    confirmSetUrl: response.url,
                     confirmSetLabel: 'bad-identifier',
                     badIdentifierReason: badIdentifiersReasons[response.identifier]
                 });

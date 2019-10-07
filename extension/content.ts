@@ -539,6 +539,11 @@ function getBadIdentifierReason(identifier: string, url: string) {
         identifier == 'twitter.com/threader_app') return 'This is user is a bot.';
     if (identifier == 'twitter.com/hashtag') return 'Hashtags cannot be labeled, only users.';
     if (url.includes('youtube.com/watch')) return 'Only channels can be labeled, not specific videos.';
+    if (url.includes('reddit.com/') && url.includes('/comments/')) return 'Only users and subreddits can be labeled, not specific posts.';
+    if (url.includes('facebook.com') && (
+        url.includes('/posts/') ||
+        url.includes('/photo.php') ||
+        url.includes('/photos/'))) return 'Only pages, users and groups can be labeled, not specific posts or photos.';
     if (url.includes('wiki') && url.includes('#')) return 'Wiki paragraphs cannot be labeled, only whole articles.';
     return null;
 }
@@ -595,7 +600,7 @@ function displayConfirmation(identifier: string, label: LabelKind, badIdentifier
 browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesSubmission>((message, sender, sendResponse) => {
 
     if (message.updateAllLabels || message.confirmSetLabel) {
-        displayConfirmation(message.confirmSetIdentifier, message.confirmSetLabel, message.badIdentifierReason, message.url);
+        displayConfirmation(message.confirmSetIdentifier, message.confirmSetLabel, message.badIdentifierReason, message.confirmSetUrl);
         updateAllLabels(true);
         return;
     }

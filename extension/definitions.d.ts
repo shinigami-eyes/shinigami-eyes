@@ -35,6 +35,7 @@ interface ShinigamiEyesCommand {
     setTheme?: string
     confirmSetIdentifier?: string
     confirmSetLabel?: LabelKind
+    confirmSetUrl?: string
     badIdentifierReason?: BadIdentifierReason
 }
 type LabelMap = { [identifier: string]: LabelKind };
