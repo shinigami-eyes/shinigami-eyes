@@ -425,10 +425,8 @@ function tryParseURL(urlstr: string) {
     }
 }
 
-function getIdentifierFromURLImpl(url: URL): string {
+function tryUnwrapNestedURL(url: URL): URL {
     if (!url) return null;
-
-    // nested urls
     if (url.href.indexOf('http', 1) != -1) {
         if (url.pathname.startsWith('/intl/')) return null; // facebook language switch links
 
@@ -441,11 +439,22 @@ function getIdentifierFromURLImpl(url: URL): string {
 
         for (const value of values) {
             if (value.startsWith('http:') || value.startsWith('https:')) {
-                return getIdentifierFromURLImpl(tryParseURL(value));
+                return tryParseURL(value);
             }
         }
         const newurl = tryParseURL(url.href.substring(url.href.indexOf('http', 1)));
-        if (newurl) return getIdentifierFromURLImpl(newurl);
+        if (newurl) return newurl;
+    }
+    return null;
+}
+
+function getIdentifierFromURLImpl(url: URL): string {
+    if (!url) return null;
+
+    // nested urls
+    const nested = tryUnwrapNestedURL(url);
+    if (nested) {
+        return getIdentifierFromURLImpl(nested);
     }
 
     // fb group member badge
@@ -533,6 +542,12 @@ function getSnippet(node: HTMLElement) {
 function getBadIdentifierReason(identifier: string, url: string) {
     identifier = identifier || '';
     url = url || '';
+    if (url) {
+        const nested = tryUnwrapNestedURL(tryParseURL(url));
+        if (nested) url = nested.href;
+    }
+
+    if (identifier == 't.co') return 'Shortened link. Please follow the link and then mark the resulting page.';
     if (
         identifier.startsWith('reddit.com/user/') ||
         identifier == 'twitter.com/threadreaderapp' ||
