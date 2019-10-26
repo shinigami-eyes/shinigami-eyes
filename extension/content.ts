@@ -4,6 +4,7 @@ var hostname = typeof (location) != 'undefined' ? location.hostname : '';
 if (hostname.startsWith('www.')) {
     hostname = hostname.substring(4);
 }
+if (hostname == 'mobile.twitter.com') hostname = 'twitter.com';
 if (hostname.endsWith('.reddit.com')) hostname = 'reddit.com';
 if (hostname.endsWith('.facebook.com')) hostname = 'facebook.com';
 if (hostname.endsWith('.youtube.com')) hostname = 'youtube.com';
