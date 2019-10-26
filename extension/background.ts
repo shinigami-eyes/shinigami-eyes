@@ -397,6 +397,7 @@ function createContextMenu(text: string, id: ContextMenuCommand) {
             "*://duckduckgo.com/*",
 
             "*://*/",
+            "*://*/?fbclid=*",
             "*://*/about*",
             "*://*/contact*",
             "*://*/faq*",
