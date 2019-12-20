@@ -51,6 +51,13 @@ function fixupSiteStyles() {
             .stream-item a:active .fullname
             {color:inherit;}
         `);
+    } else if (hostname === 'tweetdeck.twitter.com') {
+        let profile: null|HTMLElement = (<HTMLElement>document.querySelector('.js-account-summary [rel=user]'));
+        let handle: null|String = profile ? profile.dataset.userName : null;
+
+        if (handle) {
+            myself = 'twitter.com/' + handle;
+        }
     } else if (hostname == 'reddit.com') {
         myself = getIdentifier(<HTMLAnchorElement>document.querySelector('#header-bottom-right .user a'));
         if (!myself) {
@@ -88,6 +95,7 @@ function init() {
         'youtube.com',
         'reddit.com',
         'twitter.com',
+        'tweetdeck.twitter.com',
         'medium.com',
         'disqus.com',
         'rationalwiki.org',
@@ -104,7 +112,7 @@ function init() {
         setInterval(updateYouTubeChannelHeader, 300);
         setInterval(updateAllLabels, 6000);
     }
-    if (hostname == 'twitter.com') {
+    if (hostname == 'twitter.com' || hostname == 'tweetdeck.twitter.com') {
         setInterval(updateTwitterClasses, 800);
     }
 
@@ -394,8 +402,9 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
                 p = p.parentElement;
             }
         }
-    } else if (hostname == 'twitter.com') {
+    } else if (hostname == 'twitter.com' || hostname == 'tweetdeck.twitter.com') {
         if (dataset && dataset.expandedUrl) return getIdentifier(dataset.expandedUrl);
+        if (dataset && dataset.fullUrl) return getIdentifier(dataset.expandedUrl);
         if (element.href.startsWith('https://t.co/')) {
             const title = element.title;
             if (title && (title.startsWith('http://') || title.startsWith('https://')))
