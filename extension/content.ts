@@ -245,7 +245,7 @@ function solvePendingLabels() {
     });
 }
 
-function applyLabel(a: HTMLAnchorElement, identifier: string) {
+function applyLabel(a: HTMLMarkableElement, identifier: string) {
     if (a.assignedCssLabel) {
         a.classList.remove('assigned-label-' + a.assignedCssLabel);
         a.classList.remove('has-assigned-label');
@@ -261,7 +261,65 @@ function applyLabel(a: HTMLAnchorElement, identifier: string) {
     }
 }
 
+function initTweetdeckOtherRepliesLink(a: HTMLAnchorElement) {
+    // Text is something along the lines of
+    // > @first
+    // > @first @second
+    // > @first @second @third
+    // > @first @second [language dependent text along the lines of n more]
+    // ad nauseam
+    const handleFinder = /@[a-z0-9_]+/ig;
+    const text = a.textContent;
+
+    // Because there's already an event bound to this element we can't just -remove- it
+    // Also since it's an anchor element we're very limited in -what- is allowed to be nested
+    // into it, so we'll empty the element, and fill it up with text nodes
+    // And label @handle's with span's
+    a.textContent = "";
+
+    let result;
+    let lastIndex = 0;
+    while ((result = handleFinder.exec(text)) !== null) {
+        // Get text between last element and this element
+        const lastString = text.substring(lastIndex, result.index);
+        if (lastString !== "") {
+            // If there is text, add it as text node
+            a.append(new Text(lastString));
+        }
+
+        // Create marker element which will allow colouring
+        const marker = document.createElement("span");
+        marker.textContent = result[0];
+
+        // Strip @ from handle
+        const identifier = "twitter.com/" + result[0].substr(1);
+        const label = knownLabels[identifier];
+        if (label === undefined) {
+            labelsToSolve.push({element: marker, identifier: identifier});
+        } else {
+            applyLabel(marker, identifier);
+        }
+
+        // add marker element to a
+        a.appendChild(marker);
+
+        // Save last index
+        lastIndex = result.index + result[0].length;
+    }
+
+    // Collect and if needed append trailing string
+    const endString = text.substring(lastIndex);
+    if (endString !== "") {
+        a.append(new Text(endString));
+    }
+}
+
 function initLink(a: HTMLAnchorElement) {
+    if (hostname === 'tweetdeck.twitter.com' && a.classList.contains('other-replies-link')) {
+        initTweetdeckOtherRepliesLink(a);
+        return;
+    }
+
     var identifier = getIdentifier(a);
     if (!identifier) {
         if (hostname == 'youtube.com' || hostname == 'twitter.com')

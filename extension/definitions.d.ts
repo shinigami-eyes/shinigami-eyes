@@ -6,8 +6,11 @@ declare class BloomFilter {
 interface HTMLElement {
     assignedCssLabel?: string
 }
+
+type HTMLMarkableElement = HTMLAnchorElement | HTMLSpanElement
+
 interface LabelToSolve {
-    element: HTMLAnchorElement
+    element: HTMLMarkableElement
     identifier: string
 }
 type LabelKind = 't-friendly' | 'transphobic' | 'none' | '' | 'bad-identifier';
