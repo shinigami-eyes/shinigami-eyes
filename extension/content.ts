@@ -315,9 +315,18 @@ function initTweetdeckOtherRepliesLink(a: HTMLAnchorElement) {
 }
 
 function initLink(a: HTMLAnchorElement) {
-    if (hostname === 'tweetdeck.twitter.com' && a.classList.contains('other-replies-link')) {
-        initTweetdeckOtherRepliesLink(a);
-        return;
+    if (hostname === 'tweetdeck.twitter.com') {
+        if (a.classList.contains('other-replies-link')) {
+            initTweetdeckOtherRepliesLink(a);
+            return;
+        }
+
+        // js-account-summary contains the link to profile
+        // We can use this to update `myself`
+        if (a.parentElement.classList.contains("js-account-summary") && a.dataset.userName) {
+            myself = `twitter.com/${a.dataset.userName}`;
+            return;
+        }
     }
 
     var identifier = getIdentifier(a);
