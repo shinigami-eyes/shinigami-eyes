@@ -37,7 +37,15 @@ function fixupSiteStyles() {
             .assigned-label-t-friendly { outline: 1px solid var(--ShinigamiEyesTFriendly) !important; }
         `);
     } else if (hostname == 'twitter.com') {
-        myself = getIdentifier(<HTMLAnchorElement>document.querySelector('.DashUserDropdown-userInfo a'));
+        let profileLink = <HTMLAnchorElement>document.querySelector('.DashUserDropdown-userInfo a');
+        if (profileLink == null) {
+            // If no profile link could be found via the old resolver, the user is most likely using the new twitter style
+            // Which includes a lot of obfuscation, so use aria hinting to resolve it
+            profileLink = <HTMLAnchorElement>document.querySelector('nav[aria-label="Primary"] [aria-label="Profile"][role="link"]')
+        }
+
+        myself = getIdentifier(profileLink);
+
         addStyleSheet(`
             .pretty-link b, .pretty-link s {
                 color: inherit !important;
