@@ -524,19 +524,42 @@ init();
 
 var lastGeneratedLinkId = 0;
 
-function getSnippet(node: HTMLElement) {
+function getMatchingAncestor(node: HTMLElement, match: (node: HTMLElement) => boolean) {
     while (node) {
-        var classList = node.classList;
-        if (hostname == 'facebook.com' && node.dataset && node.dataset.ftr) return node;
-        if (hostname == 'reddit.com' && (classList.contains('scrollerItem') || classList.contains('thing') || classList.contains('Comment'))) return node;
-        if (hostname == 'twitter.com' && (classList.contains('stream-item') || classList.contains('permalink-tweet-container') || node.tagName == 'ARTICLE')) return node;
-        if (hostname == 'disqus.com' && (classList.contains('post-content'))) return node;
-        if (hostname == 'medium.com' && (classList.contains('streamItem') || classList.contains('streamItemConversationItem'))) return node;
-        if (hostname == 'youtube.com' && node.tagName == 'YTD-COMMENT-RENDERER') return node;
-        if (hostname.endsWith('tumblr.com') && (node.dataset.postId || classList.contains('post'))) return node;
-
+        if (match(node)) return node;
         node = node.parentElement;
     }
+    return node;
+}
+
+function getMatchingAncestorByCss(node: HTMLElement, cssMatch: string) {
+    return getMatchingAncestor(node, x => x.matches(cssMatch));
+}
+
+function getSnippet(node: HTMLElement) {
+    if (hostname == 'facebook.com') {
+        return getMatchingAncestor(node, x => {
+            var dataset = x.dataset;
+            if (!dataset) return false;
+            if (dataset.ftr) return true;
+            if (dataset.highlightTokens) return true;
+            if (dataset.gt && dataset.vistracking) return true;
+            return false;
+        });
+    }
+    if (hostname == 'reddit.com')
+        return getMatchingAncestorByCss(node, '.scrollerItem, .thing, .Comment');
+    if (hostname == 'twitter.com')
+        return getMatchingAncestorByCss(node, '.stream-item, .permalink-tweet-container, article');
+    if (hostname == 'disqus.com')
+        return getMatchingAncestorByCss(node, '.post-content');
+    if (hostname == 'medium.com')
+        return getMatchingAncestorByCss(node, '.streamItem, .streamItemConversationItem');
+    if (hostname == 'youtube.com')
+        return getMatchingAncestorByCss(node, 'ytd-comment-renderer, ytd-video-secondary-info-renderer');
+    if (hostname == 'tumblr.com')
+        return getMatchingAncestor(node, x => (x.dataset && !!x.dataset.postId) || x.classList.contains('post'));
+
     return null;
 }
 
