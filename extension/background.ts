@@ -1,4 +1,4 @@
-﻿var browser: Browser = browser || chrome;
+var browser: Browser = browser || chrome;
 
 const PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
 const MIGRATION = ':MIGRATION'
@@ -70,7 +70,9 @@ const badIdentifiersArray = [
     'facebook.com/like.php',
     'facebook.com/local_surface',
     'facebook.com/logout.php',
+    'facebook.com/marketplace',
     'facebook.com/mbasic',
+    'facebook.com/me',
     'facebook.com/media',
     'facebook.com/menu',
     'facebook.com/messages',
@@ -85,6 +87,7 @@ const badIdentifiersArray = [
     'facebook.com/permalink.php',
     'facebook.com/pg',
     'facebook.com/photo.php',
+    'facebook.com/photo',
     'facebook.com/places',
     'facebook.com/policies',
     'facebook.com/privacy',
