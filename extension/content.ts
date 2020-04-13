@@ -310,9 +310,9 @@ function getCurrentFacebookPageId() {
     return null;
 }
 
-function getIdentifier(link: string | HTMLAnchorElement) {
+function getIdentifier(link: string | HTMLAnchorElement, originalTarget?: HTMLElement) {
     try {
-        var k = link instanceof Node ? getIdentifierFromElementImpl(link) : getIdentifierFromURLImpl(tryParseURL(link));
+        var k = link instanceof Node ? getIdentifierFromElementImpl(link, originalTarget) : getIdentifierFromURLImpl(tryParseURL(link));
         if (!k || k.indexOf('!') != -1) return null;
         return k.toLowerCase();
     } catch (e) {
@@ -321,7 +321,12 @@ function getIdentifier(link: string | HTMLAnchorElement) {
     }
 }
 
-function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
+function isFacebookPictureLink(element: HTMLAnchorElement) { 
+    var href = element.href;
+    return href && (href.includes('/photo/') || href.includes('/photo.php'));
+}
+
+function getIdentifierFromElementImpl(element: HTMLAnchorElement, originalTarget: HTMLElement): string {
     if (!element) return null;
 
     const dataset = element.dataset;
@@ -357,7 +362,12 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
         if (element.getAttribute('role') == 'link' && parent && parent.tagName == 'SPAN' && firstChild && firstChild.tagName == 'SPAN') return null;
 
         // React big profile picture (user or page)
-        if (firstChild && firstChild.firstElementChild instanceof SVGElement && !getMatchingAncestorByCss(element, '[role=article]')) {
+        if (originalTarget instanceof SVGImageElement && isFacebookPictureLink(element) && !getMatchingAncestorByCss(element, '[role=article]')) {
+            return getIdentifier(window.location.href);
+        }
+
+        // React cover picture
+        if (originalTarget instanceof HTMLImageElement && isFacebookPictureLink(element) && element.getAttribute('aria-label') && !getMatchingAncestorByCss(element, '[role=article]')) { 
             return getIdentifier(window.location.href);
         }
 
@@ -658,7 +668,8 @@ browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesSubmiss
     }
 
     message.contextPage = window.location.href;
-    var target = lastRightClickedElement; // message.elementId ? browser.menus.getTargetElement(message.elementId) : null;
+    const originalTarget = lastRightClickedElement;
+    let target = originalTarget; // message.elementId ? browser.menus.getTargetElement(message.elementId) : null;
 
     while (target) {
         if (target instanceof HTMLAnchorElement) break;
@@ -667,7 +678,7 @@ browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesSubmiss
 
     if (target && (<HTMLAnchorElement>target).href != message.url) target = null;
 
-    var identifier = target ? getIdentifier(<HTMLAnchorElement>target) : getIdentifier(message.url);
+    var identifier = target ? getIdentifier(<HTMLAnchorElement>target, originalTarget) : getIdentifier(message.url);
     if (!identifier) {
         displayConfirmation(null, 'bad-identifier', null, message.url, target);
         return;
