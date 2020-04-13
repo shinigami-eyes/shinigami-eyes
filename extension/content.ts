@@ -333,6 +333,7 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
         if (element.classList && element.classList.contains('time-ago')) return null;
     } else if (hostname == 'facebook.com') {
         const parent = element.parentElement;
+        const firstChild = <HTMLElement>element.firstChild;
         if (parent && (parent.tagName == 'H1' || parent.id == 'fb-timeline-cover-name')) {
             const id = getCurrentFacebookPageId();
             //console.log('Current fb page: ' + id)
@@ -341,7 +342,7 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
         }
 
         // comment timestamp
-        if (element.firstChild && (<HTMLElement>element.firstChild).tagName == 'ABBR' && element.lastChild == element.firstChild) return null;
+        if (firstChild && firstChild.tagName == 'ABBR' && element.lastChild == firstChild) return null;
 
         // post 'see more'
         if (element.classList.contains('see_more_link')) return null;
@@ -349,6 +350,11 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
         // post 'continue reading'
         if (parent && parent.classList.contains('text_exposed_link')) return null;
 
+        // React comment timestamp
+        if (parent && parent.tagName == 'LI') return null;
+
+        // React post timestamp
+        if (element.getAttribute('role') == 'link' && parent && parent.tagName == 'SPAN' && firstChild && firstChild.tagName == 'SPAN') return null;
 
         if (dataset) {
             const hovercard = dataset.hovercard;
@@ -539,6 +545,7 @@ function getMatchingAncestorByCss(node: HTMLElement, cssMatch: string) {
 function getSnippet(node: HTMLElement) {
     if (hostname == 'facebook.com') {
         return getMatchingAncestor(node, x => {
+            if (x.getAttribute('role') == 'article' && x.getAttribute('aria-labelledby')) return true;
             var dataset = x.dataset;
             if (!dataset) return false;
             if (dataset.ftr) return true;
@@ -581,6 +588,7 @@ function getBadIdentifierReason(identifier: string, url: string) {
     if (url.includes('reddit.com/') && url.includes('/comments/')) return 'Only users and subreddits can be labeled, not specific posts.';
     if (url.includes('facebook.com') && (
         url.includes('/posts/') ||
+        url.includes('/photo/') ||
         url.includes('/photo.php') ||
         url.includes('/photos/'))) return 'Only pages, users and groups can be labeled, not specific posts or photos.';
     if (url.includes('wiki') && url.includes('#')) return 'Wiki paragraphs cannot be labeled, only whole articles.';
