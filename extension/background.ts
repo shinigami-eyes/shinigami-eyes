@@ -545,8 +545,6 @@ browser.contextMenus.onClicked.addListener(function (info, tab) {
             if (response.secondaryIdentifier && badIdentifiers[response.secondaryIdentifier])
                 response.secondaryIdentifier = null;
         }
-        if (response.debug && /^facebook\.com\/[a-zA-Z]/.test(response.identifier))
-            alert('Note: could not find numeric id for ' + response.identifier);
         response.tabId = tabId;
         response.frameId = frameId;
         saveLabel(response);
