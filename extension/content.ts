@@ -570,7 +570,7 @@ function getSnippet(node: HTMLElement) {
     return null;
 }
 
-function getBadIdentifierReason(identifier: string, url: string) {
+function getBadIdentifierReason(identifier: string, url: string, target: HTMLElement) {
     identifier = identifier || '';
     url = url || '';
     if (url) {
@@ -597,7 +597,7 @@ function getBadIdentifierReason(identifier: string, url: string) {
 
 var previousConfirmationMessage: HTMLElement = null;
 
-function displayConfirmation(identifier: string, label: LabelKind, badIdentifierReason: BadIdentifierReason, url: string) {
+function displayConfirmation(identifier: string, label: LabelKind, badIdentifierReason: BadIdentifierReason, url: string, target: HTMLElement) {
     if (previousConfirmationMessage) {
         previousConfirmationMessage.remove();
         previousConfirmationMessage = null;
@@ -614,7 +614,7 @@ function displayConfirmation(identifier: string, label: LabelKind, badIdentifier
     let text: string;
 
     if (label == 'bad-identifier') {
-        const displayReason = getBadIdentifierReason(identifier, url);
+        const displayReason = getBadIdentifierReason(identifier, url, target);
         if (displayReason) text = displayReason;
         else if (badIdentifierReason == 'SN') text = 'This social network is not supported: ' + identifier + '.';
         else if (badIdentifierReason == 'AR') text = 'This is an archival link, it cannot be labeled: ' + identifier;
@@ -647,7 +647,7 @@ function displayConfirmation(identifier: string, label: LabelKind, badIdentifier
 browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesSubmission>((message, sender, sendResponse) => {
 
     if (message.updateAllLabels || message.confirmSetLabel) {
-        displayConfirmation(message.confirmSetIdentifier, message.confirmSetLabel, message.badIdentifierReason, message.confirmSetUrl);
+        displayConfirmation(message.confirmSetIdentifier, message.confirmSetLabel, message.badIdentifierReason, message.confirmSetUrl, null);
         updateAllLabels(true);
         return;
     }
@@ -664,7 +664,7 @@ browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesSubmiss
 
     var identifier = target ? getIdentifier(<HTMLAnchorElement>target) : getIdentifier(message.url);
     if (!identifier) {
-        displayConfirmation(null, 'bad-identifier', null, message.url);
+        displayConfirmation(null, 'bad-identifier', null, message.url, target);
         return;
     }
 
