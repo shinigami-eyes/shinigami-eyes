@@ -356,6 +356,11 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement): string {
         // React post timestamp
         if (element.getAttribute('role') == 'link' && parent && parent.tagName == 'SPAN' && firstChild && firstChild.tagName == 'SPAN') return null;
 
+        // React big profile picture (user or page)
+        if (firstChild && firstChild.firstElementChild instanceof SVGElement && !getMatchingAncestorByCss(element, '[role=article]')) {
+            return getIdentifier(window.location.href);
+        }
+
         if (dataset) {
             const hovercard = dataset.hovercard;
             if (hovercard) {
@@ -656,7 +661,7 @@ browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesSubmiss
     var target = lastRightClickedElement; // message.elementId ? browser.menus.getTargetElement(message.elementId) : null;
 
     while (target) {
-        if ((<HTMLAnchorElement>target).href) break;
+        if (target instanceof HTMLAnchorElement) break;
         target = target.parentElement;
     }
 
