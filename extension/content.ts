@@ -625,7 +625,7 @@ function displayConfirmation(identifier: string, label: LabelKind, badIdentifier
         label == 't-friendly' ? '#eaffcf' :
             label == 'transphobic' ? '#f5d7d7' :
                 '#eeeeee';
-    confirmation.style.cssText = `transition: opacity 7s ease-in-out; opacity: 1; position: fixed; padding: 30px 15px; z-index: 99999999; white-space: pre-wrap; top: 200px; left: 30%; right: 30%; background: ${background}; color: black; font-weight: bold; font-family: Arial; box-shadow: 0px 5px 10px #ddd; border: 1px solid #ccc; font-size: 11pt;`;
+    confirmation.style.cssText = `transition: opacity 7s ease-in-out !important; opacity: 1; position: fixed; padding: 30px 15px; z-index: 99999999; white-space: pre-wrap; top: 200px; left: 30%; right: 30%; background: ${background}; color: black; font-weight: bold; font-family: Arial; box-shadow: 0px 5px 10px #ddd; border: 1px solid #ccc; font-size: 11pt;`;
     let text: string;
 
     if (label == 'bad-identifier') {
