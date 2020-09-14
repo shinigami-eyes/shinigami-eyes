@@ -11,3 +11,4 @@ extension/data/t-friendly.dat
 extension/background.js
 extension/content.js
 extension/help.js
+extension/options.js
