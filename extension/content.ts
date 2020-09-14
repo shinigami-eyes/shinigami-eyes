@@ -492,10 +492,14 @@ function getIdentifierFromURLImpl(url: URL): string {
 
     if (host.startsWith('www.')) host = host.substring(4);
 
+    const pathArray = url.pathname.split('/');
+
     if (domainIs(host, 'facebook.com')) {
         const fbId = searchParams.get('id');
         const p = url.pathname.replace('/pg/', '/');
-        return 'facebook.com/' + (fbId || getPartialPath(p, p.startsWith('/groups/') ? 2 : 1).substring(1));
+        const isGroup = p.startsWith('/groups/');
+        if (isGroup && p.includes('/user/')) return 'facebook.com/' + pathArray[4]; // fb.com/groups/.../user/...
+        return 'facebook.com/' + (fbId || getPartialPath(p, isGroup ? 2 : 1).substring(1));
     } else if (domainIs(host, 'reddit.com')) {
         const pathname = url.pathname.replace('/u/', '/user/');
         if (!pathname.startsWith('/user/') && !pathname.startsWith('/r/')) return null;
