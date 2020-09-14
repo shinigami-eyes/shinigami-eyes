@@ -1,9 +1,9 @@
-var browser: Browser = browser || chrome;
+﻿var browser: Browser = browser || chrome;
 
 const PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
 const MIGRATION = ':MIGRATION'
 
-const CURRENT_VERSION = 100023;
+const CURRENT_VERSION = 100024;
 
 const badIdentifiersReasons: { [id: string]: BadIdentifierReason } = {};
 const badIdentifiers: { [id: string]: true } = {};
