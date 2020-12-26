@@ -518,6 +518,10 @@ function getIdentifierFromURLImpl(url: URL): string {
     } else if (domainIs(host, 'disqus.com') && url.pathname.startsWith('/by/')) {
         return 'disqus.com' + getPartialPath(url.pathname, 2);
     } else if (domainIs(host, 'medium.com')) {
+        const hostParts = host.split('.');
+        if (hostParts.length == 3 && hostParts[0] != 'www') { 
+            return host;
+        }
         return 'medium.com' + getPartialPath(url.pathname.replace('/t/', '/'), 1);
     } else if (domainIs(host, 'tumblr.com')) {
         if (url.pathname.startsWith('/register/follow/')) {

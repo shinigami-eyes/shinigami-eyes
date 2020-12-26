@@ -396,7 +396,7 @@ function createContextMenu(text: string, id: ContextMenuCommand) {
             "*://*.reddit.com/*",
             "*://*.twitter.com/*",
             "*://*.t.co/*",
-            "*://medium.com/*",
+            "*://*.medium.com/*",
             "*://disqus.com/*",
             "*://*.tumblr.com/*",
             "*://*.wikipedia.org/*",
