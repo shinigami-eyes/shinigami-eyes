@@ -383,14 +383,7 @@ browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesMessage
 loadBloomFilter('transphobic');
 loadBloomFilter('t-friendly');
 
-
-
-function createContextMenu(text: string, id: ContextMenuCommand) {
-    browser.contextMenus.create({
-        id: id,
-        title: text,
-        contexts: ["link"],
-        targetUrlPatterns: [
+const socialNetworkPatterns = [
             "*://*.facebook.com/*",
             "*://*.youtube.com/*",
             "*://*.reddit.com/*",
@@ -404,7 +397,9 @@ function createContextMenu(text: string, id: ContextMenuCommand) {
             "*://*.google.com/*",
             "*://*.bing.com/*",
             "*://duckduckgo.com/*",
+];
 
+const homepagePatterns = [
             "*://*/",
             "*://*/?fbclid=*",
             "*://*/about*",
@@ -417,16 +412,45 @@ function createContextMenu(text: string, id: ContextMenuCommand) {
             "*://*/en/",
             "*://*/index.html",
             "*://*/index.php",
-        ]
+];
+
+const allPatterns = socialNetworkPatterns.concat(homepagePatterns);
+
+function createEntityContextMenu(text: string, id: ContextMenuCommand) {
+    browser.contextMenus.create({
+        id: id,
+        title: text,
+        contexts: ["link"],
+        targetUrlPatterns: allPatterns
     });
 }
 
-createContextMenu('Mark as anti-trans', 'mark-transphobic');
-createContextMenu('Mark as t-friendly', 'mark-t-friendly');
-createContextMenu('Clear', 'mark-none');
-browser.contextMenus.create({ type: 'separator' });
-createContextMenu('Settings', 'options');
-createContextMenu('Help', 'help');
+
+function createSystemContextMenu(text: string, id: ContextMenuCommand, separator?: boolean) {
+    browser.contextMenus.create({
+        id: id,
+        title: text,
+        contexts: ["all"],
+        type: separator ? 'separator' : 'normal',
+        documentUrlPatterns: allPatterns
+    });
+}
+
+
+browser.contextMenus.create({
+    title: '(Please right click on a link instead)', 
+    enabled: false,
+    contexts: ['page'],
+    documentUrlPatterns: socialNetworkPatterns
+});
+
+createEntityContextMenu('Mark as anti-trans', 'mark-transphobic');
+createEntityContextMenu('Mark as t-friendly', 'mark-t-friendly');
+createEntityContextMenu('Clear', 'mark-none');
+
+createSystemContextMenu('---', 'separator', true);
+createSystemContextMenu('Settings', 'options');
+createSystemContextMenu('Help', 'help');
 
 var uncommittedResponse: ShinigamiEyesSubmission = null;
 

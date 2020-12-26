@@ -27,8 +27,10 @@ declare type Browser = {
         create(options: {
             id?: string
             title?: string
-            contexts?: 'link'[]
+            enabled?: boolean
+            contexts?: ('all' | 'page' | 'frame' | 'selection' | 'link' | 'editable' | 'image' | 'video' | 'audio' | 'launcher' | 'browser_action' | 'page_action' | 'action')[]
             targetUrlPatterns?: string[]
+            documentUrlPatterns?: string[]
             type?: 'normal' | 'separator'
         }): void
         onClicked: {
