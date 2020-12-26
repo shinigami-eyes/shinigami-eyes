@@ -359,7 +359,8 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement, originalTarget
         if (parent && parent.tagName == 'LI') return null;
 
         // React post timestamp
-        if (element.getAttribute('role') == 'link' && parent && parent.tagName == 'SPAN' && firstChild && firstChild.tagName == 'SPAN') return null;
+        if (element.getAttribute('role') == 'link' && parent && parent.tagName == 'SPAN' && firstChild && firstChild.tagName == 'SPAN' && firstChild.tabIndex == 0) 
+            return null;
 
         // React big profile picture (user or page)
         if (originalTarget instanceof SVGImageElement && isFacebookPictureLink(element) && !getMatchingAncestorByCss(element, '[role=article]')) {
