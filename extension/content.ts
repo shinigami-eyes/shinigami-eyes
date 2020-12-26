@@ -422,8 +422,10 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement, originalTarget
             if (title && (title.startsWith('http://') || title.startsWith('https://')))
                 return getIdentifier(title);
             const content = element.textContent;
-            if (!content.includes(' ') && content.includes('.') && !content.includes('…'))
-                return getIdentifier('http://' + content);
+            if (!content.includes(' ') && content.includes('.') && !content.includes('…')) {
+                const url = content.startsWith('http://') || content.startsWith('https://') ? content : 'http://' + content;
+                return getIdentifier(url);
+            }
         }
     } else if (domainIs(hostname, 'wikipedia.org')) {
         if (element.classList.contains('interlanguage-link-target')) return null;
