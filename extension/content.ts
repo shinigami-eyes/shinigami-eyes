@@ -429,7 +429,7 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement, originalTarget
         if (element.classList.contains('interlanguage-link-target')) return null;
     }
 
-    if (element.classList.contains('tumblelog')) return element.textContent.substr(1) + '.tumblr.com';
+    if (element.classList.contains('tumblelog')) return element.textContent.replace('@', '') + '.tumblr.com';
 
     const href = element.href;
     if (href && (!href.endsWith('#') || href.includes('&stick='))) return getIdentifierFromURLImpl(tryParseURL(href));
