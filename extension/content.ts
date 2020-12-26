@@ -584,7 +584,7 @@ function getSnippet(node: HTMLElement) {
     if (hostname == 'youtube.com')
         return getMatchingAncestorByCss(node, 'ytd-comment-renderer, ytd-video-secondary-info-renderer');
     if (hostname == 'tumblr.com')
-        return getMatchingAncestor(node, x => (x.dataset && !!x.dataset.postId) || x.classList.contains('post'));
+        return getMatchingAncestor(node, x => (x.dataset && !!(x.dataset.postId || x.dataset.id)) || x.classList.contains('post'));
 
     return null;
 }
