@@ -455,6 +455,7 @@ function tryUnwrapNestedURL(url: URL): URL {
         // const values = url.searchParams.values()
         // HACK: values(...) is not iterable on facebook (babel polyfill?)
         const values = url.search.split('&').map(x => {
+            if (x.startsWith('ref_url=')) return '';
             const eq = x.indexOf('=');
             return eq == -1 ? '' : decodeURIComponent(x.substr(eq + 1));
         });
