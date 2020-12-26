@@ -499,6 +499,7 @@ function getIdentifierFromURLImpl(url: URL): string {
     const pathArray = url.pathname.split('/');
 
     if (domainIs(host, 'facebook.com')) {
+        if (searchParams.get('story_fbid')) return null;
         const fbId = searchParams.get('id');
         const p = url.pathname.replace('/pg/', '/');
         const isGroup = p.startsWith('/groups/');
@@ -624,6 +625,8 @@ function getBadIdentifierReason(identifier: string, url: string, target: HTMLEle
         url.includes('/posts/') ||
         url.includes('/photo/') ||
         url.includes('/photo.php') ||
+        url.includes('/permalink.php') ||
+        url.includes('/permalink/') ||
         url.includes('/photos/'))) return 'Only pages, users and groups can be labeled, not specific posts or photos.';
     if (url.includes('wiki') && url.includes('#')) return 'Wiki paragraphs cannot be labeled, only whole articles.';
     return null;
