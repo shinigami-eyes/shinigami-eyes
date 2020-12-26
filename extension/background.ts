@@ -1,4 +1,4 @@
-﻿var browser: Browser = browser || chrome;
+var browser: Browser = browser || chrome;
 
 const PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
 const MIGRATION = ':MIGRATION'
@@ -109,6 +109,8 @@ const badIdentifiersArray = [
     'goo.gl',
     'google.com',
     'googleusercontent.com',
+    'http',
+    'https',
     'i.imgur.com',
     'i.reddituploads.com',
     'imdb.com=SN',
@@ -261,6 +263,10 @@ const badIdentifiersArray = [
     'youtube.com/playlist',
     'youtube.com/redirect',
     'youtube.com/watch',
+    'youtube.com/feed',
+    'youtube.com/premium',
+    'youtube.com/gaming',
+    'youtube.com/account',
 ].map(x => {
     const arr = x.split('=');
     const id = arr[0];
