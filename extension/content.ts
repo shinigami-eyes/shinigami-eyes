@@ -185,7 +185,7 @@ function updateYouTubeChannelHeader() {
             replacement.style.fontWeight = '400';
             replacement.style.lineHeight = '3rem';
             replacement.style.textDecoration = 'none';
-            replacement.style.color = 'black';
+            replacement.style.color = 'var(--yt-spec-text-primary)';
         }
         replacement.textContent = lastAppliedYouTubeTitle;
         replacement.href = lastAppliedYouTubeUrl;
