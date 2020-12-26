@@ -561,10 +561,17 @@ function getMatchingAncestorByCss(node: HTMLElement, cssMatch: string) {
     return getMatchingAncestor(node, x => x.matches(cssMatch));
 }
 
-function getSnippet(node: HTMLElement) {
+function getSnippet(node: HTMLElement) : HTMLElement {
     if (hostname == 'facebook.com') {
+        const pathname = window.location.pathname;
+        const isPhotoPage = pathname.startsWith('/photo') || pathname.includes('/photos/') || pathname.startsWith('/video') || pathname.includes('/videos/');
+        if (isPhotoPage) { 
+            const sidebar = document.querySelector('[role=complementary]');
+            if (sidebar) return sidebar.parentElement;
+        }
+        const isSearchPage = pathname.startsWith('/search/');
         return getMatchingAncestor(node, x => {
-            if (x.getAttribute('role') == 'article' && x.getAttribute('aria-labelledby')) return true;
+            if (x.getAttribute('role') == 'article' && (isSearchPage || x.getAttribute('aria-labelledby'))) return true;
             var dataset = x.dataset;
             if (!dataset) return false;
             if (dataset.ftr) return true;
