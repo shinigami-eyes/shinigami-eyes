@@ -108,8 +108,6 @@ function init() {
         setInterval(updateTwitterClasses, 800);
     }
 
-    console.log('Self: ' + myself)
-
     document.addEventListener('contextmenu', evt => {
         lastRightClickedElement = <HTMLElement>evt.target;
     }, true);
