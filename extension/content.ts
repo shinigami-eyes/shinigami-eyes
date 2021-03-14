@@ -534,8 +534,14 @@ function getIdentifierFromURLImpl(url: URL): string {
         }
         return null;
     } else if (domainIs(host, 'wikipedia.org') || domainIs(host, 'rationalwiki.org')) {
-        if (url.hash || url.pathname.includes(':')) return null;
-        if (url.pathname.startsWith('/wiki/')) return 'wikipedia.org' + decodeURIComponent(getPartialPath(url.pathname, 2));
+        const pathname = url.pathname;
+        if (url.hash) return null;
+        if (pathname.startsWith('/wiki/Special:Contributions/') && url.href == window.location.href)
+            return 'wikipedia.org/wiki/User:' + pathArray[3];
+        if (pathname.startsWith('/wiki/User:'))
+            return 'wikipedia.org/wiki/User:' + pathArray[2].split(':')[1];
+        if (pathname.includes(':')) return null;
+        if (pathname.startsWith('/wiki/')) return 'wikipedia.org' + decodeURIComponent(getPartialPath(pathname, 2));
         else return null;
     } else if (host.indexOf('.blogspot.') != -1) {
         const m = captureRegex(host, /([a-zA-Z0-9\-]*)\.blogspot/);
