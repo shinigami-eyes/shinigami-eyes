@@ -520,7 +520,7 @@ function getIdentifierFromURLImpl(url: URL): string {
         return 'disqus.com' + getPartialPath(url.pathname, 2);
     } else if (domainIs(host, 'medium.com')) {
         const hostParts = host.split('.');
-        if (hostParts.length == 3 && hostParts[0] != 'www') { 
+        if (hostParts.length == 3 && hostParts[0] != 'www') {
             return host;
         }
         return 'medium.com' + getPartialPath(url.pathname.replace('/t/', '/'), 1);
@@ -536,6 +536,12 @@ function getIdentifierFromURLImpl(url: URL): string {
     } else if (domainIs(host, 'wikipedia.org') || domainIs(host, 'rationalwiki.org')) {
         const pathname = url.pathname;
         if (url.hash) return null;
+        if (pathname == '/w/index.php' && searchParams.get('action') == 'edit') {
+            const title = searchParams.get('title');
+            if (title && title.startsWith('User:')) {
+                return 'wikipedia.org/wiki/' + title;
+            }
+        }
         if (pathname.startsWith('/wiki/Special:Contributions/') && url.href == window.location.href)
             return 'wikipedia.org/wiki/User:' + pathArray[3];
         if (pathname.startsWith('/wiki/User:'))
