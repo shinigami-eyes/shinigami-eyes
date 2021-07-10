@@ -564,6 +564,7 @@ function objectToBytes(obj: any) {
 
 interface AsymmetricallyEncryptedData {
     symmetricKey: JsonWebKey;
+    sha256: string;
 }
 
 async function encryptSubmission(plainObj: any): Promise<CipherSubmission> {
@@ -583,10 +584,14 @@ async function encryptSubmission(plainObj: any): Promise<CipherSubmission> {
 
     const iv = window.crypto.getRandomValues(new Uint8Array(16));
 
+    const plainData = objectToBytes(plainObj);
+
     const symmetricallyEncryptedData = await crypto.subtle.encrypt({
         name: "AES-CBC",
         iv
-    }, symmetricKey, objectToBytes(plainObj));
+    }, symmetricKey, plainData);
+
+    const plainHash = await crypto.subtle.digest('SHA-256', plainData);
 
     const asymmetricallyEncryptedSymmetricKey = await crypto.subtle.encrypt(
         {
@@ -594,7 +599,8 @@ async function encryptSubmission(plainObj: any): Promise<CipherSubmission> {
         },
         publicEncryptionKey,
         objectToBytes(<AsymmetricallyEncryptedData>{
-            symmetricKey: await crypto.subtle.exportKey('jwk', symmetricKey)
+            symmetricKey: await crypto.subtle.exportKey('jwk', symmetricKey),
+            sha256: bufferToBase64(plainHash)
         })
     );
     return {
