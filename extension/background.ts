@@ -644,7 +644,6 @@ async function submitPendingRatings() {
     }
 
     lastSubmissionError = null;
-    console.log('Sending request');
     try {
         const response = await fetch('https://shini-api.xyz/submit-vote', {
             body: JSON.stringify(actualRequest),
