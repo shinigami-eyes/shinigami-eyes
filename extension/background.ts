@@ -573,6 +573,8 @@ async function encryptSubmission(plainObj: any): Promise<CipherSubmission> {
         hash: 'SHA-256'
     }, false, ['encrypt']);
 
+    // Since asymmetric encryption only supports limited data size, we encrypt data symmetrically
+    // and then protect the symmetric key asymmetrically.
     const symmetricKey = await crypto.subtle.generateKey(
         {
             name: 'AES-CBC',
