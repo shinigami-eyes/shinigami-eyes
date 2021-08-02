@@ -76,7 +76,6 @@
     "permissions": [
         "contextMenus",
         "storage",
-        "*://shinigami-eyes.azurewebsites.net/*",
         "*://*/*"
     ],
     "applications": {
