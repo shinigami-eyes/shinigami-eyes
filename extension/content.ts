@@ -37,7 +37,15 @@ function fixupSiteStyles() {
             .assigned-label-t-friendly { outline: 1px solid var(--ShinigamiEyesTFriendly) !important; }
         `);
     } else if (hostname == 'twitter.com') {
-        myself = getIdentifier(<HTMLAnchorElement>document.querySelector('.DashUserDropdown-userInfo a'));
+        let profileLink = <HTMLAnchorElement>document.querySelector('.DashUserDropdown-userInfo a');
+        if (profileLink == null) {
+            // If no profile link could be found via the old resolver, the user is most likely using the new twitter style
+            // Which includes a lot of obfuscation, so use aria hinting to resolve it
+            profileLink = <HTMLAnchorElement>document.querySelector('nav[aria-label="Primary"] [aria-label="Profile"][role="link"]')
+        }
+
+        myself = getIdentifier(profileLink);
+
         addStyleSheet(`
             .pretty-link b, .pretty-link s {
                 color: inherit !important;
@@ -51,6 +59,13 @@ function fixupSiteStyles() {
             .stream-item a:active .fullname
             {color:inherit;}
         `);
+    } else if (hostname === 'tweetdeck.twitter.com') {
+        let profile: null|HTMLElement = (<HTMLElement>document.querySelector('.js-account-summary [rel=user]'));
+        let handle: null|String = profile ? profile.dataset.userName : null;
+
+        if (handle) {
+            myself = 'twitter.com/' + handle;
+        }
     } else if (hostname == 'reddit.com') {
         myself = getIdentifier(<HTMLAnchorElement>document.querySelector('#header-bottom-right .user a'));
         if (!myself) {
@@ -88,6 +103,7 @@ function init() {
         'youtube.com',
         'reddit.com',
         'twitter.com',
+        'tweetdeck.twitter.com',
         'medium.com',
         'disqus.com',
         'rationalwiki.org',
@@ -104,7 +120,7 @@ function init() {
         setInterval(updateYouTubeChannelHeader, 300);
         setInterval(updateAllLabels, 6000);
     }
-    if (hostname == 'twitter.com') {
+    if (hostname == 'twitter.com' || hostname == 'tweetdeck.twitter.com') {
         setInterval(updateTwitterClasses, 800);
     }
 
@@ -227,7 +243,7 @@ function solvePendingLabels() {
     });
 }
 
-function applyLabel(a: HTMLAnchorElement, identifier: string) {
+function applyLabel(a: HTMLMarkableElement, identifier: string) {
     if (a.assignedCssLabel) {
         a.classList.remove('assigned-label-' + a.assignedCssLabel);
         a.classList.remove('has-assigned-label');
@@ -243,7 +259,74 @@ function applyLabel(a: HTMLAnchorElement, identifier: string) {
     }
 }
 
+function initTweetdeckOtherRepliesLink(a: HTMLAnchorElement) {
+    // Text is something along the lines of
+    // > @first
+    // > @first @second
+    // > @first @second @third
+    // > @first @second [language dependent text along the lines of n more]
+    // ad nauseam
+    const handleFinder = /@[a-z0-9_]+/ig;
+    const text = a.textContent;
+
+    // Because there's already an event bound to this element we can't just -remove- it
+    // Also since it's an anchor element we're very limited in -what- is allowed to be nested
+    // into it, so we'll empty the element, and fill it up with text nodes
+    // And label @handle's with span's
+    a.textContent = "";
+
+    let result;
+    let lastIndex = 0;
+    while ((result = handleFinder.exec(text)) !== null) {
+        // Get text between last element and this element
+        const lastString = text.substring(lastIndex, result.index);
+        if (lastString !== "") {
+            // If there is text, add it as text node
+            a.append(new Text(lastString));
+        }
+
+        // Create marker element which will allow colouring
+        const marker = document.createElement("span");
+        marker.textContent = result[0];
+
+        // Strip @ from handle
+        const identifier = "twitter.com/" + result[0].substr(1);
+        const label = knownLabels[identifier];
+        if (label === undefined) {
+            labelsToSolve.push({element: marker, identifier: identifier});
+        } else {
+            applyLabel(marker, identifier);
+        }
+
+        // add marker element to a
+        a.appendChild(marker);
+
+        // Save last index
+        lastIndex = result.index + result[0].length;
+    }
+
+    // Collect and if needed append trailing string
+    const endString = text.substring(lastIndex);
+    if (endString !== "") {
+        a.append(new Text(endString));
+    }
+}
+
 function initLink(a: HTMLAnchorElement) {
+    if (hostname === 'tweetdeck.twitter.com') {
+        if (a.classList.contains('other-replies-link')) {
+            initTweetdeckOtherRepliesLink(a);
+            return;
+        }
+
+        // js-account-summary contains the link to profile
+        // We can use this to update `myself`
+        if (a.parentElement.classList.contains("js-account-summary") && a.dataset.userName) {
+            myself = `twitter.com/${a.dataset.userName}`;
+            return;
+        }
+    }
+
     var identifier = getIdentifier(a);
     if (!identifier) {
         if (hostname == 'youtube.com' || hostname == 'twitter.com')
@@ -414,8 +497,9 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement, originalTarget
                 p = p.parentElement;
             }
         }
-    } else if (hostname == 'twitter.com') {
+    } else if (hostname == 'twitter.com' || hostname == 'tweetdeck.twitter.com') {
         if (dataset && dataset.expandedUrl) return getIdentifier(dataset.expandedUrl);
+        if (dataset && dataset.fullUrl) return getIdentifier(dataset.expandedUrl);
         if (element.href.startsWith('https://t.co/')) {
             const title = element.title;
             if (title && (title.startsWith('http://') || title.startsWith('https://')))
