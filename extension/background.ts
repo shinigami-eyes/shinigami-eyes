@@ -272,6 +272,7 @@ const badIdentifiersArray = [
     'tmblr.co',
     'tumblr.com',
     'twitch.tv=SN',
+    'tweetdeck.twitter.com',
     'twitter.com',
     'twitter.com/explore',
     'twitter.com/hashtag',
