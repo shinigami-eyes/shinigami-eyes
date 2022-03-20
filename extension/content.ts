@@ -513,7 +513,14 @@ function getIdentifierFromURLImpl(url: URL): string {
         if (pathname.includes('/comments/') && hostname == 'reddit.com') return null;
         return 'reddit.com' + getPartialPath(pathname, 2);
     } else if (domainIs(host, 'twitter.com')) {
-        return 'twitter.com' + getPartialPath(url.pathname, 1);
+        const isSpecial =  url.pathname.startsWith('/i/');
+        const isCommunity = url.pathname.startsWith('/i/communities/');
+        if (isCommunity) {
+            return 'twitter.com' + getPartialPath(url.pathname, 3);
+        } else if (!isSpecial) {
+            return 'twitter.com' + getPartialPath(url.pathname, 1);
+        }
+        return null;
     } else if (domainIs(host, 'youtube.com')) {
         const pathname = url.pathname;
         if (pathname.startsWith('/user/') || pathname.startsWith('/c/') || pathname.startsWith('/channel/'))
