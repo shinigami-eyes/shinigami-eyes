@@ -26,6 +26,7 @@
 
                 "*://duckduckgo.com/*",
                 "*://*.bing.com/*",
+                "*://*.ecosia.org/*",
 
                 "*://*.google.ar/*",
                 "*://*.google.at/*",
