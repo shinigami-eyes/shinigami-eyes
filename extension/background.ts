@@ -40,6 +40,7 @@ const badIdentifiersArray = [
     'docs.google.com',
     'drive.google.com',
     'duckduckgo.com',
+    'ecosia.org',
     'en.wikipedia.org',
     'en.wikiquote.org',
     'etsy.com=SN',
@@ -460,6 +461,7 @@ const socialNetworkPatterns = [
             "*://*.rationalwiki.org/*",
             "*://*.google.com/*",
             "*://*.bing.com/*",
+            "*://*.ecosia.org/*",
             "*://duckduckgo.com/*",
 ];
 

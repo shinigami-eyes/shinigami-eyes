@@ -93,6 +93,7 @@ function init() {
         'rationalwiki.org',
         'duckduckgo.com',
         'bing.com',
+        'ecosia.org',
     ].includes(hostname) ||
         domainIs(hostname, 'tumblr.com') ||
         domainIs(hostname, 'wikipedia.org') ||
