@@ -461,7 +461,6 @@ const socialNetworkPatterns = [
             "*://*.google.com/*",
             "*://*.bing.com/*",
             "*://duckduckgo.com/*",
-            "*://*.amazon.com/*",
             "*://*.goodreads.com/*",
 ];
 
