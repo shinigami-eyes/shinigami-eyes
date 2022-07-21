@@ -31,7 +31,7 @@ function fixupSiteStyles() {
             .assigned-label-transphobic { outline: 2px solid var(--ShinigamiEyesTransphobic) !important; }
             .assigned-label-t-friendly { outline: 1px solid var(--ShinigamiEyesTFriendly) !important; }
         `);
-    } else if (hostname == 'rationalwiki.org' || domainIs(hostname, 'wikipedia.org')) {
+    } else if (hostname == 'rationalwiki.org' || domainIs(hostname, 'wikipedia.org') || hostname == 'goodreads.com') {
         addStyleSheet(`
             .assigned-label-transphobic { outline: 1px solid var(--ShinigamiEyesTransphobic) !important; }
             .assigned-label-t-friendly { outline: 1px solid var(--ShinigamiEyesTFriendly) !important; }
@@ -93,6 +93,7 @@ function init() {
         'rationalwiki.org',
         'duckduckgo.com',
         'bing.com',
+        'goodreads.com',
     ].includes(hostname) ||
         domainIs(hostname, 'tumblr.com') ||
         domainIs(hostname, 'wikipedia.org') ||
@@ -428,9 +429,15 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement, originalTarget
         }
     } else if (domainIs(hostname, 'wikipedia.org')) {
         if (element.classList.contains('interlanguage-link-target')) return null;
-    }
+    } else if (hostname == 'goodreads.com') {
+        if (element.classList.contains('authorName')) return element.textContent;
+        if (element.classList.contains('author')) return element.textContent;
+        if (element.classList.contains('gr-book__authorLink')) return element.textContent;
+    } 
 
     if (element.classList.contains('tumblelog')) return element.textContent.replace('@', '') + '.tumblr.com';
+
+
 
     const href = element.href;
     if (href && (!href.endsWith('#') || href.includes('&stick='))) return getIdentifierFromURLImpl(tryParseURL(href));

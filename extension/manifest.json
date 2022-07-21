@@ -43,7 +43,8 @@
                 "*://*.google.it/*",
                 "*://*.google.no/*",
                 "*://*.google.pt/*",
-                "*://*.google.se/*"
+                "*://*.google.se/*",
+                "*://*.goodreads.com/*"
             ],
             "css": [
                 "content.css"
