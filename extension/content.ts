@@ -622,6 +622,12 @@ function getSnippet(node: HTMLElement) : HTMLElement {
         return getMatchingAncestorByCss(node, 'ytd-comment-renderer, ytd-video-secondary-info-renderer');
     if (hostname == 'tumblr.com')
         return getMatchingAncestor(node, x => (x.dataset && !!(x.dataset.postId || x.dataset.id)) || x.classList.contains('post'));
+    if (hostname == 'bsky.app')
+        return getMatchingAncestorByCss(node, '.css-175oi2r');
+    if (hostname == 'threads.net')
+        return getMatchingAncestorByCss(node, '.x78zum5.xdt5ytf');
+    if (hostname == 'instagram.com')
+        return getMatchingAncestorByCss(node, 'article');
 
     return null;
 }
