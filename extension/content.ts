@@ -518,7 +518,7 @@ function getIdentifierFromURLImpl(url: URL): string {
         if (!pathname.startsWith('/user/') && !pathname.startsWith('/r/')) return null;
         if (pathname.includes('/comments/') && hostname == 'reddit.com') return null;
         return 'reddit.com' + getPartialPath(pathname, 2);
-    } else if (domainIs(host, 'twitter.com')) {
+    } else if (domainIs(host, 'twitter.com') || domainIs(host, 'x.com')) {
         return 'twitter.com' + getPartialPath(url.pathname, 1);
     } else if (domainIs(host, 'youtube.com')) {
         const pathname = url.pathname;
@@ -542,7 +542,7 @@ function getIdentifierFromURLImpl(url: URL): string {
             if (!url.pathname.startsWith('/tagged/')) return url.host;
         }
         return null;
-    } else if (domainIs(host, 'wikipedia.org') || domainIs(host, 'rationalwiki.org')) {
+    } else if (domainIs(host, 'wikipedia.org') || domainIs(host, 'wikimedia.org') || domainIs(host, 'wikidata.org') || domainIs(host, 'rationalwiki.org')) {
         const pathname = url.pathname;
         if (url.hash) return null;
         if (pathname == '/w/index.php' && searchParams.get('action') == 'edit') {
@@ -568,6 +568,18 @@ function getIdentifierFromURLImpl(url: URL): string {
             if (q) return 'wikipedia.org/wiki/' + q.replace(/\s/g, '_');
         }
         return null;
+    } else if (domainIs(host, 'bsky.app')) {
+        if (url.pathname.startsWith('/profile/'))
+            return 'bsky.app' + getPartialPath(url.pathname, 2);
+        else
+            return null;
+    } else if (domainIs(host, 'threads.net')) {
+        return 'threads.net' + getPartialPath(url.pathname, 1);
+    } else if (domainIs(host, 'instagram.net')) {
+        if (!url.pathname.startsWith('/p/'))
+            return 'threads.net' + getPartialPath(url.pathname, 1);
+        else
+            return null;
     } else {
         if (host.startsWith('m.')) host = host.substr(2);
         return host;
@@ -622,8 +634,8 @@ function getSnippet(node: HTMLElement) : HTMLElement {
         return getMatchingAncestorByCss(node, 'ytd-comment-renderer, ytd-video-secondary-info-renderer');
     if (hostname == 'tumblr.com')
         return getMatchingAncestor(node, x => (x.dataset && !!(x.dataset.postId || x.dataset.id)) || x.classList.contains('post'));
-    if (hostname == 'bsky.app')
-        return getMatchingAncestorByCss(node, '.css-175oi2r');
+    // if (hostname == 'bsky.app')
+    //     return getMatchingAncestorByCss(node, '.css-175oi2r');
     if (hostname == 'threads.net')
         return getMatchingAncestorByCss(node, '.x78zum5.xdt5ytf');
     if (hostname == 'instagram.com')
