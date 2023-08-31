@@ -452,6 +452,7 @@ const socialNetworkPatterns = [
             "*://*.youtube.com/*",
             "*://*.reddit.com/*",
             "*://*.twitter.com/*",
+            "*://*.x.com/*",
             "*://*.t.co/*",
             "*://*.medium.com/*",
             "*://disqus.com/*",
