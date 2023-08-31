@@ -455,7 +455,7 @@ const socialNetworkPatterns = [
             "*://*.x.com/*",
             "*://*.t.co/*",
             "*://*.bsky.app/*",
-            "*://threads.net/*",
+            "*://*.threads.net/*",
             "*://*.instagram.com/*",
             "*://*.medium.com/*",
             "*://disqus.com/*",
