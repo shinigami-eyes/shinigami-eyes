@@ -31,12 +31,12 @@ function fixupSiteStyles() {
             .assigned-label-transphobic { outline: 2px solid var(--ShinigamiEyesTransphobic) !important; }
             .assigned-label-t-friendly { outline: 1px solid var(--ShinigamiEyesTFriendly) !important; }
         `);
-    } else if (hostname == 'rationalwiki.org' || domainIs(hostname, 'wikipedia.org')) {
+    } else if (hostname == 'rationalwiki.org' || domainIs(hostname, 'wikipedia.org') || domainIs(hostname, 'wikimedia.org') || hostname == 'wikidata.org') {
         addStyleSheet(`
             .assigned-label-transphobic { outline: 1px solid var(--ShinigamiEyesTransphobic) !important; }
             .assigned-label-t-friendly { outline: 1px solid var(--ShinigamiEyesTFriendly) !important; }
         `);
-    } else if (hostname == 'twitter.com') {
+    } else if (hostname == 'twitter.com' || hostname == 'x.com') {
         myself = getIdentifier(<HTMLAnchorElement>document.querySelector('.DashUserDropdown-userInfo a'));
         addStyleSheet(`
             .pretty-link b, .pretty-link s {
@@ -74,7 +74,7 @@ function addStyleSheet(css: string) {
 
 function maybeDisableCustomCss() {
     var shouldDisable: (s: { ownerNode: HTMLElement }) => boolean = null;
-    if (hostname == 'twitter.com') shouldDisable = x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('user-style');
+    if (hostname == 'twitter.com' || hostname == 'x.com') shouldDisable = x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('user-style');
     else if (hostname == 'medium.com') shouldDisable = x => x.ownerNode && x.ownerNode.className && x.ownerNode.className == 'js-collectionStyle';
     else if (hostname == 'disqus.com') shouldDisable = x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('css_');
 
@@ -88,14 +88,20 @@ function init() {
         'youtube.com',
         'reddit.com',
         'twitter.com',
+        'x.com',
+        'bsky.app',
+        'threads.net',
+        'instagram.com',
         'medium.com',
         'disqus.com',
+        'wikidata.org',
         'rationalwiki.org',
         'duckduckgo.com',
         'bing.com',
     ].includes(hostname) ||
         domainIs(hostname, 'tumblr.com') ||
         domainIs(hostname, 'wikipedia.org') ||
+        domainIs(hostname, 'wikimedia.org') ||
         /^google(\.co)?\.\w+$/.test(hostname);
 
     fixupSiteStyles();
@@ -426,7 +432,7 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement, originalTarget
                 return getIdentifier(url);
             }
         }
-    } else if (domainIs(hostname, 'wikipedia.org')) {
+    } else if (domainIs(hostname, 'wikipedia.org') || domainIs(hostname, 'wikimedia.org') || hostname == 'wikidata.org') {
         if (element.classList.contains('interlanguage-link-target')) return null;
     }
 

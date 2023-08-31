@@ -462,7 +462,7 @@ const socialNetworkPatterns = [
             "*://*.tumblr.com/*",
             "*://*.wikimedia.org/*",
             "*://*.wikipedia.org/*",
-            "*://wikidata.org/*",
+            "*://*.wikidata.org/*",
             "*://*.rationalwiki.org/*",
             "*://*.google.com/*",
             "*://*.bing.com/*",
