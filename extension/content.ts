@@ -110,7 +110,7 @@ function init() {
         setInterval(updateYouTubeChannelHeader, 300);
         setInterval(updateAllLabels, 6000);
     }
-    if (hostname == 'twitter.com') {
+    if (hostname == 'twitter.com' || hostname == 'x.com') {
         setInterval(updateTwitterClasses, 800);
     }
 
@@ -244,7 +244,7 @@ function applyLabel(a: HTMLAnchorElement, identifier: string) {
     if (a.assignedCssLabel) {
         a.classList.add('assigned-label-' + a.assignedCssLabel);
         a.classList.add('has-assigned-label');
-        if (hostname == 'twitter.com')
+        if (hostname == 'twitter.com' || hostname == 'x.com')
             a.classList.remove('u-textInheritColor');
     }
 }
@@ -252,7 +252,7 @@ function applyLabel(a: HTMLAnchorElement, identifier: string) {
 function initLink(a: HTMLAnchorElement) {
     var identifier = getIdentifier(a);
     if (!identifier) {
-        if (hostname == 'youtube.com' || hostname == 'twitter.com')
+        if (hostname == 'youtube.com' || hostname == 'twitter.com' || hostname == 'x.com')
             applyLabel(a, '');
         return;
     }
@@ -420,7 +420,7 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement, originalTarget
                 p = p.parentElement;
             }
         }
-    } else if (hostname == 'twitter.com') {
+    } else if (hostname == 'twitter.com' || hostname == 'x.com') {
         if (dataset && dataset.expandedUrl) return getIdentifier(dataset.expandedUrl);
         if (element.href.startsWith('https://t.co/')) {
             const title = element.title;
@@ -612,7 +612,7 @@ function getSnippet(node: HTMLElement) : HTMLElement {
     }
     if (hostname == 'reddit.com')
         return getMatchingAncestorByCss(node, '.scrollerItem, .thing, .Comment');
-    if (hostname == 'twitter.com')
+    if (hostname == 'twitter.com' || hostname == 'x.com')
         return getMatchingAncestorByCss(node, '.stream-item, .permalink-tweet-container, article');
     if (hostname == 'disqus.com')
         return getMatchingAncestorByCss(node, '.post-content');
