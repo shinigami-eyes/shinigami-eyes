@@ -19,7 +19,6 @@
                 "*://*.twitter.com/*",
                 "*://*.medium.com/*",
                 "*://disqus.com/*",
-                "*://*.tumblr.com/*",
                 "*://*.wikipedia.org/*",
                 "*://*.rationalwiki.org/*",
                 "*://shinigami-eyes.localhost/*",
@@ -54,8 +53,23 @@
             "matches": [
                 "*://*/*"
             ],
+            "exlcude_matches": [
+                "*://*.tumblr.com/*"
+            ],
             "js": [
                 "content.js"
+            ]
+        },
+        {
+            "all_frames": false,
+            "matches": [
+                "*://*.tumblr.com/*"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "css": [
+                "content.css"
             ]
         }
     ],
