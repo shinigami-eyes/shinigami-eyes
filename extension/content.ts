@@ -11,6 +11,10 @@ if (hostname.endsWith('.youtube.com')) hostname = 'youtube.com';
 
 var myself: string = null;
 var isSocialNetwork: boolean = null;
+var styleMap: {transphobic: string, tFriendly: string} = {
+    transphobic: 'color: var(--ShinigamiEyesTransphobic) !important;', 
+    tFriendly: 'var(--ShinigamiEyesTFriendly) !important;'
+};
 
 function fixupSiteStyles() {
     if (hostname == 'facebook.com') {
@@ -27,22 +31,18 @@ function fixupSiteStyles() {
             {color:inherit;}
         `);
     } else if (domainIs(hostname, 'tumblr.com')) {
-        addStyleSheet(`
-            .assigned-label-transphobic { outline: 2px solid var(--ShinigamiEyesTransphobic) !important; }
-            .assigned-label-t-friendly { outline: 1px solid var(--ShinigamiEyesTFriendly) !important; }
-        `);
+        styleMap.transphobic = 'outline: 2px solid var(--ShinigamiEyesTransphobic) !important;';
+        styleMap.tFriendly = 'outline: 1px solid var(--ShinigamiEyesTFriendly) !important;';
     } else if (hostname == 'rationalwiki.org' || domainIs(hostname, 'wikipedia.org')) {
-        addStyleSheet(`
-            .assigned-label-transphobic { outline: 1px solid var(--ShinigamiEyesTransphobic) !important; }
-            .assigned-label-t-friendly { outline: 1px solid var(--ShinigamiEyesTFriendly) !important; }
-        `);
+        styleMap.transphobic = 'outline: 1px solid var(--ShinigamiEyesTransphobic) !important;';
+        styleMap.tFriendly = 'outline: 1px solid var(--ShinigamiEyesTFriendly) !important;';
     } else if (hostname == 'twitter.com') {
         myself = getIdentifier(<HTMLAnchorElement>document.querySelector('.DashUserDropdown-userInfo a'));
         addStyleSheet(`
             .pretty-link b, .pretty-link s {
                 color: inherit !important;
             }
-            
+
             a.show-thread-link, a.ThreadedConversation-moreRepliesLink {
                 color: inherit !important;
             }
@@ -154,9 +154,9 @@ function updateTwitterClasses() {
         lastAppliedTwitterUrl = location.href;
     }
     for (const a of document.querySelectorAll('a')) {
-        if (a.assignedCssLabel && !a.classList.contains('has-assigned-label')) {
-            a.classList.add('assigned-label-' + a.assignedCssLabel);
-            a.classList.add('has-assigned-label');
+        if (a.assignedCssLabel && !a.hasAssigned) {
+            a.style.cssText = styleMap[a.assignedCssLabel == 't-friendly' ? 'tFriendly': 'transphobic'];
+            a.hasAssigned = true;
         }
     }
 }
@@ -229,15 +229,15 @@ function solvePendingLabels() {
 
 function applyLabel(a: HTMLAnchorElement, identifier: string) {
     if (a.assignedCssLabel) {
-        a.classList.remove('assigned-label-' + a.assignedCssLabel);
-        a.classList.remove('has-assigned-label');
+        a.style.cssText.replace(styleMap[a.assignedCssLabel == 't-friendly' ? 'tFriendly': 'transphobic'], "");
+        a.hasAssigned = false;
     }
 
     a.assignedCssLabel = knownLabels[identifier] || '';
 
     if (a.assignedCssLabel) {
-        a.classList.add('assigned-label-' + a.assignedCssLabel);
-        a.classList.add('has-assigned-label');
+        a.style.cssText = styleMap[a.assignedCssLabel == 't-friendly' ? 'tFriendly': 'transphobic'];
+        a.hasAssigned = true;
         if (hostname == 'twitter.com')
             a.classList.remove('u-textInheritColor');
     }

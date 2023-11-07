@@ -5,6 +5,7 @@ declare class BloomFilter {
 }
 interface HTMLElement {
     assignedCssLabel?: string
+    hasAssigned?: boolean
 }
 interface LabelToSolve {
     element: HTMLAnchorElement
