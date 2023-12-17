@@ -31,12 +31,12 @@ function fixupSiteStyles() {
             .assigned-label-transphobic { outline: 2px solid var(--ShinigamiEyesTransphobic) !important; }
             .assigned-label-t-friendly { outline: 1px solid var(--ShinigamiEyesTFriendly) !important; }
         `);
-    } else if (hostname == 'rationalwiki.org' || domainIs(hostname, 'wikipedia.org')) {
+    } else if (hostname == 'rationalwiki.org' || domainIs(hostname, 'wikipedia.org') || domainIs(hostname, 'wikimedia.org') || hostname == 'wikidata.org') {
         addStyleSheet(`
             .assigned-label-transphobic { outline: 1px solid var(--ShinigamiEyesTransphobic) !important; }
             .assigned-label-t-friendly { outline: 1px solid var(--ShinigamiEyesTFriendly) !important; }
         `);
-    } else if (hostname == 'twitter.com') {
+    } else if (hostname == 'twitter.com' || hostname == 'x.com') {
         myself = getIdentifier(<HTMLAnchorElement>document.querySelector('.DashUserDropdown-userInfo a'));
         addStyleSheet(`
             .pretty-link b, .pretty-link s {
@@ -74,7 +74,7 @@ function addStyleSheet(css: string) {
 
 function maybeDisableCustomCss() {
     var shouldDisable: (s: { ownerNode: HTMLElement }) => boolean = null;
-    if (hostname == 'twitter.com') shouldDisable = x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('user-style');
+    if (hostname == 'twitter.com' || hostname == 'x.com') shouldDisable = x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('user-style');
     else if (hostname == 'medium.com') shouldDisable = x => x.ownerNode && x.ownerNode.className && x.ownerNode.className == 'js-collectionStyle';
     else if (hostname == 'disqus.com') shouldDisable = x => x.ownerNode && x.ownerNode.id && x.ownerNode.id.startsWith('css_');
 
@@ -88,14 +88,20 @@ function init() {
         'youtube.com',
         'reddit.com',
         'twitter.com',
+        'x.com',
+        'bsky.app',
+        'threads.net',
+        'instagram.com',
         'medium.com',
         'disqus.com',
+        'wikidata.org',
         'rationalwiki.org',
         'duckduckgo.com',
         'bing.com',
     ].includes(hostname) ||
         domainIs(hostname, 'tumblr.com') ||
         domainIs(hostname, 'wikipedia.org') ||
+        domainIs(hostname, 'wikimedia.org') ||
         /^google(\.co)?\.\w+$/.test(hostname);
 
     fixupSiteStyles();
@@ -104,7 +110,7 @@ function init() {
         setInterval(updateYouTubeChannelHeader, 300);
         setInterval(updateAllLabels, 6000);
     }
-    if (hostname == 'twitter.com') {
+    if (hostname == 'twitter.com' || hostname == 'x.com') {
         setInterval(updateTwitterClasses, 800);
     }
 
@@ -238,7 +244,7 @@ function applyLabel(a: HTMLAnchorElement, identifier: string) {
     if (a.assignedCssLabel) {
         a.classList.add('assigned-label-' + a.assignedCssLabel);
         a.classList.add('has-assigned-label');
-        if (hostname == 'twitter.com')
+        if (hostname == 'twitter.com' || hostname == 'x.com')
             a.classList.remove('u-textInheritColor');
     }
 }
@@ -246,7 +252,7 @@ function applyLabel(a: HTMLAnchorElement, identifier: string) {
 function initLink(a: HTMLAnchorElement) {
     var identifier = getIdentifier(a);
     if (!identifier) {
-        if (hostname == 'youtube.com' || hostname == 'twitter.com')
+        if (hostname == 'youtube.com' || hostname == 'twitter.com' || hostname == 'x.com')
             applyLabel(a, '');
         return;
     }
@@ -414,7 +420,7 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement, originalTarget
                 p = p.parentElement;
             }
         }
-    } else if (hostname == 'twitter.com') {
+    } else if (hostname == 'twitter.com' || hostname == 'x.com') {
         if (dataset && dataset.expandedUrl) return getIdentifier(dataset.expandedUrl);
         if (element.href.startsWith('https://t.co/')) {
             const title = element.title;
@@ -426,7 +432,7 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement, originalTarget
                 return getIdentifier(url);
             }
         }
-    } else if (domainIs(hostname, 'wikipedia.org')) {
+    } else if (domainIs(hostname, 'wikipedia.org') || domainIs(hostname, 'wikimedia.org') || hostname == 'wikidata.org') {
         if (element.classList.contains('interlanguage-link-target')) return null;
     }
 
@@ -512,7 +518,7 @@ function getIdentifierFromURLImpl(url: URL): string {
         if (!pathname.startsWith('/user/') && !pathname.startsWith('/r/')) return null;
         if (pathname.includes('/comments/') && hostname == 'reddit.com') return null;
         return 'reddit.com' + getPartialPath(pathname, 2);
-    } else if (domainIs(host, 'twitter.com')) {
+    } else if (domainIs(host, 'twitter.com') || domainIs(host, 'x.com')) {
         return 'twitter.com' + getPartialPath(url.pathname, 1);
     } else if (domainIs(host, 'youtube.com')) {
         const pathname = url.pathname;
@@ -536,7 +542,7 @@ function getIdentifierFromURLImpl(url: URL): string {
             if (!url.pathname.startsWith('/tagged/')) return url.host;
         }
         return null;
-    } else if (domainIs(host, 'wikipedia.org') || domainIs(host, 'rationalwiki.org')) {
+    } else if (domainIs(host, 'wikipedia.org') || domainIs(host, 'wikimedia.org') || domainIs(host, 'wikidata.org') || domainIs(host, 'rationalwiki.org')) {
         const pathname = url.pathname;
         if (url.hash) return null;
         if (pathname == '/w/index.php' && searchParams.get('action') == 'edit') {
@@ -562,6 +568,18 @@ function getIdentifierFromURLImpl(url: URL): string {
             if (q) return 'wikipedia.org/wiki/' + q.replace(/\s/g, '_');
         }
         return null;
+    } else if (domainIs(host, 'bsky.app')) {
+        if (url.pathname.startsWith('/profile/'))
+            return 'bsky.app' + getPartialPath(url.pathname, 2);
+        else
+            return null;
+    } else if (domainIs(host, 'threads.net')) {
+        return 'threads.net' + getPartialPath(url.pathname, 1);
+    } else if (domainIs(host, 'instagram.net')) {
+        if (!url.pathname.startsWith('/p/'))
+            return 'threads.net' + getPartialPath(url.pathname, 1);
+        else
+            return null;
     } else {
         if (host.startsWith('m.')) host = host.substr(2);
         return host;
@@ -606,7 +624,7 @@ function getSnippet(node: HTMLElement) : HTMLElement {
     }
     if (hostname == 'reddit.com')
         return getMatchingAncestorByCss(node, '.scrollerItem, .thing, .Comment');
-    if (hostname == 'twitter.com')
+    if (hostname == 'twitter.com' || hostname == 'x.com')
         return getMatchingAncestorByCss(node, '.stream-item, .permalink-tweet-container, article');
     if (hostname == 'disqus.com')
         return getMatchingAncestorByCss(node, '.post-content');
@@ -616,6 +634,12 @@ function getSnippet(node: HTMLElement) : HTMLElement {
         return getMatchingAncestorByCss(node, 'ytd-comment-renderer, ytd-video-secondary-info-renderer');
     if (hostname == 'tumblr.com')
         return getMatchingAncestor(node, x => (x.dataset && !!(x.dataset.postId || x.dataset.id)) || x.classList.contains('post'));
+    // if (hostname == 'bsky.app')
+    //     return getMatchingAncestorByCss(node, '.css-175oi2r');
+    if (hostname == 'threads.net')
+        return getMatchingAncestorByCss(node, '.x78zum5.xdt5ytf');
+    if (hostname == 'instagram.com')
+        return getMatchingAncestorByCss(node, 'article');
 
     return null;
 }

@@ -354,7 +354,7 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId', 'theme', '
     theme = v.theme;
     disableAsymmetricEncryption = v.disableAsymmetricEncryption || false;
 
-    const migration = overrides[MIGRATION] || 0;
+    const migration = <any>overrides[MIGRATION] || 0;
     if (migration < CURRENT_VERSION) {
 
         for (const key of Object.getOwnPropertyNames(overrides)) {
@@ -452,11 +452,17 @@ const socialNetworkPatterns = [
             "*://*.youtube.com/*",
             "*://*.reddit.com/*",
             "*://*.twitter.com/*",
+            "*://*.x.com/*",
             "*://*.t.co/*",
+            "*://*.bsky.app/*",
+            "*://*.threads.net/*",
+            "*://*.instagram.com/*",
             "*://*.medium.com/*",
             "*://disqus.com/*",
             "*://*.tumblr.com/*",
+            "*://*.wikimedia.org/*",
             "*://*.wikipedia.org/*",
+            "*://*.wikidata.org/*",
             "*://*.rationalwiki.org/*",
             "*://*.google.com/*",
             "*://*.bing.com/*",
