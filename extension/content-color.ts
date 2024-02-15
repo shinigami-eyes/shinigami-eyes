@@ -1,0 +1,1 @@
+(<any>window).shinigamiEyesColorLinks = true;

@@ -11,4 +11,3 @@ For more information: [Shinigami Eyes website](https://shinigami-eyes.github.io/
 
 ![Screenshot](https://raw.githubusercontent.com/shinigami-eyes/shinigami-eyes/master/images/preview.png)
 
-Follow us on Twitter: [@ShinigamiEyesT](https://www.twitter.com/ShinigamiEyesT)

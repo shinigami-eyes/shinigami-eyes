@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "Shinigami Eyes",
     "author": "Shinigami Eyes",
-    "version": "1.0.29",
+    "version": "1.0.33",
     "homepage_url": "https://shinigami-eyes.github.io/",
     "description": "Highlights transphobic/anti-LGBT and trans-friendly subreddits/users/facebook pages/groups with different colors.",
     "icons": {
@@ -17,12 +17,61 @@
                 "*://*.youtube.com/*",
                 "*://*.reddit.com/*",
                 "*://*.twitter.com/*",
+                "*://*.x.com/*",
                 "*://*.medium.com/*",
                 "*://disqus.com/*",
                 "*://*.tumblr.com/*",
                 "*://*.wikipedia.org/*",
                 "*://*.rationalwiki.org/*",
-                "*://shinigami-eyes.localhost/*",
+                "*://cohost.org/*",
+                "*://*.bsky.app/*",
+
+                "*://anarchism.space/*",
+                "*://aus.social/*",
+                "*://c.im/*",
+                "*://chaos.social/*",
+                "*://eightpoint.app/*",
+                "*://eldritch.cafe/*",
+                "*://fosstodon.org/*",
+                "*://hachyderm.io/*",
+                "*://infosec.exchange/*",
+                "*://kolektiva.social/*",
+                "*://mas.to/*",
+                "*://masto.ai/*",
+                "*://mastodon.art/*",
+                "*://mastodon.cloud/*",
+                "*://mastodon.green/*",
+                "*://mastodon.ie/*",
+                "*://mastodon.lol/*",
+                "*://mastodon.nz/*",
+                "*://mastodon.online/*",
+                "*://mastodon.scot/*",
+                "*://mastodon.social/*",
+                "*://mastodon.world/*",
+                "*://mastodon.xyz/*",
+                "*://mastodonapp.uk/*",
+                "*://meow.social/*",
+                "*://mstdn.ca/*",
+                "*://mstdn.jp/*",
+                "*://mstdn.social/*",
+                "*://octodon.social/*",
+                "*://ohai.social/*",
+                "*://pixelfed.social/*",
+                "*://queer.party/*",
+                "*://sfba.social/*",
+                "*://social.transsafety.network/*",
+                "*://tech.lgbt/*",
+                "*://techhub.social/*",
+                "*://toot.cat/*",
+                "*://toot.community/*",
+                "*://toot.wales/*",
+                "*://vulpine.club/*",
+                "*://wandering.shop/*",
+
+                
+                "*://*.threads.net/*",
+
+                
 
                 "*://duckduckgo.com/*",
                 "*://*.bing.com/*",
@@ -47,7 +96,11 @@
             ],
             "css": [
                 "content.css"
-            ]
+            ],
+            "js": [
+                "content-color.js"
+            ],
+            "run_at": "document_start"
         },
         {
             "all_frames": true,
@@ -58,10 +111,6 @@
                 "content.js"
             ]
         }
-    ],
-    "web_accessible_resources": [
-        "data/transphobic.dat",
-        "data/t-friendly.dat"
     ],
     "background": {
         "scripts": [

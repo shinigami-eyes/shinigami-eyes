@@ -1,0 +1,73 @@
+diff --git a/extension/background.ts b/extension/background.ts
+index 3281b4b..a489b6c 100644
+--- a/extension/background.ts
++++ b/extension/background.ts
+@@ -1,3 +1,5 @@
++import { BloomFilter, CombinedBloomFilter } from "./bloomfilter.js";
++
+ var browser: Browser = browser || chrome;
+ 
+ const PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
+@@ -834,7 +836,7 @@ function openOptions() {
+ }
+ 
+ function getURL(path: string) { 
+-    return browser.extension.getURL(path);
++    return chrome.runtime.getURL(path);
+ }
+ 
+ 
+diff --git a/extension/bloomfilter.ts b/extension/bloomfilter.ts
+index d2a990b..6b9d5ad 100644
+--- a/extension/bloomfilter.ts
++++ b/extension/bloomfilter.ts
+@@ -1,4 +1,4 @@
+-class BloomFilter {
++export class BloomFilter {
+ 
+   m: number;
+   k: number;
+@@ -107,7 +107,7 @@ function fnv_mix(a: number) {
+   return a & 0xffffffff;
+ }
+ 
+-class CombinedBloomFilter { 
++export class CombinedBloomFilter { 
+   name: LabelKind;
+ 
+   parts: BloomFilter[];
+diff --git a/extension/manifest.json b/extension/manifest.json
+index 70b0875..a699b95 100644
+--- a/extension/manifest.json
++++ b/extension/manifest.json
+@@ -1,5 +1,5 @@
+ {
+-    "manifest_version": 2,
++    "manifest_version": 3,
+     "name": "Shinigami Eyes",
+     "author": "Shinigami Eyes",
+     "version": "1.0.33",
+@@ -113,10 +113,8 @@
+         }
+     ],
+     "background": {
+-        "scripts": [
+-            "bloomfilter.js",
+-            "background.js"
+-        ]
++        "service_worker": "background.js",
++        "type": "module"
+     },
+     "options_ui": {
+         "page": "options.html",
+@@ -124,7 +122,9 @@
+     },
+     "permissions": [
+         "contextMenus",
+-        "storage",
++        "storage"
++    ],
++    "host_permissions": [
+         "*://*/*"
+     ],
+     "applications": {

@@ -3,7 +3,7 @@ var browser: Browser = browser || chrome;
 const PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
 const MIGRATION = ':MIGRATION'
 
-const CURRENT_VERSION = 100029;
+const CURRENT_VERSION = 100033;
 
 const badIdentifiersReasons: { [id: string]: BadIdentifierReason } = {};
 const badIdentifiers: { [id: string]: true } = {};
@@ -17,9 +17,11 @@ const badIdentifiers: { [id: string]: true } = {};
 const badIdentifiersArray = [
     'a.co',
     'about.me=SN',
+    'allmylinks.com=SN',
     'amzn.to',
     'archive.is=AR',
     'archive.org=AR',
+    'archiveofourown.org=SN',
     'ask.fm=SN',
     'assets.tumblr.com',
     'bing.com',
@@ -30,8 +32,13 @@ const badIdentifiersArray = [
     'cash.me=SN',
     'change.org',
     'chrome.google.com',
+    'cohost.org',
+    'cohost.org/rc',
+    'counter.social=SN',
+    'curiouscat.live=SN',
     'curiouscat.me=SN',
     'curiouscat.qa=SN',
+    'curiositystream.com=SN',
     'deviantart.com=SN',
     'discord.gg=SN',
     'discordapp.com=SN',
@@ -124,10 +131,12 @@ const badIdentifiersArray = [
     'facebook.com/watch',
     'fb.me',
     'flickr.com=SN',
+    'furaffinity.net=SN',
     'gofundme.com=SN',
     'goo.gl',
     'google.com',
     'googleusercontent.com',
+    'hivesocial.app=SN',
     'http',
     'https',
     'i.imgur.com',
@@ -143,14 +152,20 @@ const badIdentifiersArray = [
     'linktr.ee=SN',
     'mail.google.com',
     'media.tumblr.com',
+    'at.tumblr.com',
     'medium.com',
+    'nebula.app=SN',
+    'nebula.tv=SN',
     'news.google.com',
     'onlyfans.com=SN',
     'open.spotify.com=SN',
     'patreon.com=SN',
     'paypal.com=SN',
     'paypal.me=SN',
+    'post.news=SN',
+    'pillowfort.social=SN',
     'pinterest.com=SN',
+    'pixiv.net',
     'play.google.com',
     'plus.google.com=SN',
     'podcasts.apple.com=SN',
@@ -201,6 +216,7 @@ const badIdentifiersArray = [
     'reddit.com/user/jiffierbot',
     'reddit.com/user/livetwitchclips',
     'reddit.com/user/lyrics-matcher-bot',
+    'reddit.com/user/magic_eye_bot',
     'reddit.com/user/mailmygovnnbot',
     'reddit.com/user/massdropbot',
     'reddit.com/user/mentioned_videos',
@@ -268,10 +284,12 @@ const badIdentifiersArray = [
     't.umblr.com',
     'tapastic.com=SN',
     'tapatalk.com=SN',
+    'tinyurl.com',
     'tiktok.com=SN',
     'tmblr.co',
     'tumblr.com',
     'twitch.tv=SN',
+    'x.com',
     'twitter.com',
     'twitter.com/explore',
     'twitter.com/hashtag',
@@ -303,6 +321,51 @@ const badIdentifiersArray = [
     'youtube.com/premium',
     'youtube.com/redirect',
     'youtube.com/watch',
+    'anarchism.space',
+    'aus.social',
+    'c.im',
+    'chaos.social',
+    'eightpoint.app',
+    'eldritch.cafe',
+    'fosstodon.org',
+    'hachyderm.io',
+    'infosec.exchange',
+    'kolektiva.social',
+    'mas.to',
+    'masto.ai',
+    'mastodon.art',
+    'mastodon.cloud',
+    'mastodon.green',
+    'mastodon.ie',
+    'mastodon.lol',
+    'mastodon.nz',
+    'mastodon.online',
+    'mastodon.scot',
+    'mastodon.social',
+    'mastodon.world',
+    'mastodon.xyz',
+    'mastodonapp.uk',
+    'meow.social',
+    'mstdn.ca',
+    'mstdn.jp',
+    'mstdn.social',
+    'octodon.social',
+    'ohai.social',
+    'pixelfed.social',
+    'queer.party',
+    'sfba.social',
+    'social.transsafety.network',
+    'tech.lgbt',
+    'techhub.social',
+    'toot.cat',
+    'toot.community',
+    'toot.wales',
+    'vulpine.club',
+    'wandering.shop',
+
+    'threads.net',
+    'bsky.social=SN',
+    'bsky.app=SN'
 ].map(x => {
     const arr = x.split('=');
     const id = arr[0];
@@ -341,9 +404,11 @@ var theme: string = '';
 
 var disableAsymmetricEncryption = false;
 
+var initializationPromise = new Promise<void>((resolve) => { 
+        
 browser.storage.local.get(['overrides', 'accepted', 'installationId', 'theme', 'disableAsymmetricEncryption'], v => {
     if (!v.installationId) {
-        installationId = (Math.random() + '.' + Math.random() + '.' + Math.random()).replace(/\./g, '');
+        installationId = crypto.randomUUID();
         browser.storage.local.set({ installationId: installationId });
     } else {
         installationId = v.installationId;
@@ -354,7 +419,7 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId', 'theme', '
     theme = v.theme;
     disableAsymmetricEncryption = v.disableAsymmetricEncryption || false;
 
-    const migration = overrides[MIGRATION] || 0;
+    const migration = +(overrides[MIGRATION] || 0);
     if (migration < CURRENT_VERSION) {
 
         for (const key of Object.getOwnPropertyNames(overrides)) {
@@ -375,20 +440,25 @@ browser.storage.local.get(['overrides', 'accepted', 'installationId', 'theme', '
         overrides[MIGRATION] = <any>CURRENT_VERSION;
         browser.storage.local.set({ overrides: overrides });
     }
+        resolve();
 })
+});
 
-const bloomFilters: BloomFilter[] = [];
+
+const bloomFilters: CombinedBloomFilter[] = [];
 
 async function loadBloomFilter(name: LabelKind) {
-
-    const url = browser.extension.getURL('data/' + name + '.dat');
+    const url = getURL('data/' + name + '.dat');
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
 
-    const array = new Uint32Array(arrayBuffer);
-    const b = new BloomFilter(array, 20);
-    b.name = name;
-    bloomFilters.push(b);
+    const combined = new CombinedBloomFilter();
+    combined.name = name;
+    combined.parts = [
+        new BloomFilter(new Int32Array(arrayBuffer.slice(0, 287552)), 20),
+        new BloomFilter(new Int32Array(arrayBuffer.slice(287552)), 21),
+    ];
+    bloomFilters.push(combined);
 }
 
 
@@ -398,7 +468,7 @@ function setAsymmetricEncryptionEnabled(enabled: boolean) {
 }
 
 
-browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesMessage | LabelMap>((message, sender, sendResponse) => {
+async function handleMessage(message: ShinigamiEyesMessage, sender: MessageSender) : Promise<LabelMap> { 
     if (message.setTheme) {
         theme = message.setTheme;
         browser.storage.local.set({ theme: message.setTheme });
@@ -419,10 +489,12 @@ browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesMessage
     }
     if (message.closeCallingTab) {
         browser.tabs.remove(sender.tab.id);
-        return;
+        return {};
     }
     const response: LabelMap = {};
-    const transphobic = message.myself && bloomFilters.filter(x => x.name == 'transphobic')[0].test(message.myself);
+    await initializationPromise;
+    await bloomFiltersLoadedPromise;
+    const transphobic = message.myself && bloomFilters.filter(x => x.name == 'transphobic')[0].test(message.myself) && installationId.includes('-');
     for (const id of message.ids) {
         if (overrides[id] !== undefined) {
             response[id] = overrides[id];
@@ -438,29 +510,46 @@ browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesMessage
         }
         for (const bloomFilter of bloomFilters) {
             if (bloomFilter.test(id)) response[id] = bloomFilter.name;
+            if (id.startsWith('youtube.com/@')) { 
+                if (bloomFilter.test(id.replace('/@', '/c/'))) response[id] = bloomFilter.name;
+            }
         }
     }
     response[':theme'] = <any>theme;
-    sendResponse(response);
+    return response;
+}
+
+browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesMessage | LabelMap>((message, sender, sendResponse) => {
+    handleMessage(message, sender).then(response => sendResponse(response));
+    return true;
 });
 
-loadBloomFilter('transphobic');
-loadBloomFilter('t-friendly');
+var bloomFiltersLoadedPromise = (async () => {
+    await loadBloomFilter('transphobic');
+    await loadBloomFilter('t-friendly');
+})();
 
 const socialNetworkPatterns = [
-            "*://*.facebook.com/*",
-            "*://*.youtube.com/*",
-            "*://*.reddit.com/*",
-            "*://*.twitter.com/*",
-            "*://*.t.co/*",
-            "*://*.medium.com/*",
-            "*://disqus.com/*",
-            "*://*.tumblr.com/*",
-            "*://*.wikipedia.org/*",
-            "*://*.rationalwiki.org/*",
-            "*://*.google.com/*",
-            "*://*.bing.com/*",
-            "*://duckduckgo.com/*",
+    "*://*.facebook.com/*",
+    "*://*.youtube.com/*",
+    "*://*.reddit.com/*",
+    "*://*.twitter.com/*",
+    "*://*.x.com/*",
+    "*://*.t.co/*",
+    "*://*.bsky.app/*",
+    "*://*.bsky.social/*",
+    "*://*.medium.com/*",
+    "*://disqus.com/*",
+    "*://*.tumblr.com/*",
+    "*://*.wikipedia.org/*",
+    "*://*.rationalwiki.org/*",
+    "*://*.google.com/*",
+    "*://*.bing.com/*",
+    "*://duckduckgo.com/*",
+    "*://cohost.org/*",
+
+    "*://*/@*",
+    "*://*/users/*",
 ];
 
 const homepagePatterns = [
@@ -503,6 +592,7 @@ function createSystemContextMenu(text: string, id: ContextMenuCommand, separator
 
 browser.contextMenus.create({
     title: '(Please right click on a link instead)', 
+    id: 'instructions-needs-link',
     enabled: false,
     contexts: ['page'],
     documentUrlPatterns: socialNetworkPatterns
@@ -584,7 +674,7 @@ async function encryptSubmission(plainObj: any): Promise<CipherSubmission> {
         ['encrypt', 'decrypt']
     );
 
-    const iv = window.crypto.getRandomValues(new Uint8Array(16));
+    const iv = globalThis.crypto.getRandomValues(new Uint8Array(16));
 
     const plainData = objectToBytes(plainObj);
 
@@ -622,10 +712,14 @@ interface CipherSubmission {
     version: number;
 }
 
-
+const submissionsBeingSubmitted = new Set<ShinigamiEyesSubmission>();
 
 async function submitPendingRatings() {
-    const submitted = getPendingSubmissions().map(x => x);
+    const submitted = getPendingSubmissions().filter(x => !submissionsBeingSubmitted.has(x));
+    for (const entry of submitted) {
+        submissionsBeingSubmitted.add(entry);
+    }
+    
     let plainRequest : any = {
         installationId: installationId,
         lastError: lastSubmissionError,
@@ -653,10 +747,13 @@ async function submitPendingRatings() {
 
     lastSubmissionError = null;
     try {
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), 90000);
         const response = await fetch('https://shini-api.xyz/submit-vote', {
             body: JSON.stringify(actualRequest),
             method: 'POST',
             credentials: 'omit',
+            signal: controller.signal
         });
         if (response.status != 200) throw ('HTTP status: ' + response.status)
         const result = await response.text();
@@ -667,6 +764,10 @@ async function submitPendingRatings() {
         browser.storage.local.set({ overrides: overrides });
     } catch (e) {
         lastSubmissionError = '' + e
+    } finally {
+        for (const entry of submitted) {
+            submissionsBeingSubmitted.delete(entry);
+        }
     }
 
 }
@@ -688,6 +789,21 @@ function saveLabel(response: ShinigamiEyesSubmission) {
         browser.storage.local.set({ overrides: overrides });
         response.version = CURRENT_VERSION;
         response.submissionId = (Math.random() + '').replace('.', '');
+        let totalSize = 0;
+        for (const entry of getPendingSubmissions()) {
+            if(entry.snippet)
+                totalSize += entry.snippet.length;
+        }
+        if (totalSize > 2000000) {
+            for (const entry of getPendingSubmissions()) {
+                entry.snippet = null;
+                entry.trimmed = true;
+            }
+        }
+        if (response.snippet && response.snippet.length > 10000000) {
+            response.snippet = null;
+            response.trimmed = true;
+        }
         getPendingSubmissions().push(response);
         submitPendingRatings();
         //console.log(response);
@@ -706,17 +822,20 @@ function saveLabel(response: ShinigamiEyesSubmission) {
 
 function openHelp() {
     browser.tabs.create({
-        url: browser.extension.getURL('help.html')
+        url: getURL('help.html')
     })
 }
 
 
 function openOptions() {
     browser.tabs.create({
-        url: browser.extension.getURL('options.html')
+        url: getURL('options.html')
     })
 }
 
+function getURL(path: string) { 
+    return browser.extension.getURL(path);
+}
 
 
 function sendMessageToContent(tabId: number, frameId: number, message: ShinigamiEyesCommand) {

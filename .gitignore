@@ -12,3 +12,5 @@ extension/background.js
 extension/content.js
 extension/help.js
 extension/options.js
+extension/bloomfilter.js
+extension/content-color.js

@@ -1,8 +1,4 @@
-declare class BloomFilter {
-    constructor(data: Uint32Array, k: number);
-    test(key: string): boolean;
-    name: LabelKind;
-}
+
 interface HTMLElement {
     assignedCssLabel?: string
 }
@@ -24,7 +20,7 @@ interface ShinigamiEyesSubmission {
     contextPage?: string
     linkId?: number
     snippet?: string
-    isSocialNetwork?: boolean
+    trimmed?: boolean
 }
 interface ShinigamiEyesCommand {
     acceptClicked?: boolean

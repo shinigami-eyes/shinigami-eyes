@@ -4,7 +4,8 @@ declare type Browser = {
         sendMessage<TRequest, TResponse>(request: TRequest, response: (response: TResponse) => void): void;
         onMessage: {
             addListener<TRequest, TResponse>(listener: (message: TRequest, sender: MessageSender, sendResponse: (response: TResponse) => void) => void): void
-        }
+        };
+        getURL(relativeUrl: string): string;
     }
 
     storage: {

@@ -4,18 +4,19 @@ var hostname = typeof (location) != 'undefined' ? location.hostname : '';
 if (hostname.startsWith('www.')) {
     hostname = hostname.substring(4);
 }
-if (hostname == 'mobile.twitter.com') hostname = 'twitter.com';
+if (hostname == 'mobile.twitter.com' || hostname == 'mobile.x.com' || hostname == 'x.com') hostname = 'twitter.com';
 if (hostname.endsWith('.reddit.com')) hostname = 'reddit.com';
 if (hostname.endsWith('.facebook.com')) hostname = 'facebook.com';
 if (hostname.endsWith('.youtube.com')) hostname = 'youtube.com';
 
 var myself: string = null;
-var isSocialNetwork: boolean = null;
+var isMastodon: boolean = null;
+const colorLinks = !!(<any>window).shinigamiEyesColorLinks;
 
 function fixupSiteStyles() {
     if (hostname == 'facebook.com') {
-        let m = document.querySelector("[id^='profile_pic_header_']")
-        if (m) myself = 'facebook.com/' + captureRegex(m.id, /header_(\d+)/);
+        const s = [...document.querySelectorAll('script')].map(x => x.innerText.match(/profileSwitcherEligibleProfiles.*username":"(.*?)"/)).map(x => x ? x[1] : null).filter(x => x)[0]
+        if (s) myself = 'facebook.com/' + s;
     } else if (hostname == 'medium.com') {
         addStyleSheet(`
             a.show-thread-link, a.ThreadedConversation-moreRepliesLink {
@@ -37,7 +38,8 @@ function fixupSiteStyles() {
             .assigned-label-t-friendly { outline: 1px solid var(--ShinigamiEyesTFriendly) !important; }
         `);
     } else if (hostname == 'twitter.com') {
-        myself = getIdentifier(<HTMLAnchorElement>document.querySelector('.DashUserDropdown-userInfo a'));
+        const s = [...document.querySelectorAll('script')].map(x => x.innerText.match(/screen_name":"(.*?)"/)).map(x => x ? x[1] : null).filter(x => x)[0]
+        myself = s ? 'twitter.com/' + s.toLowerCase() : null;
         addStyleSheet(`
             .pretty-link b, .pretty-link s {
                 color: inherit !important;
@@ -82,27 +84,66 @@ function maybeDisableCustomCss() {
         [...document.styleSheets].filter(<any>shouldDisable).forEach(x => x.disabled = true);
 }
 
+function isElementVisible(x: HTMLElement) { 
+    return !!x.getBoundingClientRect().width;
+}
+
+function linkify(oldNode: Node, href: string) : HTMLAnchorElement { 
+    const newLink = document.createElement('a');
+    newLink.textContent = oldNode.textContent;
+    if (oldNode instanceof HTMLElement) {
+        newLink.setAttribute('style', oldNode.getAttribute('style'));
+        newLink.className = oldNode.className;
+    }
+    newLink.href = href
+    oldNode.parentElement.replaceChild(newLink, oldNode);
+    return newLink;
+}
+
+function linkifyBlueskyLinks() { 
+    const toLinkify = [...document.querySelectorAll('div[aria-label][role=link][tabindex="0"] > div')].filter(x => x.childNodes.length == 1 && x.firstChild.nodeType == Node.TEXT_NODE && isElementVisible(x as HTMLElement));
+    for (const oldLink of toLinkify) {
+        const identifier = oldLink.parentElement.getAttribute('aria-label') ?? '';
+        if (!/^[\w\-]+\.[\w\.]+$/.test(identifier)) continue;
+        linkify(oldLink, 'https://bsky.app/profile/' + identifier);
+    }
+
+    const mobileUiToLinkify = [...document.querySelectorAll('div[dir=auto][style]')].filter(x => x.firstChild == x.lastChild && x.firstChild.nodeType == Node.TEXT_NODE && x.firstChild.textContent == '·').map(x => x.previousSibling as HTMLElement).filter(x => (x.firstChild as HTMLElement)?.tagName == 'DIV' && isElementVisible(x));
+    for (const oldLink of mobileUiToLinkify) { 
+        const span = oldLink.querySelector('span')
+        if (span && span.textContent.startsWith('@')) { 
+            const identifier = span.textContent.substring(1).trim();
+            const href = 'https://bsky.app/profile/' + identifier;
+            const displayName = span.parentElement.firstChild;
+            linkify(span, href);
+            if (displayName?.nodeType == Node.TEXT_NODE)
+                linkify(displayName, href);
+        }
+    }
+
+    const profileLinks = [...document.querySelectorAll('[data-testid=profileHeaderDisplayName]')].filter(x => isElementVisible(x as HTMLElement));
+    if (profileLinks.length == 1) { 
+        const profileLink = profileLinks[0];
+        const parts = new URL(location.href).pathname.split('/');
+        if (parts[1] == 'profile') {
+            const a = linkify(profileLink.firstChild, 'https://bsky.app/profile/' + parts[2]);
+            a.style.textDecoration = 'none';
+            a.style.pointerEvents = 'auto';
+        }
+    }
+}
+
 function init() {
-    isSocialNetwork = [
-        'facebook.com',
-        'youtube.com',
-        'reddit.com',
-        'twitter.com',
-        'medium.com',
-        'disqus.com',
-        'rationalwiki.org',
-        'duckduckgo.com',
-        'bing.com',
-    ].includes(hostname) ||
-        domainIs(hostname, 'tumblr.com') ||
-        domainIs(hostname, 'wikipedia.org') ||
-        /^google(\.co)?\.\w+$/.test(hostname);
+    isMastodon = !!(document.getElementById('mastodon') || document.querySelector("a[href*='joinmastodon.org/apps']")) || hostname == 'threads.net';
 
     fixupSiteStyles();
 
     if (domainIs(hostname, 'youtube.com')) {
         setInterval(updateYouTubeChannelHeader, 300);
         setInterval(updateAllLabels, 6000);
+    }
+    if (domainIs(hostname, 'bsky.app')) { 
+        setInterval(linkifyBlueskyLinks, 500);
     }
     if (hostname == 'twitter.com') {
         setInterval(updateTwitterClasses, 800);
@@ -115,7 +156,7 @@ function init() {
     maybeDisableCustomCss();
     updateAllLabels();
 
-    if (isSocialNetwork) {
+    if (colorLinks) {
         var observer = new MutationObserver(mutationsList => {
             maybeDisableCustomCss();
             for (const mutation of mutationsList) {
@@ -194,11 +235,10 @@ function updateYouTubeChannelHeader() {
 }
 
 function updateAllLabels(refresh?: boolean) {
+    if (!colorLinks) return;
     if (refresh) knownLabels = {};
-    if (isSocialNetwork) {
         for (const a of document.getElementsByTagName('a')) {
             initLink(a);
-        }
     }
     solvePendingLabels();
 }
@@ -312,6 +352,7 @@ function getIdentifier(link: string | HTMLAnchorElement, originalTarget?: HTMLEl
     try {
         var k = link instanceof Node ? getIdentifierFromElementImpl(link, originalTarget) : getIdentifierFromURLImpl(tryParseURL(link));
         if (!k || k.indexOf('!') != -1) return null;
+        if (isMastodon && k == location.host) return null;
         return k.toLowerCase();
     } catch (e) {
         console.warn("Unable to get identifier for " + link);
@@ -329,6 +370,15 @@ function getIdentifierFromElementImpl(element: HTMLAnchorElement, originalTarget
 
     const dataset = element.dataset;
 
+    if (hostname == 'bsky.app') { 
+        if (element.href.includes('/profile/did:')) { 
+            const identifier = element.textContent.trim();
+            if (identifier.startsWith('@')) { 
+                return identifier.substring(1);
+            }
+            return null;
+        }
+    }
     if (hostname == 'reddit.com') {
         const parent = element.parentElement;
         if (parent && parent.classList.contains('domain') && element.textContent.startsWith('self.')) return null;
@@ -476,6 +526,10 @@ function tryUnwrapNestedURL(url: URL): URL {
     return null;
 }
 
+
+const MASTODON_FALSE_POSITIVES = ['tiktok.com', 'youtube.com', 'medium.com', 'foundation.app', 'pronouns.page'];
+
+
 function getIdentifierFromURLImpl(url: URL): string {
     if (!url) return null;
 
@@ -500,6 +554,21 @@ function getIdentifierFromURLImpl(url: URL): string {
 
     const pathArray = url.pathname.split('/');
 
+    if (domainIs(host, 'bsky.social') || domainIs(host, 'bsky.app')) { 
+        let username: string = null;
+        if (pathArray[3] == 'lists') return null;
+        if (pathArray[3] == 'feed') return null;
+        if (pathArray[1] == 'profile') {
+            username = pathArray[2];
+            if (username.startsWith('@'))
+                username = username.substring(1);
+        } else if (url.pathname.startsWith('/@')) {
+            username = pathArray[1].substring(1);
+        } else if (host.includes('.bsky.')) { 
+            username = captureRegex(host, /^(.+)\.bsky/)
+        }
+        return username ? (username.includes('.') ? username : username + '.bsky.social') : null;
+    }
     if (domainIs(host, 'facebook.com')) {
         if (searchParams.get('story_fbid')) return null;
         const fbId = searchParams.get('id');
@@ -512,7 +581,7 @@ function getIdentifierFromURLImpl(url: URL): string {
         if (!pathname.startsWith('/user/') && !pathname.startsWith('/r/')) return null;
         if (pathname.includes('/comments/') && hostname == 'reddit.com') return null;
         return 'reddit.com' + getPartialPath(pathname, 2);
-    } else if (domainIs(host, 'twitter.com')) {
+    } else if (domainIs(host, 'twitter.com') || domainIs(host, 'x.com')) {
         return 'twitter.com' + getPartialPath(url.pathname, 1);
     } else if (domainIs(host, 'youtube.com')) {
         const pathname = url.pathname;
@@ -532,8 +601,17 @@ function getIdentifierFromURLImpl(url: URL): string {
             const name = getPathPart(url.pathname, 2);
             return name ? name + '.tumblr.com' : null;
         }
-        if (host != 'www.tumblr.com' && host != 'assets.tumblr.com' && host.indexOf('.media.') == -1) {
-            if (!url.pathname.startsWith('/tagged/')) return url.host;
+        if (host == 'tumblr.com' || host == 'at.tumblr.com') {
+            let name = getPathPart(url.pathname, 0);
+            if (!name) return null;
+            if (name == 'blog') name = getPathPart(url.pathname, 1);
+            if (['new', 'dashboard', 'explore', 'inbox', 'likes', 'following', 'settings', 'changes', 'help', 'about', 'apps', 'policy', 'post', 'search', 'tagged'].includes(name))
+                return null;
+            if (name.startsWith('@')) name = name.substring(1);
+            return name + '.tumblr.com';
+        }
+        if (host != 'tumblr.com' && host != 'assets.tumblr.com' && host.indexOf('.media.') == -1) {
+            if (!url.pathname.includes('/tagged/')) return url.host;
         }
         return null;
     } else if (domainIs(host, 'wikipedia.org') || domainIs(host, 'rationalwiki.org')) {
@@ -562,8 +640,26 @@ function getIdentifierFromURLImpl(url: URL): string {
             if (q) return 'wikipedia.org/wiki/' + q.replace(/\s/g, '_');
         }
         return null;
+    } else if (domainIs(host, 'cohost.org')) {
+        return 'cohost.org' + getPartialPath(url.pathname, 1);
     } else {
         if (host.startsWith('m.')) host = host.substr(2);
+        if (url.pathname.startsWith('/@') || url.pathname.startsWith('/web/@')) { 
+            let username = getPathPart(url.pathname, 0);
+            if (username == 'web') { 
+                username = getPathPart(url.pathname, 1);
+            }
+            username = username.substring(1);
+            var parts = username.split('@');
+            if (parts.length == 2) return parts[1] + '/@' + parts[0];
+            if (parts.length == 1 && username && !MASTODON_FALSE_POSITIVES.includes(host))
+                return host + '/@' + username;
+        }
+        if (url.pathname.startsWith('/users/')) { 
+            let username = getPathPart(url.pathname, 1);
+            if (username && !MASTODON_FALSE_POSITIVES.includes(host))
+                return host + '/@' + username;
+        }
         return host;
     }
 }
@@ -580,12 +676,37 @@ function getMatchingAncestor(node: HTMLElement, match: (node: HTMLElement) => bo
     }
     return node;
 }
+function getOutermostMatchingAncestor(node: HTMLElement, match: (node: HTMLElement) => boolean) {
+    let result : HTMLElement = null;
+    while (node) {
+        if (match(node)) result = node;
+        node = node.parentElement;
+    }
+    return result;
+}
+
+function getAbsoluteOffsetTop(node: HTMLElement) { 
+    let top = 0;
+    while (node) {
+        top += node.offsetTop;
+        node = node.offsetParent instanceof HTMLElement ? node.offsetParent : null;
+    }
+    return top;
+}
 
 function getMatchingAncestorByCss(node: HTMLElement, cssMatch: string) {
     return getMatchingAncestor(node, x => x.matches(cssMatch));
 }
 
-function getSnippet(node: HTMLElement) : HTMLElement {
+function getSnippet(node: HTMLElement): HTMLElement {
+    try {
+        return getSnippetImpl(node);
+    } catch (e) { 
+        console.warn("Could not obtain snippet: " + e);
+        return null;
+    }
+}
+function getSnippetImpl(node: HTMLElement) : HTMLElement {
     if (hostname == 'facebook.com') {
         const pathname = window.location.pathname;
         const isPhotoPage = pathname.startsWith('/photo') || pathname.includes('/photos/') || pathname.startsWith('/video') || pathname.includes('/videos/');
@@ -617,6 +738,22 @@ function getSnippet(node: HTMLElement) : HTMLElement {
     if (hostname == 'tumblr.com')
         return getMatchingAncestor(node, x => (x.dataset && !!(x.dataset.postId || x.dataset.id)) || x.classList.contains('post'));
 
+    if (hostname == 'threads.net') {         
+        if (location.pathname.includes('/post/')) {
+            return getOutermostMatchingAncestor(node, x => getAbsoluteOffsetTop(x) > 30);
+        } else { 
+            return getOutermostMatchingAncestor(node, x => x.dataset.pressableContainer == 'true');
+        }
+    }
+    if (hostname == 'bsky.app') { 
+        if (location.pathname.includes('/post/')) {
+            return getOutermostMatchingAncestor(node, x => x.dataset.testid?.startsWith('postThreadItem-by-'))?.parentElement?.parentElement;
+        }else{
+            return getOutermostMatchingAncestor(node, x => x.dataset.testid?.startsWith('feedItem-by-'));
+        }
+    }
+    if (isMastodon)
+        return (/\/\d+$/.test(location.pathname) ? getMatchingAncestorByCss(node, '.scrollable') : null ) ?? getMatchingAncestorByCss(node, '.status, article, .detailed-status__wrapper, .status__wrapper-reply');
     return null;
 }
 
@@ -644,6 +781,8 @@ function getBadIdentifierReason(identifier: string, url: string, target: HTMLEle
         url.includes('/permalink/') ||
         url.includes('/photos/'))) return 'Only pages, users and groups can be labeled, not specific posts or photos.';
     if (url.includes('wiki') && url.includes('#')) return 'Wiki paragraphs cannot be labeled, only whole articles.';
+    if (url.includes('tumblr.com/') && (url.includes('/tagged/') || url.includes('/search/')))
+        return 'Only blogs can be labeled, not tags.'
     return null;
 }
 
@@ -655,7 +794,7 @@ function displayConfirmation(identifier: string, label: LabelKind, badIdentifier
         previousConfirmationMessage = null;
     }
     if (!label) return;
-    if (isSocialNetwork && label != 'bad-identifier') return;
+    if (colorLinks && label != 'bad-identifier') return;
 
     const confirmation = document.createElement('div');
     const background =
@@ -677,9 +816,10 @@ function displayConfirmation(identifier: string, label: LabelKind, badIdentifier
  ${identifier || url}
 `;
     } else {
+        const suffix = (isMastodon && !colorLinks) ? 'on supported Mastodon instances.' : 'on search engines and social networks.';
         text = identifier + (
-            label == 't-friendly' ? ' will be displayed as trans-friendly on search engines and social networks.' :
-                label == 'transphobic' ? ' will be displayed as anti-trans on search engines and social networks.' :
+            label == 't-friendly' ? ' will be displayed as trans-friendly ' + suffix :
+                label == 'transphobic' ? ' will be displayed as anti-trans ' + suffix:
                     ' has been cleared.'
         );
     }
@@ -739,6 +879,5 @@ browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesSubmiss
         if (message.debug <= 1)
             setTimeout(() => snippet.classList.remove(debugClass), 1500)
     }
-    message.isSocialNetwork = isSocialNetwork;
     sendResponse(message);
 })
