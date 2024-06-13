@@ -1,10 +1,11 @@
 html {
     padding: 0;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 body {
     margin: 0;
     padding: 0;
+    font-size: 100%;
 }
 
 .assigned-label-unknown {
@@ -79,7 +80,6 @@ section {
 }
 
 .fb-post {
-    font-family: Arial;
     padding: 15px;
 }
 
@@ -107,11 +107,13 @@ section {
     margin-top: 10px;
 }
 
+.summary {
+    font-style: italic;
+}
+
 .summary,
 .reasoning {
     color: #444;
-    font-style: italic;
-    font-family: Arial;
     margin: 0 15px;
 }
 
@@ -144,3 +146,6 @@ section {
 label, button {
     cursor: pointer;
 }
+abbr {
+    cursor: help;
+} 

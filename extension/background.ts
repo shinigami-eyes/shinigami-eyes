@@ -3,7 +3,7 @@ var browser: Browser = browser || chrome;
 const PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
 const MIGRATION = ':MIGRATION'
 
-const CURRENT_VERSION = 100033;
+const CURRENT_VERSION = 100035;
 
 const badIdentifiersReasons: { [id: string]: BadIdentifierReason } = {};
 const badIdentifiers: { [id: string]: true } = {};
@@ -24,6 +24,7 @@ const badIdentifiersArray = [
     'archiveofourown.org=SN',
     'ask.fm=SN',
     'assets.tumblr.com',
+    'beacons.ai=SN',
     'bing.com',
     'bit.ly',
     'blogspot.com',
@@ -288,6 +289,7 @@ const badIdentifiersArray = [
     'tiktok.com=SN',
     'tmblr.co',
     'tumblr.com',
+    'communities.tumblr.com',
     'twitch.tv=SN',
     'x.com',
     'twitter.com',
@@ -494,7 +496,9 @@ async function handleMessage(message: ShinigamiEyesMessage, sender: MessageSende
     const response: LabelMap = {};
     await initializationPromise;
     await bloomFiltersLoadedPromise;
-    const transphobic = message.myself && bloomFilters.filter(x => x.name == 'transphobic')[0].test(message.myself) && installationId.includes('-');
+    const tfriendlyBloomFilter = bloomFilters.filter(x => x.name == 't-friendly')[0];
+    const transphobicBloomFilter = bloomFilters.filter(x => x.name == 'transphobic')[0];
+    const transphobic = message.myself && transphobicBloomFilter.test(message.myself) && installationId.includes('-');
     for (const id of message.ids) {
         if (overrides[id] !== undefined) {
             response[id] = overrides[id];
@@ -508,15 +512,20 @@ async function handleMessage(message: ShinigamiEyesMessage, sender: MessageSende
             }
             if (sum % 8 != 0) continue;
         }
-        for (const bloomFilter of bloomFilters) {
-            if (bloomFilter.test(id)) response[id] = bloomFilter.name;
-            if (id.startsWith('youtube.com/@')) { 
-                if (bloomFilter.test(id.replace('/@', '/c/'))) response[id] = bloomFilter.name;
-            }
-        }
+
+        const isTFriendly = testBloomFilter(tfriendlyBloomFilter, id);
+        const isTransphobic = testBloomFilter(transphobicBloomFilter, id);
+        if (isTransphobic != isTFriendly)
+            response[id] = isTransphobic ? 'transphobic' : 't-friendly';
     }
     response[':theme'] = <any>theme;
     return response;
+}
+
+function testBloomFilter(bloomFilter: CombinedBloomFilter, id: string) { 
+    if (bloomFilter.test(id)) return true;
+    if (id.startsWith('youtube.com/@') && bloomFilter.test(id.replace('/@', '/c/'))) return true;
+    return false;
 }
 
 browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesMessage | LabelMap>((message, sender, sendResponse) => {
@@ -784,7 +793,7 @@ function saveLabel(response: ShinigamiEyesSubmission) {
                 .map<ShinigamiEyesSubmission>(x => { return { identifier: x, label: overrides[x] } });
         }
         overrides[response.identifier] = response.mark;
-        if (response.secondaryIdentifier)
+        if (response.secondaryIdentifier && !response.secondaryIdentifier.startsWith('twitter.com/i/user/'))
             overrides[response.secondaryIdentifier] = response.mark;
         browser.storage.local.set({ overrides: overrides });
         response.version = CURRENT_VERSION;

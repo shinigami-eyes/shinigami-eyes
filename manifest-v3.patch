@@ -1,5 +1,5 @@
 diff --git a/extension/background.ts b/extension/background.ts
-index 3281b4b..a489b6c 100644
+index f247cd1..970e41d 100644
 --- a/extension/background.ts
 +++ b/extension/background.ts
 @@ -1,3 +1,5 @@
@@ -8,7 +8,7 @@ index 3281b4b..a489b6c 100644
  var browser: Browser = browser || chrome;
  
  const PENDING_SUBMISSIONS = ':PENDING_SUBMISSIONS'
-@@ -834,7 +836,7 @@ function openOptions() {
+@@ -843,7 +845,7 @@ function openOptions() {
  }
  
  function getURL(path: string) { 
@@ -36,8 +36,21 @@ index d2a990b..6b9d5ad 100644
    name: LabelKind;
  
    parts: BloomFilter[];
+diff --git a/extension/content.ts b/extension/content.ts
+index 8d10932..e7d76ea 100644
+--- a/extension/content.ts
++++ b/extension/content.ts
+@@ -929,7 +929,7 @@ browser.runtime.onMessage.addListener<ShinigamiEyesMessage, ShinigamiEyesSubmiss
+                         linkId: message.linkId,
+                         wantIdForScreenName: twitterUserName
+                     };
+-                    const response = await findTwitterNumericIdsFirefox(request);
++                    const response = await findTwitterNumericIdsChrome(request);
+                     const twitterMapping = response.mappings?.filter(x => twitterUserName == x.userName?.toLowerCase())[0];
+                     if (twitterMapping)
+                         message.secondaryIdentifier = 'twitter.com/i/user/' + twitterMapping.numericId;      
 diff --git a/extension/manifest.json b/extension/manifest.json
-index 70b0875..a699b95 100644
+index 81c6cad..9827ac1 100644
 --- a/extension/manifest.json
 +++ b/extension/manifest.json
 @@ -1,5 +1,5 @@
@@ -47,7 +60,14 @@ index 70b0875..a699b95 100644
      "name": "Shinigami Eyes",
      "author": "Shinigami Eyes",
      "version": "1.0.33",
-@@ -113,10 +113,8 @@
+@@ -118,16 +118,15 @@
+                 "https://x.com/*",
+                 "https://twitter.com/*"
+             ],
++            "world": "MAIN",
+             "js": [
+                 "content-web.js"
+             ]
          }
      ],
      "background": {
@@ -60,7 +80,7 @@ index 70b0875..a699b95 100644
      },
      "options_ui": {
          "page": "options.html",
-@@ -124,7 +122,9 @@
+@@ -135,7 +134,9 @@
      },
      "permissions": [
          "contextMenus",
