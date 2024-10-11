@@ -54,7 +54,7 @@ type MessageSender = {
 };
 declare type BrowserStorage = {
     get(names: string[], callback: (obj: any) => void): void
-    set(obj: { [name: string]: any }): void;
+    set(obj: { [name: string]: any }, callback?: () => void): void;
 }
 declare var browser: Browser;
 declare var chrome: Browser;

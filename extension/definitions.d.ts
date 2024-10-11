@@ -21,6 +21,7 @@ interface ShinigamiEyesSubmission {
     linkId?: number
     snippet?: string
     trimmed?: boolean
+    bloomVersion?: number
 }
 interface ShinigamiEyesCommand {
     acceptClicked?: boolean
